@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Contracts\" />
+    <Folder Include="Contracts\DTOs\" />
+    <Folder Include="Hubs\" />
+    <Folder Include="Infrastructure\Interfaces\" />
+    <Folder Include="Infrastructure\Services\" />
+    <Folder Include="Mappings\" />
+  </ItemGroup>
+
+</Project>
