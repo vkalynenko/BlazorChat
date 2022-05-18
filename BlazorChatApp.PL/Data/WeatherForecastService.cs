@@ -1,4 +1,4 @@
-namespace BlazorChatApp.Data
+namespace BlazorChatApp.PL.Data
 {
     public class WeatherForecastService
     {
