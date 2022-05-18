@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlazorChatApp.BLL.Mappings
+namespace BlazorChatApp.DAL.Domain.Entities
 {
-    public class Mappping
+    public enum ChatType
     {
-
+        Public,
+        Private
     }
 }
