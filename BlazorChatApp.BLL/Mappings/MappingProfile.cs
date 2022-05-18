@@ -8,7 +8,6 @@ namespace BlazorChatApp.BLL.Mappings
         //CreateMap<UserDto, User>();
         public MappingProfile()
         {
-            
-        }
+            }
     }
 }
