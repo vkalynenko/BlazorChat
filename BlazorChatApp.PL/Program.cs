@@ -1,6 +1,7 @@
 using AutoMapper;
 using BlazorChatApp.BLL.Mappings;
 using BlazorChatApp.DAL.Domain.EF;
+using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.PL.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,9 @@ builder.Services.AddDbContext<BlazorChatAppContext>(options =>
 
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = false)
 //    .AddEntityFrameworkStores<BlazorChatAppContext>();
-
+//builder.Services.AddIdentity<IdentityUser>(options => options.User.RequireUniqueEmail = true);
+builder.Services.AddDbContext<BlazorChatAppContext>(options =>
+    options.UseSqlServer(connectionString));
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

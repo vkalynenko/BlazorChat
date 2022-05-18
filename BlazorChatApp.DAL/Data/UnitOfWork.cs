@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BlazorChatApp.DAL.Data.Interfaces;
+using BlazorChatApp.DAL.Domain.EF;
 
 namespace BlazorChatApp.DAL.Data
 {
-    public class UnitOfWork 
+    public class UnitOfWork : IUnitOfWork
     {
+        private readonly BlazorChatAppContext _context;
 
+        public UnitOfWork(BlazorChatAppContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<int> SaveChanges()
+        {
+            return await _context.SaveChangesAsync();
+        } 
     }
 }

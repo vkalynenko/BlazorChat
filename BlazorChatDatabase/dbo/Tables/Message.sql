@@ -1,10 +1,11 @@
 ﻿CREATE TABLE [dbo].[Message] (
     [Id]         INT            NOT NULL,
-    [Text]       NVARCHAR (50)  NULL,
+    [MessageText]       NVARCHAR (50)  NULL,
     [SentTime]   DATETIME       NULL,
     [SenderName] NVARCHAR (50)  NULL,
-    [SenderId]   NVARCHAR (MAX) NULL,
-    [ChatId]     INT            NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    ChatID int FOREIGN KEY REFERENCES Chat(Id),
+    UserId nvarchar(450) foreign key references AspNetUsers(Id)
+   
 );
 
