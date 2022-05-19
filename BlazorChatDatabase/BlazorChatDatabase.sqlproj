@@ -71,6 +71,7 @@
     <Build Include="dbo\Tables\AspNetUserLogins.sql" />
     <Build Include="dbo\Tables\AspNetUserRoles.sql" />
     <Build Include="dbo\Tables\AspNetUserTokens.sql" />
+    <Build Include="dbo\Tables\ChatUser.sql" />
     <Build Include="dbo\Tables\Chat.sql" />
     <Build Include="dbo\Tables\Message.sql" />
   </ItemGroup>

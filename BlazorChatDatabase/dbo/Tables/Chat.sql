@@ -1,7 +1,6 @@
-﻿CREATE TABLE [dbo].[Chat] (
-    [Id]       INT           NOT NULL,
-    [ChatName] NVARCHAR (50) NULL,
-    [Type] NCHAR(10) NULL, 
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
-
+﻿CREATE TABLE [dbo].[Chat]
+(
+  [Id] INT NOT NULL PRIMARY KEY,  
+  ChatID int FOREIGN KEY REFERENCES Chat(Id),
+  UserId nvarchar(450) foreign key references AspNetUsers(Id), 
+)

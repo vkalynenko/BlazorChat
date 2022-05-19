@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlazorChatApp.DAL.Data.Interfaces
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork 
     {
         Task<int> SaveChanges();
 

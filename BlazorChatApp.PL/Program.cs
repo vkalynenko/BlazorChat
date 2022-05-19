@@ -1,9 +1,6 @@
 using AutoMapper;
 using BlazorChatApp.BLL.Mappings;
 using BlazorChatApp.DAL.Domain.EF;
-using BlazorChatApp.DAL.Domain.Entities;
-using BlazorChatApp.PL.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,15 +9,14 @@ var connectionString = builder.Configuration.GetConnectionString("ConnectionStri
 builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString)); ;
 
-//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = false)
-//    .AddEntityFrameworkStores<BlazorChatAppContext>();
-//builder.Services.AddIdentity<IdentityUser>(options => options.User.RequireUniqueEmail = true);
 builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString));
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+//builder.Services.AddTransient<WeatherForecastService>();
+//builder.Services.AddTransient<IAuthorizationService, AuthorizationService>();
 var mapperConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new MappingProfile());
@@ -46,7 +42,6 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.Run();
