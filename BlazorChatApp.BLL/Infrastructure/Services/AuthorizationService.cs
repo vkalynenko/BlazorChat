@@ -46,7 +46,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                     return "Ok";
                 }
 
-                throw new Exception("Login or password isn't correct");
+                throw new Exception( "Login or password isn't correct") ;
             }
 
             throw new NullReferenceException("This user doesn't exist");

@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "BlazorChatDatabase", "BlazorChatDatabase\BlazorChatDatabase.sqlproj", "{975EB068-FE74-4CA4-BA37-13A583AB2ECD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorChatApp.PL", "BlazorChatApp.PL\BlazorChatApp.PL.csproj", "{AE0FF41D-44CC-421A-A111-5B35D3EFEB73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorChatApp.PL", "BlazorChatApp.PL\BlazorChatApp.PL.csproj", "{AE0FF41D-44CC-421A-A111-5B35D3EFEB73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

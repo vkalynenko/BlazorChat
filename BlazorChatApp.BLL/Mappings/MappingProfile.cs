@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
+using BlazorChatApp.BLL.Contracts.DTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Mappings
 {
     public class MappingProfile  : Profile
     {
-        //CreateMap<User, UserDto>();
-        //CreateMap<UserDto, User>();
         public MappingProfile()
         {
-
+            CreateMap<IdentityUser, LoginDto>().ReverseMap();
+            CreateMap<IdentityUser, RegisterDto>().ReverseMap();    
         }
     }
 }

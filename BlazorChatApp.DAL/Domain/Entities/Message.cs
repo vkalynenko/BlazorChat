@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorChatApp.DAL.Domain.Entities
 {
-    public class Message{
+    public class Message
+    {
 
         [Key]
         public int Id { get; set; }
@@ -17,5 +19,6 @@ namespace BlazorChatApp.DAL.Domain.Entities
             SentTime = DateTime.Now;
         }
 
+        public IEnumerable<Message> Messages;
     }
 }
