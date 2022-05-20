@@ -4,6 +4,6 @@ namespace BlazorChatApp.DAL.Domain.Entities
 {
     public class User : IdentityUser
     {
-        public virtual ICollection<Message> Messages { get; set; } = new HashSet<Message>();
+        private ICollection<Message> Messages { get; set; }
     }
 }
