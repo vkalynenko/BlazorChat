@@ -9,6 +9,6 @@ namespace BlazorChatApp.DAL.Data.Interfaces
         Task JoinRoom(int chatId, string userId);
         IEnumerable<Chat> GetChats(string userId);
         Task<int> CreatePrivateChat(string rootId, string targetId);
-        Task<Chat> GetPrivateChat(string user1Id, string user2Id);
+        Chat GetPrivateChat(string user1Id, string user2Id);
     }
 }

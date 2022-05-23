@@ -20,8 +20,13 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         }
 
-        public async Task<string> Register(RegisterDto model)
+        public async Task<string> Register(string userName, string password)
         {
+            var model = new RegisterDto
+            {
+                UserName = userName,
+                Password = password,
+            };
             var user = _userManager.Users.FirstOrDefault(c => c.UserName == model.UserName);
             if (user != null)
             {
@@ -34,16 +39,22 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         }
 
-        public async Task<string> Login(LoginDto model)
+        public async Task<string> Login(string userName, string password)
         {
+            var model = new LoginDto
+            {
+                UserName = userName,
+                Password = password,
+            };
             var user = _userManager.Users.FirstOrDefault(c => c.UserName == model.UserName);
             if (user != null)
             {
                 var result = await _signInManager
-                    .PasswordSignInAsync(model.UserName, model.Password, true, false);
+                .PasswordSignInAsync(model.UserName, model.Password, true, false);
+                
                 if (result.Succeeded)
                 {
-                    return "Ok";
+                    await _signInManager.SignInAsync(user, false);
                 }
 
                 throw new Exception( "Login or password isn't correct") ;

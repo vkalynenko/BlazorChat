@@ -1,0 +1,59 @@
+﻿@page "/register"
+@using Microsoft.AspNetCore.Components
+@using BlazorChatApp.BLL.Contracts.DTOs
+@inject BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService Service
+@inject AuthenticationStateProvider stateProvider
+@inject NavigationManager NavManager
+@inject RegisterDto RegisterDto
+
+<h1>Registration</h1>
+<EditForm Model="RegisterDto" OnSubmit="RegisterAsync">
+    <div class="container">
+        <div class="message">
+            <label for="login">Enter your username</label>
+            <InputText id="login" class="message" @bind-Value="RegisterDto.UserName"/>
+        </div><br/>
+        <div class="message">
+            <label for="password">Enter your password</label>
+            <InputText  id="password" class="message" @bind-Value="RegisterDto.Password" type="password"/>
+        </div><br/>
+        <div class="message">
+            <label for="confirmedPassword">Enter your password again</label>
+            <InputText  id="confirmedPassword" class="message" @bind-Value="ConfirmedPassword" type="password"/>
+        </div><br/>
+        <button class="btn btn-primary" type="submit">Register</button>
+    </div> 
+</EditForm>
+
+
+@code
+{
+    public string? ConfirmedPassword { get; set; }
+
+
+    private async Task RegisterAsync()
+    { 
+
+        if (ConfirmedPassword != RegisterDto.Password)
+        {
+            NavManager.NavigateTo("/register");
+
+        }
+        try
+        {
+            var result = await Service.Register(RegisterDto.UserName,RegisterDto.Password);
+            if (result == "Ok")
+            {
+                 NavManager.NavigateTo("/login");
+            }
+           
+        }
+        catch
+        {
+            NavManager.NavigateTo("/register");
+        }
+     
+    }
+
+    
+}

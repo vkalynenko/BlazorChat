@@ -1,20 +1,44 @@
-﻿@inherits LayoutComponentBase
-
+﻿@inject BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService Service
+@inject NavigationManager NavManager
+@inherits LayoutComponentBase
 <PageTitle>BlazorChatApp.PL</PageTitle>
 
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
         <div class="top-row px-4">
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-            <a>Register</a>
-        </div>
+            <AuthorizeView>
+                <Authorized>
+                    <h1 >Hello, @context.User.Identity?.Name!</h1>
+                    <a class="nav-link" onclick="Logout" >
+                        <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
+                    </a>
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink class="nav-link" href="login" >
+                        <span class="oi oi-account-login" aria-hidden="true"></span> Log in
+                    </NavLink>
+                    <NavLink class="nav-link" href="register" >
+                        <span class="oi oi-account-login" href="/register" aria-hidden="true"></span> Register
+                    </NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
 
+            
+        </div>
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+@code
+{
+    public async Task Logout()
+    {
+        await Service.LogOut();
+        NavManager.NavigateTo("/login");
+    }
+}

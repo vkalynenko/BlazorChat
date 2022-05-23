@@ -78,14 +78,11 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 .Include(x => x.Users)
                 .Where(x => x.Users.All(y => y.UserId != userId) && x.Type != ChatType.Private);
         }
-        public async Task<Chat> GetPrivateChat(string user1Id, string user2Id)
+        public Chat GetPrivateChat(string user1Id, string user2Id)
         {
-            var chats = await _context.Chats.Include(x => x.Users)
+            return  _context.Chats.Include(x => x.Users)
                 .Where(chat => chat.Type.Equals(ChatType.Private))
-                .ToListAsync();
-
-            return await Task.Run(() => chats
-                .FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id)));
+                .FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id));
         }
 
         public async Task JoinRoom(int chatId, string userId)

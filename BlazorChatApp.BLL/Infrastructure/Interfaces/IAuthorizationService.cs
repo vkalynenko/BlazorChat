@@ -5,8 +5,8 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
 {
     public interface IAuthorizationService
     {
-        Task<string> Register(RegisterDto model);
-        Task<string> Login(LoginDto model);
+        Task<string> Register(string userName, string password);
+        Task<string> Login(string userName, string password);
         Task LogOut();
     }
 }
