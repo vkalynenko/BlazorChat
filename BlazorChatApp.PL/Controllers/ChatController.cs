@@ -53,11 +53,12 @@ namespace BlazorChatApp.PL.Controllers
                 {
                     ChatId = chatId,
                     MessageText = message,
-                    SenderName = User.Identity.Name,
+                    SenderName = User.Identity?.Name,
                     SentTime = DateTime.Now,
                 };
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                await _messageRepository.CreateMessage(chatId, message, User.Identity.Name, userId );
+                if (User.Identity?.Name != null)
+                    await _messageRepository.CreateMessage(chatId, message, User.Identity?.Name, userId);
 
                 await _chat.Clients.Group(roomName)
                     .SendAsync("ReceiveMessage", new

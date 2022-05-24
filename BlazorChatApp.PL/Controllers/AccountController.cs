@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using BlazorChatApp.BLL.Contracts.DTOs;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
+using IAuthorizationService = BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService;
 
 namespace BlazorChatApp.PL.Controllers
 {
@@ -15,20 +14,17 @@ namespace BlazorChatApp.PL.Controllers
     public class AccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _configuration;
+        private readonly IAuthorizationService _service;
 
-        public AccountController(UserManager<IdentityUser> userManager, 
-            RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AccountController(UserManager<IdentityUser> userManager, IAuthorizationService service)
         {
             _userManager = userManager;
-            _roleManager = roleManager;
-            _configuration = configuration;
+            _service = service;
         }
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(string userName, string password)
+        public async Task<IActionResult> LoginAsync(string userName, string password)
         {
             var model = new LoginDto
             {
@@ -51,7 +47,7 @@ namespace BlazorChatApp.PL.Controllers
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-                var token = GenerateJwtToken(authClaims);
+                var token = _service.GenerateJwtToken(authClaims);
 
                 return Ok(new
                 {
@@ -65,8 +61,15 @@ namespace BlazorChatApp.PL.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto model)
+        public async Task<IActionResult> RegisterAsync(string userName, string password)
         {
+            var model = new RegisterDto
+            {
+                UserName = userName,
+                Password = password,
+
+            };
+
             var userExists = await _userManager.FindByNameAsync(model.UserName);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, 
@@ -86,23 +89,14 @@ namespace BlazorChatApp.PL.Controllers
             return Ok(new ResponseDto { Status = "Success", Message = "User created successfully!" });
         }
 
-        private JwtSecurityToken GenerateJwtToken(List<Claim> authClaims)
+
+        [HttpGet]
+        [Route("/logout")]
+        public async Task<IActionResult> LogoutAsync()
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding
-                .UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddDays(1),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey,
-                    SecurityAlgorithms.HmacSha256)
-            );
-
-            return token;
+            await _service.LogOutAsync();
+            return Ok();
         }
-
         
     }
 }

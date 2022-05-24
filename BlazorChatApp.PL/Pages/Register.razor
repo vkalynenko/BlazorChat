@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components
 @using BlazorChatApp.BLL.Contracts.DTOs
 @using BlazorChatApp.PL.Controllers
+@using Microsoft.AspNetCore.Mvc
 @inject BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService Service
 @inject NavigationManager NavManager
 @inject RegisterDto RegisterDto
@@ -19,8 +20,8 @@
             <InputText  id="password" class="message" @bind-Value="RegisterDto.Password" type="password"/>
         </div><br/>
         <div class="message">
-            <label for="confirmedPassword">Enter your password again</label>
-            <InputText  id="confirmedPassword" class="message" @bind-Value="ConfirmedPassword" type="password"/>
+            <label for="confirmPassword">Enter your password again</label>
+            <InputText  id="confirmePassword" class="message" @bind-Value="RegisterDto.ConfirmPassword" type="password"/>
         </div><br/>
         <button class="btn btn-primary" type="submit">Register</button>
     </div> 
@@ -42,12 +43,14 @@
         }
         try
         {
-            var result = await Service.Register(RegisterDto.UserName,RegisterDto.Password);
-            if (result == "Ok")
+            if (RegisterDto.UserName != null && RegisterDto.Password != null)
             {
-                 NavManager.NavigateTo("/login");
+                var response = await Controller.RegisterAsync(RegisterDto.UserName,RegisterDto.Password);
+                if (response.GetType() == typeof(OkObjectResult))
+                {
+                    NavManager.NavigateTo("/login");
+                }
             }
-           
         }
         catch
         {

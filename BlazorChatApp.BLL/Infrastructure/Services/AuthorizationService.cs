@@ -1,73 +1,46 @@
-﻿using BlazorChatApp.BLL.Contracts.DTOs;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
-    
+
     public class AuthorizationService : IAuthorizationService
     {
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-
+        private readonly IConfiguration _configuration;
 
         public AuthorizationService(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager, IConfiguration configuration)
         {
-            _userManager = userManager;
             _signInManager = signInManager;
-
+            _configuration = configuration;
         }
 
-        public async Task<string> Register(string userName, string password)
-        {
-            var model = new RegisterDto
-            {
-                UserName = userName,
-                Password = password,
-            };
-            var user = _userManager.Users.FirstOrDefault(c => c.UserName == model.UserName);
-            if (user != null)
-            {
-                throw new Exception("User is already exists");
-            }
-
-            var appUser = new IdentityUser {UserName = model.UserName};
-            var result = await _userManager.CreateAsync(appUser, model.Password);
-            return result.Succeeded ? "Ok" : "User wasn't created";
-
-        }
-
-        public async Task<string> Login(string userName, string password)
-        {
-            var model = new LoginDto
-            {
-                UserName = userName,
-                Password = password,
-            };
-            var user = _userManager.Users.FirstOrDefault(c => c.UserName == model.UserName);
-            if (user != null)
-            {
-                var result = await _signInManager
-                .PasswordSignInAsync(model.UserName, model.Password, true, false);
-                
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, false);
-                }
-
-                throw new Exception( "Login or password isn't correct") ;
-            }
-
-            throw new NullReferenceException("This user doesn't exist");
-
-
-        }
-
-        public async Task LogOut()
+        public async Task LogOutAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+        public JwtSecurityToken GenerateJwtToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding
+                .UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddDays(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey,
+                    SecurityAlgorithms.HmacSha256)
+            );
+
+            return token;
         }
 
     }

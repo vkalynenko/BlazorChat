@@ -1,6 +1,8 @@
 ﻿@inject BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService Service
 @inject NavigationManager NavManager
+@using BlazorChatApp.PL.Controllers
 @inherits LayoutComponentBase
+@inject AccountController Controller
 <PageTitle>BlazorChatApp.PL</PageTitle>
 
 <div class="page">
@@ -13,7 +15,7 @@
             <AuthorizeView>
                 <Authorized>
                     <h1 >Hello, @context.User.Identity?.Name!</h1>
-                    <a class="nav-link" onclick="Logout" >
+                    <a class="nav-link" onclick="LogoutAsync" >
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
                     </a>
                 </Authorized>
@@ -36,9 +38,9 @@
 </div>
 @code
 {
-    public async Task Logout()
+    public async Task LogoutAsync()
     {
-        await Service.LogOut();
+        await Controller.LogoutAsync();
         NavManager.NavigateTo("/login");
     }
 }

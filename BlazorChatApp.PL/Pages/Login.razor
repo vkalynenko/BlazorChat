@@ -33,7 +33,7 @@
         {
             if (LoginDto.UserName != null && LoginDto.Password!=null)
             {
-                var response = await Controller.Login(LoginDto.UserName, LoginDto.Password);
+                var response = await Controller.LoginAsync(LoginDto.UserName, LoginDto.Password);
                 if(response.GetType() == typeof(OkObjectResult))
                 {
                     NavManager.NavigateTo("/chats");
