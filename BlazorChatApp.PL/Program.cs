@@ -20,10 +20,6 @@ var connectionString = builder.Configuration
                            ("Connection string 'ConnectionString' not found.");
 builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString)); ;
-builder.Services
-    .AddIdentity<IdentityUser, IdentityRole>(options => options
-        .SignIn.RequireConfirmedEmail = false)
-    .AddEntityFrameworkStores<BlazorChatAppContext>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddSignalRCore();
@@ -36,25 +32,33 @@ builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
-var tokenConfig = builder.Configuration["Jwt:Issuer"];
-var jwtKey = builder.Configuration["Jwt:Key"];
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
-    .AddJwtBearer(option =>
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<BlazorChatAppContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
     {
-        option.TokenValidationParameters = new TokenValidationParameters
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+
+    .AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = tokenConfig,
-            ValidAudience = tokenConfig,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding
-            .UTF8.GetBytes(jwtKey))
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
-    }
-    );
+    });
+
+
 var mapperConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new MappingProfile());
