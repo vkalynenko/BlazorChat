@@ -8,6 +8,8 @@
 @inject NavigationManager NavManager
 @inject LoginDto LoginDto
 @inject AccountController Controller
+@inject BLL.Infrastructure.Interfaces.IAuthorizationService Authorization
+
 <h1>Enter to chat</h1>
 <EditForm Model="LoginDto" OnSubmit="LoginAsync">
     <div class="container">
@@ -34,6 +36,7 @@
             if (LoginDto.UserName != null && LoginDto.Password!=null)
             {
                 var response = await Controller.LoginAsync(LoginDto.UserName, LoginDto.Password);
+               
                 if(response.GetType() == typeof(OkObjectResult))
                 {
                     NavManager.NavigateTo("/chats");
@@ -42,9 +45,7 @@
                 {
                     NavManager.NavigateTo("/login");
                 }
-               
             }
-            
         }
         catch
         {
@@ -52,4 +53,7 @@
         }
         
     }
+
+
+
 }

@@ -2,9 +2,9 @@
 @inject NavigationManager NavManager
 @using BlazorChatApp.PL.Controllers
 @inherits LayoutComponentBase
+@inject BLL.Infrastructure.Interfaces.IAuthorizationService Authorization
 @inject AccountController Controller
 <PageTitle>BlazorChatApp.PL</PageTitle>
-
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -15,21 +15,21 @@
             <AuthorizeView>
                 <Authorized>
                     <h1 >Hello, @context.User.Identity?.Name!</h1>
-                    <a class="nav-link" onclick="LogoutAsync" >
+                    <a class="nav-link" onclick="LogoutAsync">
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
                     </a>
                 </Authorized>
                 <NotAuthorized>
-                    <NavLink class="nav-link" href="login" >
+                    <NavLink class="nav-link" href="login">
                         <span class="oi oi-account-login" aria-hidden="true"></span> Log in
                     </NavLink>
-                    <NavLink class="nav-link" href="register" >
+                    <NavLink class="nav-link" href="register">
                         <span class="oi oi-account-login" href="/register" aria-hidden="true"></span> Register
                     </NavLink>
                 </NotAuthorized>
             </AuthorizeView>
 
-            
+
         </div>
         <article class="content px-4">
             @Body
@@ -38,6 +38,18 @@
 </div>
 @code
 {
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    try
+    //    {
+    //        await Authorization.SetAuthorizationHeader();
+    //    }
+    //    catch
+    //    {
+    //        NavManager.NavigateTo("/login");
+    //    }
+       
+    }
     public async Task LogoutAsync()
     {
         await Controller.LogoutAsync();

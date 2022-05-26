@@ -28,15 +28,13 @@
 </EditForm>
 
 
-@code
-{
-    public string? ConfirmedPassword { get; set; }
+@code{
 
 
-    private async Task RegisterAsync()
+private async Task RegisterAsync()
     { 
 
-        if (ConfirmedPassword != RegisterDto.Password)
+        if (RegisterDto.ConfirmPassword != RegisterDto.Password)
         {
             NavManager.NavigateTo("/register");
 

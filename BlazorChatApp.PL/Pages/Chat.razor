@@ -1,3 +1,28 @@
 ﻿@page "/chats"
-@attribute [Authorize]
+@*@attribute [Authorize]*@
+@using Blazored.LocalStorage
+@using BlazorChatApp.PL.Controllers
+@using BlazorChatApp.BLL.Contracts.DTOs
+@inject ILocalStorageService StorageService
+@inject MessageController Controller
+@inject BLL.Infrastructure.Interfaces.IAuthorizationService Authorization
+@inject LoginDto LoginDto
 <h1>Hello,there will be your chats </h1>
+
+
+<div Model="LoginDto" OnSubmit="OnInitializedAsync" >
+    <div class="container">
+       <p>@result</p>
+    </div> 
+</div>
+@*<p>@result</p>*@
+@code
+{
+    public string result { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await Authorization.SetAuthorizationHeader();
+        result = Controller.Test();
+
+    }
+}

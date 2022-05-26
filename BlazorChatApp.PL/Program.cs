@@ -12,10 +12,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration
-    .GetConnectionString("ConnectionString") ?? 
+    .GetConnectionString("ConnectionString") ??
                        throw new InvalidOperationException
                            ("Connection string 'ConnectionString' not found.");
 builder.Services.AddDbContext<BlazorChatAppContext>(options =>
@@ -26,23 +27,25 @@ builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<AccountController>();
+builder.Services.AddTransient<MessageController>();
 builder.Services.AddTransient<IAuthorizationService, AuthorizationService>();
 builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
-
+builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<BlazorChatAppContext>()
     .AddDefaultTokenProviders();
-
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
 
     .AddJwtBearer(options =>
     {

@@ -8,8 +8,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
     public interface IAuthorizationService
     {
         //Task<string> RegisterAsync(RegisterDto model);
-       // Task<string> LoginAsync(LoginDto model);
+        // Task<string> LoginAsync(LoginDto model);
         Task LogOutAsync();
         JwtSecurityToken GenerateJwtToken(List<Claim> authClaims);
+       Task SetAuthorizationHeader();
     }
 }
