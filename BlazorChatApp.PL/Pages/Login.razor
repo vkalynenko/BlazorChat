@@ -1,14 +1,10 @@
 ﻿@page "/login"
 @using Microsoft.AspNetCore.Components
 @using BlazorChatApp.BLL.Contracts.DTOs
-@using BlazorChatApp.PL.Controllers
-@using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.Mvc
-@inject SignInManager<IdentityUser> Manager
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
 @inject NavigationManager NavManager
 @inject LoginDto LoginDto
-@inject AccountController Controller
-@inject BLL.Infrastructure.Interfaces.IAuthorizationService Authorization
+
 
 <h1>Enter to chat</h1>
 <EditForm Model="LoginDto" OnSubmit="LoginAsync">
@@ -29,29 +25,22 @@
 
 @code
 {
-    private async Task LoginAsync()
+    
+    [Inject] private IAuthService _service { get; set; }
+
+    private async void LoginAsync()
     {
         try
         {
-            if (LoginDto.UserName != null && LoginDto.Password!=null)
-            {
-                var response = await Controller.LoginAsync(LoginDto.UserName, LoginDto.Password);
-               
-                if(response.GetType() == typeof(OkObjectResult))
-                {
-                    NavManager.NavigateTo("/chats");
-                }
-                else
-                {
-                    NavManager.NavigateTo("/login");
-                }
-            }
+            await _service.LoginAsync(LoginDto.UserName, LoginDto.Password);
+
+            NavManager.NavigateTo("/chats");
         }
-        catch
+        catch 
         {
-            NavManager.NavigateTo("/login");
+          NavManager.NavigateTo("/login");
         }
-        
+       
     }
 
 

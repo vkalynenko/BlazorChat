@@ -54,8 +54,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task SetAuthorizationHeader()
         {
             var token = await _localStorage.GetItemAsync<string>("token");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
+           
+            if (token != null)
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
     }

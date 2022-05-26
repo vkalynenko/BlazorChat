@@ -11,7 +11,7 @@ namespace BlazorChatApp.PL.Controllers
 {
     [Authorize]
     [Route("api/account")]
-    [ApiController]
+   // [ApiController]
     public class AccountController : BaseController
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -52,6 +52,7 @@ namespace BlazorChatApp.PL.Controllers
                 }
 
                 var token = _service.GenerateJwtToken(authClaims);
+
                 await _localStorage.SetItemAsync("token", token);
                 return Ok(new
                 {

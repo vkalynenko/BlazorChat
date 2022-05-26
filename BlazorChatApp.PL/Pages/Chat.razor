@@ -9,20 +9,20 @@
 @inject LoginDto LoginDto
 <h1>Hello,there will be your chats </h1>
 
-
-<div Model="LoginDto" OnSubmit="OnInitializedAsync" >
+<EditForm Model="LoginDto" OnSubmit="Test">
     <div class="container">
-       <p>@result</p>
+        <br/>
+        <button class="btn btn-primary" type="submit">Ok</button>
     </div> 
-</div>
-@*<p>@result</p>*@
+</EditForm>
+
 @code
 {
-    public string result { get; set; }
-    protected override async Task OnInitializedAsync()
+
+    protected async Task Test()
     {
         await Authorization.SetAuthorizationHeader();
-        result = Controller.Test();
+        var result = Controller.Test();
 
     }
 }
