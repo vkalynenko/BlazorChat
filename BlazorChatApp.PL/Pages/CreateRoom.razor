@@ -1,0 +1,45 @@
+﻿@page "/createRoom"
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@inject IChatService ChatService
+@inject NavigationManager NavManager
+<h1>Creating new chat</h1>
+
+<div class="container">
+    <p>@notification</p>
+    <input @bind:event="oninput" @bind="chatName"/>
+</div>
+<br />
+<button class="btn btn-primary" type="submit" @onclick="CreateChat" >
+    Create new room
+</button>
+@code
+{
+    private string chatName;
+    private string notification = "";
+
+
+    private async void CreateChat()
+    {
+        try
+        {
+            var roomIsCreated = await ChatService.CreateRoomAsync(chatName);
+
+            if (roomIsCreated)
+            {   
+                notification = $"Room {chatName} was successfully created!";
+                //NavManager.NavigateTo("/");
+                
+            }
+            else
+            {
+                notification = $"Failed to create room {chatName}!";
+              }
+        }
+        catch
+        {
+            notification = "Something went wrong!";
+            //NavManager.NavigateTo("/c");
+        }
+    }
+
+}

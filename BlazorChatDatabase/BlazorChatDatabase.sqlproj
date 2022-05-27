@@ -77,4 +77,9 @@
     <Build Include="dbo\Tables\ChatUsers.sql" />
     <Build Include="dbo\Tables\Messages.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\BlazorChatApp.PL\Pages\Form.razor">
+      <Link>Form.razor</Link>
+    </None>
+  </ItemGroup>
 </Project>
