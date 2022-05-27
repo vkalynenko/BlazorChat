@@ -14,9 +14,23 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             _userManager = userManager;
         }
 
-        public Task<string> Register(RegisterDto model)
+        public async Task<string> Register(RegisterDto model)
         {
-            throw new NotImplementedException();
+            var check = _userManager.Users.FirstOrDefault(x => x.UserName == model.UserName );
+            if (check != null)
+            {
+                throw new Exception("Username is already in use, please choose other!");
+            }
+
+            var newUser = new IdentityUser { UserName = model.UserName };
+            var result = await _userManager.CreateAsync(newUser, model.Password);
+
+            if (result.Succeeded)
+            {
+                return "User was created!";
+            }
+
+            return "Failed to create user!";
         }
 
         public async Task<IdentityUser> Login(LoginDto model)

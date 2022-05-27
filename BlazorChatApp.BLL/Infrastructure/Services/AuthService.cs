@@ -29,15 +29,10 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             var client = _clientFactory.CreateClient("Authorization");
 
             string path = $"{client.BaseAddress}/auth/login";
-            var httpResponse = await _httpClient.PostAsync($"{path}", 
+            var httpResponse = await client.PostAsync($"{path}", 
                 new StringContent(JsonConvert.SerializeObject(model),
                     Encoding.UTF8, "application/json"));
-            
-            //var httpResponse = await client
-            //    .PostAsync(path,
-            //        new StringContent(JsonConvert.SerializeObject(model),
-            //            Encoding.UTF8, "application/json"));
-
+        
 
             if (httpResponse.IsSuccessStatusCode)
             {
@@ -49,14 +44,44 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         }
 
-        public Task<string> RegisterAsync(string userName, string password, string confirmPassword)
+        public async Task<string> RegisterAsync(string userName, string password, string confirmPassword)
         {
-            return Task.FromResult("Ok");
-        }
+            if (password != confirmPassword)
+            {
+                return "Registration failed!";
+            }
+            RegisterDto model = new RegisterDto()
+            {
+                UserName = userName,
+                Password = password,
+                ConfirmPassword = confirmPassword
+            };
+            
 
-        public async Task LogOutAsync()
+            var client = _clientFactory.CreateClient("Authorization");
+            string path = $"{client.BaseAddress}/auth/register";
+
+            var response = await _httpClient.PostAsync(path,
+                new StringContent(JsonConvert.SerializeObject(model), 
+                    Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+               return "Registration was successful!";
+            }
+
+            return "Registration failed!";
+        }
+        public async Task<string> LogOutAsync()
         {
-            await _localStorage.ClearAsync();
+            if (await _localStorage.ContainKeyAsync("token"))
+            {
+                await _localStorage.ClearAsync();
+                return "Ok";
+            }
+
+            return "Failed!";
+
         }
 
         private async Task SetTokenToLocalStorage(HttpResponseMessage httpResponse)

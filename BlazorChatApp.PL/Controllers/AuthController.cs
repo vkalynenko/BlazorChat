@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using BlazorChatApp.BLL.Contracts.DTOs;
-using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +18,9 @@ namespace BlazorChatApp.PL.Controllers
         private readonly ITokenService _tokenService;
         private readonly ILocalStorageService _localStorage;
         private readonly IUserService _userService;
-        public AuthController(UserManager<IdentityUser> userManager, ILocalStorageService localStorage, ITokenService tokenService, IUserService userService)
+
+        public AuthController(UserManager<IdentityUser> userManager, ILocalStorageService localStorage,
+            ITokenService tokenService, IUserService userService)
         {
             _userManager = userManager;
             _localStorage = localStorage;
@@ -28,11 +29,10 @@ namespace BlazorChatApp.PL.Controllers
         }
 
         [AllowAnonymous]
-        //[Route("login")]
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync(LoginDto model /*string userName, string password*/)
+        public async Task<IActionResult> LoginAsync(LoginDto model)
         {
-            // LoginDto model = new LoginDto { UserName = userName, Password = password };
+
             try
             {
                 var check = _userManager.Users.FirstOrDefault(x => x.UserName == model.UserName);
@@ -52,9 +52,7 @@ namespace BlazorChatApp.PL.Controllers
                     {
                         authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                     }
-                    //var token = _tokenService.GenerateJwtToken(authClaims);
 
-                    //await _localStorage.SetItemAsync("token", token);
                     return Ok(new
                         {
                             GeneratedToken = _tokenService.GenerateJwtToken(authClaims)
@@ -62,12 +60,28 @@ namespace BlazorChatApp.PL.Controllers
                     );
                 }
             }
-            catch 
+            catch
             {
                 return NotFound("User wasn't found!");
             }
 
             return NotFound("Something went wrong!");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterAsync(RegisterDto model)
+        {
+            try
+            {
+                await _userService.Register(model);
+                return Ok(model);
+            }
+            catch
+            {
+                return StatusCode(400);
+            }
+
         }
     }
 }

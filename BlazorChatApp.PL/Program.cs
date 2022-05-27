@@ -25,7 +25,6 @@ builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient<IAuthorizationService, AuthorizationService>();
 builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
@@ -33,7 +32,6 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
 builder.Services.AddSingleton<LoginDto>();
@@ -69,7 +67,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddHttpClient("Authorization", async client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
-        // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+       // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
     //await Activator.CreateInstance<ILocalStorageService>().GetItemAsStringAsync("token"));
 });
 

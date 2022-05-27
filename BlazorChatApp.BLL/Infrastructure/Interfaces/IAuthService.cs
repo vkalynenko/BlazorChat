@@ -6,6 +6,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
     {
         Task<string> LoginAsync(string userName, string password);
         Task<string> RegisterAsync(string userName, string password, string confirmPassword);
-        Task LogOutAsync();
+        Task<string> LogOutAsync();
     }
 }

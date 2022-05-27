@@ -1,9 +1,7 @@
-﻿@inject BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService Service
-@inject NavigationManager NavManager
-@using BlazorChatApp.PL.Controllers
+﻿@inject NavigationManager NavManager
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
 @inherits LayoutComponentBase
-@inject BLL.Infrastructure.Interfaces.IAuthorizationService Authorization
-@*@inject AccountController Controller*@
+@inject IAuthService AuthService
 <PageTitle>BlazorChatApp.PL</PageTitle>
 <div class="page">
     <div class="sidebar">
@@ -11,7 +9,7 @@
     </div>
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+          <p>@notification</p>
             <AuthorizeView>
                 <Authorized>
                     <h1 >Hello, @context.User.Identity?.Name!</h1>
@@ -38,21 +36,19 @@
 </div>
 @code
 {
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    try
-    //    {
-    //        await Authorization.SetAuthorizationHeader();
-    //    }
-    //    catch
-    //    {
-    //        NavManager.NavigateTo("/login");
-    //    }
-       
-    }
+    private string notification = ""; 
     public async Task LogoutAsync()
     {
-        await Controller.LogoutAsync();
-        NavManager.NavigateTo("/login");
+        try
+        {
+            await AuthService.LogOutAsync();
+            NavManager.NavigateTo("/login");
+        }
+        catch
+        {
+            notification = "Logout was failed!";
+        }
+       
     }
-}
+
+  }
