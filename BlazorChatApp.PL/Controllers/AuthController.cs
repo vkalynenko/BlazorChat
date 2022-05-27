@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Mime;
 using System.Security.Claims;
 using BlazorChatApp.BLL.Contracts.DTOs;
+using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authorization;
@@ -11,10 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlazorChatApp.PL.Controllers
 {
     [Authorize]
-    [Route("api/auth")]
+    [Route("/api/auth")]
     [ApiController]
-    [Produces(MediaTypeNames.Application.Json)]
-    public class AuthController : ControllerBase
+    public class AuthController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ITokenService _tokenService;
@@ -29,15 +28,15 @@ namespace BlazorChatApp.PL.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("/login")]
-        public async Task<IActionResult> LoginAsync(LoginDto model)
+        //[Route("login")]
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginAsync(LoginDto model /*string userName, string password*/)
         {
-            //LoginDto model = new LoginDto {UserName = userName, Password = password};
+            // LoginDto model = new LoginDto { UserName = userName, Password = password };
             try
             {
                 var check = _userManager.Users.FirstOrDefault(x => x.UserName == model.UserName);
-               
+
                 if (check != null)
                 {
                     var user = await _userService.Login(model);
@@ -53,18 +52,22 @@ namespace BlazorChatApp.PL.Controllers
                     {
                         authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                     }
+                    //var token = _tokenService.GenerateJwtToken(authClaims);
 
-                   
-                    return Ok(new { Token = _tokenService.GenerateJwtToken(authClaims), RequestHeader = Request.Headers["token"] });
+                    //await _localStorage.SetItemAsync("token", token);
+                    return Ok(new
+                        {
+                            GeneratedToken = _tokenService.GenerateJwtToken(authClaims)
+                        }
+                    );
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 return NotFound("User wasn't found!");
             }
-            
+
             return NotFound("Something went wrong!");
         }
-
     }
 }

@@ -8,8 +8,5 @@ namespace BlazorChatApp.BLL.Contracts.DTOs
         public string? UserName { get; set; }
         [Required(ErrorMessage = "Enter the password")]
         public string? Password { get; set; }
-
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
     }
 }

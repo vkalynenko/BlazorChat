@@ -6,7 +6,7 @@
 @inject BlazorChatApp.BLL.Infrastructure.Interfaces.IAuthorizationService Service
 @inject NavigationManager NavManager
 @inject RegisterDto RegisterDto
-@inject AccountController Controller
+@*@inject AccountController Controller*@
 
 <h1>Registration</h1>
 <EditForm Model="RegisterDto" OnSubmit="RegisterAsync">
@@ -39,21 +39,21 @@ private async Task RegisterAsync()
             NavManager.NavigateTo("/register");
 
         }
-        try
-        {
-            if (RegisterDto.UserName != null && RegisterDto.Password != null)
-            {
-                var response = await Controller.RegisterAsync(RegisterDto.UserName,RegisterDto.Password);
-                if (response.GetType() == typeof(OkObjectResult))
-                {
-                    NavManager.NavigateTo("/login");
-                }
-            }
-        }
-        catch
-        {
-            NavManager.NavigateTo("/register");
-        }
+        //try
+        //{
+        //    if (RegisterDto.UserName != null && RegisterDto.Password != null)
+        //    {
+        //        var response = await Controller.RegisterAsync(RegisterDto.UserName,RegisterDto.Password);
+        //        if (response.GetType() == typeof(OkObjectResult))
+        //        {
+        //            NavManager.NavigateTo("/login");
+        //        }
+        //    }
+        //}
+        //catch
+        //{
+        //    NavManager.NavigateTo("/register");
+        //}
      
     }
 

@@ -1,13 +1,8 @@
-﻿using System.Net.Http.Json;
-using System.Security.Policy;
-using System.Text;
+﻿using System.Text;
 using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Http.Headers;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
@@ -16,13 +11,12 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
-        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IHttpClientFactory _clientFactory;
-        public AuthService(HttpClient httpClient, ILocalStorageService localStorage, SignInManager<IdentityUser> signInManager, IHttpClientFactory clientFactory)
+        public AuthService(HttpClient httpClient, 
+            ILocalStorageService localStorage, IHttpClientFactory clientFactory)
         {
             _httpClient = httpClient;
             _localStorage = localStorage;
-            _signInManager = signInManager;
             _clientFactory = clientFactory;
         }
 
@@ -34,29 +28,35 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             };
             var client = _clientFactory.CreateClient("Authorization");
 
-            string path = $"{client.BaseAddress}/auth/login".ToString();
+            string path = $"{client.BaseAddress}/auth/login";
+            var httpResponse = await _httpClient.PostAsync($"{path}", 
+                new StringContent(JsonConvert.SerializeObject(model),
+                    Encoding.UTF8, "application/json"));
+            
+            //var httpResponse = await client
+            //    .PostAsync(path,
+            //        new StringContent(JsonConvert.SerializeObject(model),
+            //            Encoding.UTF8, "application/json"));
 
-            var httpResponse = await client
-                .PostAsync(path,
-                    new StringContent(JsonConvert.SerializeObject(model),
-                        Encoding.UTF8, "application/json"));
 
             if (httpResponse.IsSuccessStatusCode)
             {
                await SetTokenToLocalStorage(httpResponse);
+               return "OK";
             }
 
-            return "Not OK";
+            return "Not Ok";
+
         }
 
-        public async Task<string> RegisterAsync(string userName, string password, string confirmPassword)
+        public Task<string> RegisterAsync(string userName, string password, string confirmPassword)
         {
-            return "Ok";
+            return Task.FromResult("Ok");
         }
 
         public async Task LogOutAsync()
         {
-            await _signInManager.SignOutAsync();
+            await _localStorage.ClearAsync();
         }
 
         private async Task SetTokenToLocalStorage(HttpResponseMessage httpResponse)

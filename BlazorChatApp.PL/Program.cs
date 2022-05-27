@@ -1,13 +1,10 @@
-using System.Net.Http.Headers;
-using AutoMapper;
+﻿using System.Net.Http.Headers;
 using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Infrastructure.Services;
-using BlazorChatApp.BLL.Mappings;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Data.Repositories;
 using BlazorChatApp.DAL.Domain.EF;
-using BlazorChatApp.PL.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,34 +23,28 @@ builder.Services.AddDbContext<BlazorChatAppContext>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddTransient<AccountController>();
-builder.Services.AddTransient<MessageController>();
-//builder.Services.AddTransient<AuthController>();
+builder.Services.AddControllersWithViews();
+
 builder.Services.AddTransient<IAuthorizationService, AuthorizationService>();
 builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
-builder.Services.AddBlazoredLocalStorage();
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<BlazorChatAppContext>()
     .AddDefaultTokenProviders();
 
-// http client base url and default request header
-builder.Services.AddHttpClient("Authorization", async client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
-   // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
-        //await Activator.CreateInstance<ILocalStorageService>().GetItemAsStringAsync("token"));
-} );
+builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -75,14 +66,17 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-var mapperConfig = new MapperConfiguration(mc =>
+builder.Services.AddHttpClient("Authorization", async client =>
 {
-    mc.AddProfile(new MappingProfile());
+    client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
+        // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+    //await Activator.CreateInstance<ILocalStorageService>().GetItemAsStringAsync("token"));
 });
 
-var mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton<HttpClient>();
 
 var app = builder.Build();
+
 
 if (!app.Environment.IsDevelopment())
 {
@@ -90,6 +84,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -99,12 +95,13 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.UseAuthentication();
-
 app.UseCookiePolicy();
-
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapBlazorHub();
+    endpoints.MapDefaultControllerRoute(); // Todo: add route
+    endpoints.MapFallbackToPage("/_Host");
+});
 
 app.Run();

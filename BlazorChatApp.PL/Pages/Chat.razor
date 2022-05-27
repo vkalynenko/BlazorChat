@@ -1,28 +1,30 @@
 ﻿@page "/chats"
 @*@attribute [Authorize]*@
 @using Blazored.LocalStorage
-@using BlazorChatApp.PL.Controllers
 @using BlazorChatApp.BLL.Contracts.DTOs
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
 @inject ILocalStorageService StorageService
-@inject MessageController Controller
 @inject BLL.Infrastructure.Interfaces.IAuthorizationService Authorization
 @inject LoginDto LoginDto
+
 <h1>Hello,there will be your chats </h1>
 
 <EditForm Model="LoginDto" OnSubmit="Test">
     <div class="container">
         <br/>
+        <p>@result</p>
         <button class="btn btn-primary" type="submit">Ok</button>
     </div> 
 </EditForm>
 
 @code
-{
-
-    protected async Task Test()
+{ 
+    [Inject] ITestService _testService { get; set; }
+    private string result { get; set; }
+    protected  void  Test()
     {
-        await Authorization.SetAuthorizationHeader();
-        var result = Controller.Test();
+
+         result = _testService.GetMessage();
 
     }
 }
