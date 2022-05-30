@@ -1,42 +1,46 @@
-﻿using System.Text;
-using BlazorChatApp.BLL.Helpers;
-using BlazorChatApp.BLL.Infrastructure.Interfaces;
-using Blazored.LocalStorage;
-using Newtonsoft.Json;
+﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.DAL.Data.Interfaces;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
     public class ChatService : IChatService
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILocalStorageService _localStorage;
-        private readonly IHttpClientFactory _clientFactory;
-        public ChatService(HttpClient httpClient,
-            ILocalStorageService localStorage, IHttpClientFactory clientFactory)
+
+        private readonly IUnitOfWork _unitOfWork;
+        public ChatService(IUnitOfWork unitOfWork)
         {
-            _httpClient = httpClient;
-            _localStorage = localStorage;
-            _clientFactory = clientFactory;
+            _unitOfWork = unitOfWork;
         }
-        public async Task<bool> CreateRoomAsync(string chatName)
+
+        public async Task<bool> CreateChat(string chatName, string userId)
         {
-            var client = _clientFactory.CreateClient("Authorization");
-
-            await AuthHelper.SetAuthorizationHeader(_localStorage, _httpClient);
-
-            string path = $"{client.BaseAddress}/chat/createRoom";
-
-            var httpResponse = await _httpClient.PostAsync($"{path}",
-                new StringContent(JsonConvert.SerializeObject(chatName),
-                    Encoding.UTF8, "application/json"));
-
-
-            if (httpResponse.IsSuccessStatusCode)
+            try
             {
-              return true;
+                await _unitOfWork.Chat.CreateChat(chatName, userId);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
             }
-
-            return false;
+            catch
+            {
+                return false;
+            }
         }
+
+        public async Task<bool> CreatePrivateChat(string rootId, string targetId)
+        {
+            try
+            {
+                await _unitOfWork.Chat.CreatePrivateChat(rootId, targetId);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        
+
     }
 }

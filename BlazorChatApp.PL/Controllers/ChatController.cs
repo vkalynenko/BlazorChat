@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using BlazorChatApp.DAL.Data.Interfaces;
+﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,25 +7,26 @@ namespace BlazorChatApp.PL.Controllers
     [Authorize]
     [Route("/api/chat")]
     [ApiController]
-    public class ChatController : Controller
+    public class ChatController : BaseController
     {
-        private readonly IChatRepository _chatRepository;
+        private readonly IChatService _chatService;
 
-        public ChatController(IChatRepository chatRepository)
+
+        public ChatController(IChatService chatService)
         {
-            _chatRepository = chatRepository;
+            _chatService = chatService;
         }
 
-
-        [HttpPost("createRoom")]
+        [HttpGet("createRoom/{chatName}")]
         public async Task<IActionResult> CreateRoom(string chatName)
         {
             try
             {
-               
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userId = GetUserId();
 
-                if (userId != null) await _chatRepository.CreateChat(chatName, userId);
+                if (userId != null)
+                    await _chatService.CreateChat(chatName, userId);
+                
                 return Ok();
             }
             catch
@@ -34,6 +34,22 @@ namespace BlazorChatApp.PL.Controllers
                 return StatusCode(400);
             }
 
+        }
+
+        [HttpGet("createPrivateChat/{targetId}")]
+        public async Task<IActionResult> CreatePrivateRoom(string targetId)
+        {
+            try
+            {
+                var rootId = GetUserId();
+                if (rootId != null)
+                    await _chatService.CreatePrivateChat(rootId, targetId);
+                return Ok();
+            }
+            catch
+            {
+                return StatusCode(400);
+            }
         }
     }
 }

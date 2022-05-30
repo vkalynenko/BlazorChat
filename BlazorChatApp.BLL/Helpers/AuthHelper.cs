@@ -6,10 +6,14 @@ namespace BlazorChatApp.BLL.Helpers
     public class AuthHelper
     {
  
-      public static async Task SetAuthorizationHeader(ILocalStorageService localStorage, HttpClient httpClient)
+      public async Task SetAuthorizationHeader(ILocalStorageService localStorage, HttpClient httpClient)
         {
-            var token = await localStorage.GetItemAsync<string>("token");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            if (await localStorage.ContainKeyAsync("token"))
+            {
+                var token = await localStorage.GetItemAsync<string>("token");
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            
         }
 
     }

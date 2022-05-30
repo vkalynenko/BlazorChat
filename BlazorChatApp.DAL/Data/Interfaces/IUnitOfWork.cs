@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BlazorChatApp.DAL.Data.Repositories;
-
-namespace BlazorChatApp.DAL.Data.Interfaces
+﻿namespace BlazorChatApp.DAL.Data.Interfaces
 {
-    public interface IUnitOfWork 
+    public interface IUnitOfWork : IDisposable
     {
-        Task<int> SaveChanges();
-
+        IChatRepository Chat { get; }
+        IMessageRepository Message { get; }
+        IUserRepository User { get; }
+        Task<int> SaveChangesAsync();
+        
     }
 }

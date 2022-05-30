@@ -1,55 +1,33 @@
 ﻿using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
-using BlazorChatApp.DAL.Domain.Entities;
 
 namespace BlazorChatApp.DAL.Data
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly BlazorChatAppContext _context;  
-        private GenericRepository<Chat> _chatRepository;
-        private GenericRepository<Message> _messageRepository;
+        private readonly BlazorChatAppContext _context;
+        public IChatRepository Chat { get; }
+        public IMessageRepository Message { get; }
+        public IUserRepository User { get; }
 
-        public UnitOfWork(
-            BlazorChatAppContext appContext, 
-            GenericRepository<Chat> chatRepository, 
-            GenericRepository<Message> messageRepository)
+        public UnitOfWork(BlazorChatAppContext context, 
+            IChatRepository chat, IMessageRepository message, 
+            IUserRepository user)
         {
-            _context = appContext;
-            _chatRepository = chatRepository;
-            _messageRepository = messageRepository;
+            _context = context;
+            Chat = chat;
+            Message = message;
+            User = user;
         }
 
-        public GenericRepository<Chat> ChatRepository
-        {
-            get
-            {
-
-                if (_chatRepository == null)
-                {
-                    _chatRepository = new GenericRepository<Chat>(_context);
-                }
-                return _chatRepository;
-            }
-        }
-
-        public GenericRepository<Message> MessageRepository
-        {
-            get
-            {
-
-                if (_messageRepository == null)
-                {
-                    _messageRepository = new GenericRepository<Message>(_context);
-                }
-                return _messageRepository;
-            }
-        }
-
-
-        public async Task<int> SaveChanges()
+        public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
-        } 
+        }
+
+        public void Dispose()
+        {
+           GC.SuppressFinalize(this);
+        }
     }
 }

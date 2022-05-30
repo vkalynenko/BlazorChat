@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BlazorChatApp.DAL.Domain.Entities;
-
-namespace BlazorChatApp.BLL.Infrastructure.Interfaces
+﻿namespace BlazorChatApp.BLL.Infrastructure.Interfaces
 {
     public interface IChatService
     {
-        Task<bool> CreateRoomAsync(string chatName);
+        Task<bool> CreateChat(string chatName, string userid);
+        Task<bool> CreatePrivateChat(string rootId, string targetId);
     }
 }
