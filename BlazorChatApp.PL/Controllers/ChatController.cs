@@ -8,7 +8,7 @@ namespace BlazorChatApp.PL.Controllers
     [Authorize]
     [ApiController]
     [Route("/api/chat")]
-    public class ChatController : ControllerBase
+    public class ChatController : BaseController
     {
         private readonly IChatService _chatService;
 
@@ -24,8 +24,7 @@ namespace BlazorChatApp.PL.Controllers
         {
             try
             {
-                //var userId = GetUserId();
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = GetUserId();
 
                 if (userId != null)
                     if (chatName != null)
