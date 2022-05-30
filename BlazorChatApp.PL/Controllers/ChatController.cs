@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using BlazorChatApp.BLL.Infrastructure.Interfaces;
+﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +10,8 @@ namespace BlazorChatApp.PL.Controllers
     public class ChatController : BaseController
     {
         private readonly IChatService _chatService;
-
-
-        public ChatController(IChatService chatService)
+        
+        public ChatController(IChatService chatService) 
         {
             _chatService = chatService;
         }
@@ -38,6 +36,7 @@ namespace BlazorChatApp.PL.Controllers
             }
 
         }
+
 
         //[HttpGet("createPrivateChat/{targetId}")]
         //public async Task<IActionResult> CreatePrivateRoom(string targetId)

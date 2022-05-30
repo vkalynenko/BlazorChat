@@ -52,9 +52,6 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddHttpClient("Authorization",  client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
-    //var token = await Activator.CreateInstance<ILocalStorageService>().GetItemAsync<string>("token");
-   // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
 });
 
 builder.Services.AddSingleton<HttpClient>();

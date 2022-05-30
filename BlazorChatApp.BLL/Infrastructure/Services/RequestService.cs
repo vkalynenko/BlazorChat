@@ -24,6 +24,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
 
             await SetAuthorizationHeader(_localStorage, _httpClient);
+            if (_httpClient.DefaultRequestHeaders.Authorization == null) return false;
       
             var httpResponse = await _httpClient.GetAsync(path);
           

@@ -2,8 +2,8 @@
 @using Blazored.LocalStorage
 @using BlazorChatApp.BLL.Contracts.DTOs
 @inject ILocalStorageService StorageService
+@inject NavigationManager NavManager
 @inject LoginDto LoginDto
-
 <h1>Hello,there will be your chats </h1>
 
 <EditForm Model="LoginDto">
@@ -16,6 +16,12 @@
 
 @code
 { 
-  
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await StorageService.ContainKeyAsync("token"))
+        {
+            NavManager.NavigateTo("/login");
+        }
+    }
     
 }
