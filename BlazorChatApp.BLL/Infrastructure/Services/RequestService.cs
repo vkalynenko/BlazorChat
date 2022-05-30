@@ -8,27 +8,31 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     {
         private readonly ILocalStorageService _localStorage;
         private readonly IHttpClientFactory _clientFactory;
-        public RequestService(ILocalStorageService localStorage, IHttpClientFactory clientFactory)
+        private readonly HttpClient _httpClient;
+
+        public RequestService(ILocalStorageService localStorage, IHttpClientFactory clientFactory, HttpClient httpClient)
         {
             _localStorage = localStorage;
             _clientFactory = clientFactory;
+            _httpClient = httpClient;
         }
 
         public async Task<bool> CreateRoomAsync(string chatName)
         {
             var client = _clientFactory.CreateClient("Authorization");
 
-            await SetAuthorizationHeader(_localStorage, client);
-
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
 
-            var httpResponse = await client.GetAsync(path);
-
+            await SetAuthorizationHeader(_localStorage, _httpClient);
+      
+            var httpResponse = await _httpClient.GetAsync(path);
+          
             if (httpResponse.IsSuccessStatusCode) return true;
 
             return false;
-            
+
         }
+
         public async Task<bool> CreatePrivateRoomAsync(string targetId)
         {
             var client = _clientFactory.CreateClient("Authorization");
@@ -43,8 +47,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
             return false;
 
-
-
-
         }
     }
+}

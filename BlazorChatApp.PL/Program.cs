@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,20 +30,34 @@ builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 
+builder.Services.AddTransient<IRequestService, RequestService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<UserManager<IdentityUser>>();
 builder.Services.AddTransient<IChatService, ChatService>();
+
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
+
+builder.Services.AddTransient<UserManager<IdentityUser>>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<BlazorChatAppContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddBlazoredLocalStorage();
+
+builder.Services.AddHttpClient("Authorization",  client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
+    //var token = await Activator.CreateInstance<ILocalStorageService>().GetItemAsync<string>("token");
+   // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+});
+
+builder.Services.AddSingleton<HttpClient>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -65,14 +80,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddHttpClient("Authorization", async client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
-       // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
-    //await Activator.CreateInstance<ILocalStorageService>().GetItemAsStringAsync("token"));
-});
 
-builder.Services.AddSingleton<HttpClient>();
 
 var app = builder.Build();
 
@@ -94,12 +102,14 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.UseAuthentication();
+
 app.UseCookiePolicy();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapBlazorHub();
-    endpoints.MapDefaultControllerRoute(); // Todo: add route
+    endpoints.MapDefaultControllerRoute(); 
     endpoints.MapFallbackToPage("/_Host");
 });
 

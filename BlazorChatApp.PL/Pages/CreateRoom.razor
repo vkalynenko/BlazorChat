@@ -7,11 +7,11 @@
 <div class="container">
     <p>@notification</p>
     <input @bind:event="oninput" @bind="chatName"/>
-</div>
-<br />
-<button class="btn btn-primary" type="submit" @onclick="CreateChat" >
-    Create new room
-</button>
+    <br />
+    <button class="btn btn-primary" type="submit" @onclick="CreateChat" >
+        Create new room
+    </button>
+    </div>
 @code
 {
     private string chatName;
