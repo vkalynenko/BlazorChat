@@ -1,8 +1,10 @@
 ﻿using System.Text;
 using BlazorChatApp.BLL.Contracts.DTOs;
+using BlazorChatApp.BLL.CustomFeatures;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
@@ -12,12 +14,14 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly AuthenticationStateProvider _customAuthenticationProvider;
         public AuthService(HttpClient httpClient, 
-            ILocalStorageService localStorage, IHttpClientFactory clientFactory)
+            ILocalStorageService localStorage, IHttpClientFactory clientFactory, AuthenticationStateProvider customAuthenticationProvider)
         {
             _httpClient = httpClient;
             _localStorage = localStorage;
             _clientFactory = clientFactory;
+            _customAuthenticationProvider = customAuthenticationProvider;
         }
 
         public async Task<string> LoginAsync(string userName, string password)
@@ -36,8 +40,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
             if (httpResponse.IsSuccessStatusCode)
             {
-               await SetTokenToLocalStorage(httpResponse);
-               return "OK";
+                var token = await _localStorage.GetItemAsync<string>("token");
+                TokenHolder.Token = token;
+                //await SetTokenToLocalStorage(httpResponse);
+                //(_customAuthenticationProvider as CustomAuthenticateProvider)?.Notify();
+                return "OK";
             }
 
             return "Not Ok";
@@ -76,7 +83,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             if (await _localStorage.ContainKeyAsync("token"))
             {
+                TokenHolder.Token = null;
                 await _localStorage.ClearAsync();
+                (_customAuthenticationProvider as CustomAuthenticateProvider)?.Notify();
                 return "Ok";
             }
 

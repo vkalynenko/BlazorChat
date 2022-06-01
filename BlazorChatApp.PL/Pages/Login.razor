@@ -1,10 +1,12 @@
 ﻿@page "/login"
 @using Microsoft.AspNetCore.Components
 @using BlazorChatApp.BLL.Contracts.DTOs
+@using BlazorChatApp.BLL.Helpers
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using Blazored.LocalStorage
 @inject NavigationManager NavManager
 @inject LoginDto LoginDto
-
+@inject ILocalStorageService localStorage
 
 <h1>Enter to chat</h1>
 <EditForm Model="LoginDto" OnSubmit="LoginAsync">
@@ -32,7 +34,7 @@
         try
         {
             await _service.LoginAsync(LoginDto.UserName, LoginDto.Password);
-
+          
             NavManager.NavigateTo("/chats");
         }
         catch 

@@ -10,8 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BlazorChatApp.BLL.CustomFeatures;
+using BlazorChatApp.BLL.Hubs;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration
@@ -22,7 +26,7 @@ builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString)); ;
 
 builder.Services.AddRazorPages();
-builder.Services.AddSignalRCore();
+builder.Services.AddSignalR();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 
@@ -42,6 +46,8 @@ builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
+
+builder.Services.AddTransient<CustomAuthenticateProvider>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<BlazorChatAppContext>()
@@ -77,7 +83,12 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults
+        .MimeTypes.Concat(new[] {"application/octet-stream"});
 
+});
 
 var app = builder.Build();
 
@@ -108,7 +119,8 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapBlazorHub();
-    endpoints.MapDefaultControllerRoute(); 
+    endpoints.MapDefaultControllerRoute();
+    endpoints.MapHub<ChatHub>("/chatHub");
     endpoints.MapFallbackToPage("/_Host");
 });
 

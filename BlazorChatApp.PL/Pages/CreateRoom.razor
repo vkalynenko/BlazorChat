@@ -4,6 +4,8 @@
 @inject IRequestService RequestService
 @inject NavigationManager NavManager
 @inject ILocalStorageService StorageService
+@inherits BaseComponent
+
 <h1>Creating new chat</h1>
 
 <div class="container">
@@ -18,13 +20,6 @@
 {
     private string chatName;
     private string notification = "";
-    protected override async Task OnInitializedAsync()
-    {
-        if (!await StorageService.ContainKeyAsync("token"))
-        {
-            NavManager.NavigateTo("/login");
-        }
-    }
 
     private async void CreateChat()
     {

@@ -1,16 +1,20 @@
-﻿@page "/privateChats"
+﻿@page "/logout"
 @using Blazored.LocalStorage
-@inject ILocalStorageService StorageService
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
 @inject NavigationManager NavManager
-<h1>There will be your private chats</h1>
+@inject ILocalStorageService StorageService
+
+
 
 @code
 {
+    [Inject] private IAuthService _service { get; set; }
     protected override async Task OnInitializedAsync()
     {
         if (!await StorageService.ContainKeyAsync("token"))
         {
             NavManager.NavigateTo("/login");
         }
+        await _service.LogOutAsync();
     }
 }

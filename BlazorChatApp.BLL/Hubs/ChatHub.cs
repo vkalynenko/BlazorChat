@@ -6,10 +6,10 @@ namespace BlazorChatApp.BLL.Hubs
     [Authorize]
     public class ChatHub : Hub
     {
-        public async Task Send(string message, string userName)
-        {
-            await Clients.All.SendAsync("Send", message, userName);
-        }
+        //public async Task Send(string message, string userName)
+        //{
+        //    await Clients.All.SendAsync("Send", message, userName);
+        //}
         public string GetConnectionId() => Context.ConnectionId;
 
         public Task JoinRoom(string roomId)
@@ -20,6 +20,11 @@ namespace BlazorChatApp.BLL.Hubs
         public Task LeaveRoom(string roomId)
         {
             return Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+        }
+
+        public async Task SendMessage(string message, string userName)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", message, userName);
         }
 
 

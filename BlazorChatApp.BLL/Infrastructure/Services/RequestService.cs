@@ -1,6 +1,9 @@
-﻿using BlazorChatApp.BLL.Helpers;
+﻿using System.Net.Http.Json;
+using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.BLL.Responses;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -23,7 +26,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
 
-            await SetAuthorizationHeader(_localStorage, _httpClient);
+            await SetAuthorizationHeader(_httpClient);
             if (_httpClient.DefaultRequestHeaders.Authorization == null) return false;
       
             var httpResponse = await _httpClient.GetAsync(path);
@@ -34,20 +37,45 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         }
 
-        public async Task<bool> CreatePrivateRoomAsync(string targetId)
+        public async Task<IEnumerable<IdentityUser>> GetAllUsersAsync()
         {
             var client = _clientFactory.CreateClient("Authorization");
 
-            await SetAuthorizationHeader(_localStorage, client);
+            var path = $"{client.BaseAddress}/chat/getAllUsers";
+
+            await SetAuthorizationHeader(_httpClient);
+
+            if (_httpClient.DefaultRequestHeaders.Authorization == null)
+                return new List<IdentityUser>();
+
+            //var httpResponse  = await _httpClient.GetAsync(path);
+
+            IEnumerable<IdentityUser> result = await _httpClient
+                .GetFromJsonAsync<List<IdentityUser>>(path);
+            
+            return result;
+        }
+
+        public async Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId)
+        {
+            var client = _clientFactory.CreateClient("Authorization");
+
+            await SetAuthorizationHeader(client);
+
+            if (_httpClient.DefaultRequestHeaders.Authorization == null) return null;
 
             var path = $"{client.BaseAddress}/chat/createPrivateRoom/{targetId}";
 
             var httpResponse = await client.GetAsync(path);
 
-            if (httpResponse.IsSuccessStatusCode) return true;
-
-            return false;
-
+            return new CreateChatResponse
+            {
+                IsAuthenticated = httpResponse.IsSuccessStatusCode,
+               // ChatId = httpResponse.IsSuccessStatusCode ? "21232434" : null
+               StatusCode = httpResponse.StatusCode
+            };
         }
     }
+
+   
 }

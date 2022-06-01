@@ -1,4 +1,12 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Blazored.LocalStorage
+@using System.Security.Claims
+@using BlazorChatApp.BLL.CustomFeatures
+@inject NavigationManager NavManager
+@inject ILocalStorageService StorageService
+@inject CustomAuthenticateProvider Provider
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Chat application!</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,32 +17,57 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+        
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/host" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="myChats">
+                <span class="oi oi-home" aria-hidden="true"></span> My chats
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="chats">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Chats
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="privateChats">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Private chats
-            </NavLink>
-            
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="createRoom">
-                <span class="oi oi-plus" aria-hidden="true"></span> Add new chat
-            </NavLink>
-            
-        </div>
+                <NavLink class="nav-link" href="chats">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Chats
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="createRoom">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Add public chat
+                </NavLink>
+
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="createPrivate">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Add private chat
+                </NavLink>
+
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="logout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
+                </NavLink>
+
+            </div>
+
     </nav>
 </div>
 
 @code {
+   
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    private IList<Claim> userClaim
+    {
+        get
+        {
+            var auth = authenticationState.Result;
+            if (auth.User.Identity.IsAuthenticated)
+            {
+                Provider.Notify();
+                return auth.User.Claims.ToList();
+            }
+            return new List<Claim>();
+        }
+    }
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -43,4 +76,6 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    
 }

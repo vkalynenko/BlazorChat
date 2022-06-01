@@ -1,0 +1,49 @@
+﻿@page "/createPrivate"
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using BlazorChatApp.BLL.Responses
+@using Microsoft.AspNetCore.Identity
+@using System.Net
+@inject NavigationManager NavManager
+@inject IRequestService RequestService
+@inherits BaseComponent
+
+
+<h1>There you can start messaging in private chat with defined user!</h1>
+
+<div class="container">
+    <div class="align-content-xl-center">
+        <form>
+        @foreach (var user in users)
+        {
+            <input type="hidden" id="userId" @bind-value="@user.Id"/>
+            <button type="submit" class="room-button" onclick="CreatePrivateChat">@user.UserName</button>
+        }
+        </form>
+    </div>
+</div>
+
+@code
+{
+  
+    IEnumerable<IdentityUser> users = new List<IdentityUser>();
+   
+    protected override async Task OnInitializedAsync()
+    {
+        users = await RequestService.GetAllUsersAsync();
+    }
+
+    protected async void CreatePrivateChat(string userId)
+    {
+        CreateChatResponse result =  await RequestService.CreatePrivateRoomAsync(userId);
+
+        if (result.StatusCode == HttpStatusCode.Unauthorized 
+            || result.StatusCode == HttpStatusCode.Forbidden)
+        {
+            NavManager.NavigateTo("/login");
+        }
+        else
+        {
+            NavManager.NavigateTo("/myChats");
+        }
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.DAL.Data.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
@@ -8,10 +9,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     public class UserService : IUserService
     {
         private readonly UserManager<IdentityUser> _userManager;
-
-        public UserService(UserManager<IdentityUser> userManager)
+        private readonly IUnitOfWork _unitOfWork;
+        public UserService(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<string> Register(RegisterDto model)
@@ -44,6 +46,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
             throw new Exception("Incorrect login or password!");
 
+        }
+
+        public IEnumerable<IdentityUser> GetUsers(string id)
+        {
+            return _unitOfWork.User.GetUsers(id);
         }
     }
 }

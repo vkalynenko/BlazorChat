@@ -4,24 +4,14 @@
 @inject ILocalStorageService StorageService
 @inject NavigationManager NavManager
 @inject LoginDto LoginDto
+@inherits BaseComponent
 <h1>Hello,there will be your chats </h1>
 
 <EditForm Model="LoginDto">
     <div class="container">
-        <br/>
-     
-        <button class="btn btn-primary" type="submit">Ok</button>
+   
+       
     </div> 
 </EditForm>
 
-@code
-{ 
-    protected override async Task OnInitializedAsync()
-    {
-        if (!await StorageService.ContainKeyAsync("token"))
-        {
-            NavManager.NavigateTo("/login");
-        }
-    }
-    
-}
+

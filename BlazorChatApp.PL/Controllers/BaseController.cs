@@ -1,17 +1,32 @@
 ﻿using System.Security.Claims;
-using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorChatApp.PL.Controllers
 {
+    [Authorize]
     [Controller]
     public class BaseController : ControllerBase
     {
-      
-        protected string? GetUserId()
+        private readonly UserManager<IdentityUser> _manager;
+
+        public BaseController(UserManager<IdentityUser> manager)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _manager = manager;
+        }
+
+        protected async Task<string> GetUserId()
+        {
+
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+
+            var user = await _manager.FindByNameAsync(userName);
+            var userId = user.Id;
+
             return userId;
         }
+
+       
     }
 }

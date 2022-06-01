@@ -1,0 +1,17 @@
+﻿@page "/myChats"
+@using Blazored.LocalStorage
+@inject NavigationManager NavManager
+@inject ILocalStorageService StorageService
+
+
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await StorageService.ContainKeyAsync("token"))
+        {
+            NavManager.NavigateTo("/login");
+        }
+    }
+}
