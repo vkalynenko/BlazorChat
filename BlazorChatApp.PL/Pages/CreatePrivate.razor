@@ -24,20 +24,29 @@
 
 @code
 {
-  
-    IEnumerable<IdentityUser> users = new List<IdentityUser>();
+    List<IdentityUser> users = new List<IdentityUser>();
    
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        users = await RequestService.GetAllUsersAsync();
+
+        GetAllUsersResponse getAllUsersResponse = await RequestService.GetAllUsersAsync();
+
+        if (getAllUsersResponse.StatusCode == HttpStatusCode.Unauthorized || getAllUsersResponse.StatusCode == HttpStatusCode.Forbidden)
+        {
+            NavManager.NavigateTo("/login");
+        }
+        else
+        {
+            users = await getAllUsersResponse.Users;
+        }
     }
 
     protected async void CreatePrivateChat(string userId)
     {
-        CreateChatResponse result =  await RequestService.CreatePrivateRoomAsync(userId);
+        CreateChatResponse isAllowedAccessToCreateChat =  await RequestService.CreatePrivateRoomAsync(userId);
 
-        if (result.StatusCode == HttpStatusCode.Unauthorized 
-            || result.StatusCode == HttpStatusCode.Forbidden)
+        if (isAllowedAccessToCreateChat.StatusCode == HttpStatusCode.Unauthorized 
+            || isAllowedAccessToCreateChat.StatusCode == HttpStatusCode.Forbidden)
         {
             NavManager.NavigateTo("/login");
         }

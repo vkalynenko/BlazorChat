@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Responses;
@@ -37,7 +38,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         }
 
-        public async Task<IEnumerable<IdentityUser>> GetAllUsersAsync()
+        public async Task<GetAllUsersResponse> GetAllUsersAsync()
         {
             var client = _clientFactory.CreateClient("Authorization");
 
@@ -46,14 +47,25 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             await SetAuthorizationHeader(_httpClient);
 
             if (_httpClient.DefaultRequestHeaders.Authorization == null)
-                return new List<IdentityUser>();
+                return new GetAllUsersResponse
+                {
+                    IsAuthenticated = false,
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    Users = null
+                };
 
-            //var httpResponse  = await _httpClient.GetAsync(path);
+            var httpResponse  = await _httpClient.GetAsync(path);
 
-            IEnumerable<IdentityUser> result = await _httpClient
-                .GetFromJsonAsync<List<IdentityUser>>(path);
+            //IEnumerable<IdentityUser> result = await _httpClient
+            //    .GetFromJsonAsync<List<IdentityUser>>(path);
             
-            return result;
+
+            return new GetAllUsersResponse
+            {
+                IsAuthenticated = httpResponse.IsSuccessStatusCode,
+                StatusCode = httpResponse.StatusCode,
+                Users = httpResponse.Content.ReadFromJsonAsync<List<IdentityUser>>(),
+            };
         }
 
         public async Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId)
