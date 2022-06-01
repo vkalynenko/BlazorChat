@@ -14,27 +14,36 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         private readonly IHttpClientFactory _clientFactory;
         private readonly HttpClient _httpClient;
 
-        public RequestService(ILocalStorageService localStorage, IHttpClientFactory clientFactory, HttpClient httpClient)
+        public RequestService(ILocalStorageService localStorage, 
+            IHttpClientFactory clientFactory, HttpClient httpClient)
         {
             _localStorage = localStorage;
             _clientFactory = clientFactory;
             _httpClient = httpClient;
         }
 
-        public async Task<bool> CreateRoomAsync(string chatName)
+        public async Task<CreateChatResponse> CreateRoomAsync(string chatName)
         {
             var client = _clientFactory.CreateClient("Authorization");
 
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
 
             await SetAuthorizationHeader(_httpClient);
-            if (_httpClient.DefaultRequestHeaders.Authorization == null) return false;
-      
-            var httpResponse = await _httpClient.GetAsync(path);
-          
-            if (httpResponse.IsSuccessStatusCode) return true;
+            if (_httpClient.DefaultRequestHeaders.Authorization == null)
+                return new CreateChatResponse()
+                {
+                    IsAuthenticated = false,
+                    StatusCode = HttpStatusCode.Unauthorized,
 
-            return false;
+                };
+
+            var httpResponse = await _httpClient.GetAsync(path);
+
+           return new CreateChatResponse
+           {
+               IsAuthenticated = httpResponse.IsSuccessStatusCode,
+               StatusCode = httpResponse.StatusCode
+           };
 
         }
 
@@ -87,6 +96,8 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                StatusCode = httpResponse.StatusCode
             };
         }
+
+
     }
 
    

@@ -6,7 +6,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
 {
     public interface IRequestService
     {
-        Task<bool> CreateRoomAsync(string chatName);
+        Task<CreateChatResponse> CreateRoomAsync(string chatName);
         Task<GetAllUsersResponse> GetAllUsersAsync();
 
         Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId);

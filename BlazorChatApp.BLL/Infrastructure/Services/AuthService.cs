@@ -42,7 +42,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             {
                 var token = await _localStorage.GetItemAsync<string>("token");
                 TokenHolder.Token = token;
-                //await SetTokenToLocalStorage(httpResponse);
+                await SetTokenToLocalStorage(httpResponse);
                 //(_customAuthenticationProvider as CustomAuthenticateProvider)?.Notify();
                 return "OK";
             }

@@ -36,7 +36,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<int> CreatePrivateChat(string rootId, string targetId)
         {
-            var name1 = _userManager.FindByIdAsync(targetId).Result.UserName;
+            var name1 =  _userManager.FindByIdAsync(targetId).Result.UserName;
             var name2 = _userManager.FindByIdAsync(rootId).Result.UserName;
 
             var chat = new Chat

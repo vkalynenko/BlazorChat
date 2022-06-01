@@ -1,4 +1,5 @@
 ﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,9 @@ public class ChatController : BaseController
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserService _userService;
 
-    public ChatController(IChatService chatService, UserManager<IdentityUser> userManager, IUserService userService) :base(userManager)
+    public ChatController(IChatService chatService, 
+        UserManager<IdentityUser> userManager, 
+        IUserService userService) :base(userManager)
     {
         _chatService = chatService;
         _userManager = userManager;
@@ -43,7 +46,7 @@ public class ChatController : BaseController
     }
 
 
-    [HttpGet("createPrivateChat/{targetId}")]
+    [HttpGet("createPrivateRoom/{targetId}")]
     public async Task<IActionResult> CreatePrivateRoom(string targetId)
     {
         try
@@ -75,4 +78,36 @@ public class ChatController : BaseController
 
         }
     }
+
+    [HttpGet("getAllUserChats}")]
+    public async Task<IEnumerable<Chat>> GetAllUserChats()
+    {
+        try
+        {
+            var currentUser = await GetUserId();
+            var chats = await _chatService.GetAllUserChats(currentUser);
+            return chats;
+        }
+        catch
+        {
+            return new List<Chat>();
+        }
+    }
+
+    [HttpGet("getChat/{userId}/{chatId}")]
+    public async Task<Chat> GetChat(int chatId)
+    {
+        try
+        {
+            var currentUser = await GetUserId();
+            Chat chat = await _chatService.GetCurrentChat(currentUser, chatId);
+            return chat;
+        }
+        catch
+        {
+            return new Chat();
+        }
+    }
+
+
 }

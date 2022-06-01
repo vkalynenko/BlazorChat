@@ -14,9 +14,9 @@
     <div class="align-content-xl-center">
         <form>
         @foreach (var user in users)
-        {
+        {  
             <input type="hidden" id="userId" @bind-value="@user.Id"/>
-            <button type="submit" class="room-button" onclick="CreatePrivateChat">@user.UserName</button>
+            <button type="submit" class="room-button" @onclick="() => CreatePrivateChat(user.Id)">@user.UserName</button>
         }
         </form>
     </div>
@@ -25,7 +25,8 @@
 @code
 {
     List<IdentityUser> users = new List<IdentityUser>();
-   
+    string notification = "";
+
     protected override async Task OnParametersSetAsync()
     {
 
@@ -45,6 +46,7 @@
     {
         CreateChatResponse isAllowedAccessToCreateChat =  await RequestService.CreatePrivateRoomAsync(userId);
 
+ 
         if (isAllowedAccessToCreateChat.StatusCode == HttpStatusCode.Unauthorized 
             || isAllowedAccessToCreateChat.StatusCode == HttpStatusCode.Forbidden)
         {
@@ -52,6 +54,7 @@
         }
         else
         {
+            notification = "Chat was created successfully!";
             NavManager.NavigateTo("/myChats");
         }
     }
