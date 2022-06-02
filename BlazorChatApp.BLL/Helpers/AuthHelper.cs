@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using Blazored.LocalStorage;
 
 namespace BlazorChatApp.BLL.Helpers
 {
@@ -12,7 +11,6 @@ namespace BlazorChatApp.BLL.Helpers
                 var token = TokenHolder.Token;
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
-
         }
     }
 }

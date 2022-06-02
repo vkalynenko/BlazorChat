@@ -41,12 +41,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             }
         }
 
-        public async Task<IEnumerable<Chat>> GetAllUserChats(string userId)
+        public IEnumerable<Chat> GetAllUserChats(string userId)
         {
             try
             {
-                var chats = _unitOfWork.Chat.GetAllMyChats(userId);
-                await _unitOfWork.SaveChangesAsync();
+                IEnumerable<Chat> chats = _unitOfWork.Chat.GetAllMyChats(userId);
                 return chats;
             }
             catch
@@ -59,7 +58,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             try
             {
                 Chat chat = await _unitOfWork.Chat.GetChat(chatId);
-                await _unitOfWork.SaveChangesAsync();
                 return chat;
             }
             catch
@@ -68,6 +66,17 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             }
         }
 
-
+        public IEnumerable<Chat> GetAllChats(string userId)
+        {
+            try
+            {
+                IEnumerable<Chat> chats = _unitOfWork.Chat.GetChats(userId);
+                return chats;
+            }
+            catch
+            {
+                return new List<Chat>();
+            }
+        }
     }
 }

@@ -1,12 +1,18 @@
 ﻿@page "/chats"
 @inject NavigationManager NavManager
+@using BlazorChatApp.BLL.Responses
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@inject IRequestService RequestService
 @inherits BaseComponent
 
 <h1>Hello,there are your chats which you may enter! </h1>
 
-
-
-@code
+@*@code
 {
-    
-}
+    List<Chat> chats = new List<Chat>();
+    protected override async Task OnInitializedAsync()
+    {
+        GetAllChatsResponse isAllowedToGetChats = await RequestService.GetAllChats();
+        CheckIfUserHasAccess(isAllowedToGetChats, async()=>{chats =  isAllowedToGetChats.Chats});
+    }
+}*@

@@ -24,7 +24,6 @@ public class ChatController : BaseController
         _userService = userService;
     }
 
-
     [HttpGet("createRoom/{chatName}")]
     public async Task<IActionResult> CreateRoom(string chatName)
     {
@@ -44,7 +43,6 @@ public class ChatController : BaseController
             return StatusCode(400);
         }
     }
-
 
     [HttpGet("createPrivateRoom/{targetId}")]
     public async Task<IActionResult> CreatePrivateRoom(string targetId)
@@ -68,14 +66,12 @@ public class ChatController : BaseController
         try
         {
             var currentUser = await GetUserId();
-            
             var users = _userService.GetUsers(currentUser);
             return users;
         }
         catch
         {
             return new List<IdentityUser>();
-
         }
     }
 
@@ -85,7 +81,7 @@ public class ChatController : BaseController
         try
         {
             var currentUser = await GetUserId();
-            var chats = await _chatService.GetAllUserChats(currentUser);
+            var chats =  _chatService.GetAllUserChats(currentUser);
             return chats;
         }
         catch
@@ -109,5 +105,18 @@ public class ChatController : BaseController
         }
     }
 
-
+    [HttpGet("getAllChats")]
+    public async Task<IEnumerable<Chat>> GetAllChats()
+    {
+        try
+        {
+            string currentUser = await GetUserId();
+            IEnumerable<Chat> users = _chatService.GetAllChats(currentUser);
+            return users;
+        }
+        catch
+        {
+            return new List<Chat>();
+        }
+    }
 }

@@ -104,7 +104,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             };
         }
 
-        public async Task<GetAllChatsResponse> GetAllChatsAsync()
+        public async Task<GetAllChatsResponse> GetAllChats()
         {
             var client = _clientFactory.CreateClient("Authorization");
             await SetAuthorizationHeader(client);

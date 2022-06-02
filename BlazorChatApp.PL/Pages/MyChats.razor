@@ -1,11 +1,9 @@
 ﻿@page "/myChats"
-@using Blazored.LocalStorage
 @using BlazorChatApp.BLL.Responses
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
-@using System.Net
 @inject NavigationManager NavManager
-@inject ILocalStorageService StorageService
 @inject IRequestService RequestService
+@inherits BaseComponent
 <div class="container">
     <div class="align-content-xl-center">
         <form>
@@ -20,19 +18,11 @@
 
 @code
 {
-    List<DAL.Domain.Entities.Chat> chats = new List<DAL.Domain.Entities.Chat>();
+    List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
 
     protected async Task OnAfterRenderAsync()
     {
         GetAllChatsResponse getAllChats = await RequestService.GetAllUserChats();
-        if (getAllChats.StatusCode == HttpStatusCode.Unauthorized
-            || getAllChats.StatusCode == HttpStatusCode.Forbidden)
-        {
-            NavManager.NavigateTo("/login");
-        }
-        else
-        {
-            chats = await getAllChats.Chats;
-        }
+        CheckIfUserHasAccess(getAllChats, async()=> chats = await getAllChats.Chats);
     }
 }
