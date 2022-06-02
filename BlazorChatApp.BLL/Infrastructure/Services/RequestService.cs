@@ -77,17 +77,17 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             var httpResponse = await client.GetAsync(path);
             return new CreateChatResponse
             {
-                IsAuthenticated = httpResponse.IsSuccessStatusCode,
+                IsAuthenticated = httpResponse.IsSuccessStatusCode, 
                 StatusCode = httpResponse.StatusCode
             };
         }
 
-        public async Task<GetAllChatsResponse> GetAllUserChats()
+        public async Task<GetAllUserChatsResponse> GetAllUserChats()
         {
             var client = _clientFactory.CreateClient("Authorization");
             await SetAuthorizationHeader(client);
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new GetAllChatsResponse
+                return new GetAllUserChatsResponse
                 {
                     IsAuthenticated = false,
                     StatusCode = HttpStatusCode.Unauthorized,
@@ -96,7 +96,8 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
             var path = $"{client.BaseAddress}/chat/getAllUserChats";
             var httpResponse = await client.GetAsync(path);
-            return new GetAllChatsResponse
+
+            return new GetAllUserChatsResponse
             {
                 StatusCode = httpResponse.StatusCode,
                 IsAuthenticated = httpResponse.IsSuccessStatusCode,

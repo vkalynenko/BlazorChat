@@ -6,13 +6,24 @@
 @inherits BaseComponent
 
 <h1>Hello,there are your chats which you may enter! </h1>
+<div class="container">
+    <div class="align-content-xl-center">
+        <form>
+            @foreach (var chat in chats)
+            {  
+                <input type="hidden" id="userId" @bind-value="@chat.Id"/>
+                <button type="submit" class="room-button">@chat.ChatName</button>
+            }
+        </form>
+    </div>
+</div>
 
-@*@code
+@code
 {
-    List<Chat> chats = new List<Chat>();
-    protected override async Task OnInitializedAsync()
+    List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
+    protected override async Task OnParametersSetAsync()
     {
         GetAllChatsResponse isAllowedToGetChats = await RequestService.GetAllChats();
-        CheckIfUserHasAccess(isAllowedToGetChats, async()=>{chats =  isAllowedToGetChats.Chats});
+        CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats;});
     }
-}*@
+}

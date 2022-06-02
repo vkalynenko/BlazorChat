@@ -81,11 +81,12 @@ public class ChatController : BaseController
         try
         {
             var currentUser = await GetUserId();
-            var chats =  _chatService.GetAllUserChats(currentUser);
+            IEnumerable<Chat> chats = _chatService.GetAllUserChats(currentUser);
             return chats;
         }
-        catch
+        catch(Exception message)
         {
+            Console.WriteLine($"{message}");
             return new List<Chat>();
         }
     }

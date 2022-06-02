@@ -4,6 +4,7 @@
 @inject NavigationManager NavManager
 @inject IRequestService RequestService
 @inherits BaseComponent
+
 <div class="container">
     <div class="align-content-xl-center">
         <form>
@@ -20,9 +21,9 @@
 {
     List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
 
-    protected async Task OnAfterRenderAsync()
+    protected override async Task OnInitializedAsync()
     {
-        GetAllChatsResponse getAllChats = await RequestService.GetAllUserChats();
+        GetAllUserChatsResponse getAllChats = await RequestService.GetAllUserChats();
         CheckIfUserHasAccess(getAllChats, async()=> chats = await getAllChats.Chats);
     }
 }

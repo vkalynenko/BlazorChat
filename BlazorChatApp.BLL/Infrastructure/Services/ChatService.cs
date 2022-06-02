@@ -45,7 +45,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             try
             {
-                IEnumerable<Chat> chats = _unitOfWork.Chat.GetAllMyChats(userId);
+                IEnumerable<Chat> chats = _unitOfWork.Chat.GetAllUserChats(userId);
                 return chats;
             }
             catch

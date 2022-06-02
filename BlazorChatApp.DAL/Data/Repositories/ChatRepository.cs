@@ -79,7 +79,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 .Where(x => x.Users.All(y => y.UserId != userId) && x.Type != ChatType.Private);
         }
 
-        public IEnumerable<Chat> GetAllMyChats(string userId)
+        public IEnumerable<Chat> GetAllUserChats(string userId)
         {
             return  _context.Chats.Include(x => x.Users)
                 .Where(x => x.Users.All(y => y.UserId == userId));
