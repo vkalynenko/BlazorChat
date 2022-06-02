@@ -1,6 +1,4 @@
-﻿using BlazorChatApp.BLL.Infrastructure.Services;
-using BlazorChatApp.BLL.Responses;
-using Microsoft.AspNetCore.Identity;
+﻿using BlazorChatApp.BLL.Responses;
 
 namespace BlazorChatApp.BLL.Infrastructure.Interfaces
 {
@@ -10,7 +8,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
         Task<GetAllUsersResponse> GetAllUsersAsync();
         Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId);
         Task<GetAllChatsResponse> GetAllUserChats();
-        void Check();
-
+        Task<GetAllChatsResponse> GetAllChatsAsync();
     }
 }

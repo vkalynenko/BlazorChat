@@ -31,16 +31,11 @@
         try
         {
             await _service.LoginAsync(LoginDto.UserName, LoginDto.Password);
-          
             NavManager.NavigateTo("/chats");
         }
         catch 
         {
           NavManager.NavigateTo("/login");
         }
-       
     }
-
-
-
 }

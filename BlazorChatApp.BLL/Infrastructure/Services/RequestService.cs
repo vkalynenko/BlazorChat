@@ -4,35 +4,24 @@ using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
     public class RequestService : AuthHelper, IRequestService
     {
-        private readonly ILocalStorageService _localStorage;
-        private readonly IHttpClientFactory _clientFactory;
-        private readonly HttpClient _httpClient;
-        private readonly NavigationManager NavManager;
-        public RequestService(ILocalStorageService localStorage, 
-            IHttpClientFactory clientFactory, HttpClient httpClient, NavigationManager navManager)
+    private readonly IHttpClientFactory _clientFactory;
+    public RequestService(IHttpClientFactory clientFactory)
         {
-            _localStorage = localStorage;
             _clientFactory = clientFactory;
-            _httpClient = httpClient;
-            NavManager = navManager;
         }
-
         public async Task<CreateChatResponse> CreateRoomAsync(string chatName)
         {
             var client = _clientFactory.CreateClient("Authorization");
-
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
 
-            await SetAuthorizationHeader(_httpClient);
-            if (_httpClient.DefaultRequestHeaders.Authorization == null)
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateChatResponse()
                 {
                     IsAuthenticated = false,
@@ -40,25 +29,22 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
                 };
 
-            var httpResponse = await _httpClient.GetAsync(path);
-
-           return new CreateChatResponse
-           {
+            var httpResponse = await client.GetAsync(path);
+            return new CreateChatResponse
+            {
                IsAuthenticated = httpResponse.IsSuccessStatusCode,
                StatusCode = httpResponse.StatusCode
-           };
+            };
 
         }
 
         public async Task<GetAllUsersResponse> GetAllUsersAsync()
         {
             var client = _clientFactory.CreateClient("Authorization");
-
             var path = $"{client.BaseAddress}/chat/getAllUsers";
 
-            await SetAuthorizationHeader(_httpClient);
-
-            if (_httpClient.DefaultRequestHeaders.Authorization == null)
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllUsersResponse
                 {
                     IsAuthenticated = false,
@@ -66,12 +52,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                     Users = null
                 };
 
-            var httpResponse  = await _httpClient.GetAsync(path);
-
-            //IEnumerable<IdentityUser> result = await _httpClient
-            //    .GetFromJsonAsync<List<IdentityUser>>(path);
-            
-
+            var httpResponse  = await client.GetAsync(path);
             return new GetAllUsersResponse
             {
                 IsAuthenticated = httpResponse.IsSuccessStatusCode,
@@ -83,10 +64,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId)
         {
             var client = _clientFactory.CreateClient("Authorization");
-
             await SetAuthorizationHeader(client);
 
-            if (_httpClient.DefaultRequestHeaders.Authorization == null)
+            if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateChatResponse
                 {
                     IsAuthenticated = false,
@@ -94,9 +74,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 };
 
             var path = $"{client.BaseAddress}/chat/createPrivateRoom/{targetId}";
-
             var httpResponse = await client.GetAsync(path);
-
             return new CreateChatResponse
             {
                 IsAuthenticated = httpResponse.IsSuccessStatusCode,
@@ -107,10 +85,8 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task<GetAllChatsResponse> GetAllUserChats()
         {
             var client = _clientFactory.CreateClient("Authorization");
-
             await SetAuthorizationHeader(client);
-
-            if (_httpClient.DefaultRequestHeaders.Authorization == null)
+            if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllChatsResponse
                 {
                     IsAuthenticated = false,
@@ -119,9 +95,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 };
 
             var path = $"{client.BaseAddress}/chat/getAllUserChats";
-
             var httpResponse = await client.GetAsync(path);
-
             return new GetAllChatsResponse
             {
                 StatusCode = httpResponse.StatusCode,
@@ -130,11 +104,20 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             };
         }
 
-        public void Check()
+        public async Task<GetAllChatsResponse> GetAllChatsAsync()
         {
-            
-            NavManager.NavigateTo("/login");
-            
+            var client = _clientFactory.CreateClient("Authorization");
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
+                return new GetAllChatsResponse {StatusCode = HttpStatusCode.Unauthorized, Chats = null};
+            var path = $"{client.BaseAddress}/chat/getAllChats";
+            var httpsResponse = await client.GetAsync(path);
+            return new GetAllChatsResponse
+            {
+                StatusCode = httpsResponse.StatusCode,
+                IsAuthenticated = httpsResponse.IsSuccessStatusCode,
+                Chats = httpsResponse.Content.ReadFromJsonAsync<List<Chat>>(),
+            };
         }
     }
 

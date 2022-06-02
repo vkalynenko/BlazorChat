@@ -1,18 +1,12 @@
 ﻿@page "/chats"
-@using Blazored.LocalStorage
-@using BlazorChatApp.BLL.Contracts.DTOs
-@inject ILocalStorageService StorageService
 @inject NavigationManager NavManager
-@inject LoginDto LoginDto
+@inherits BaseComponent
+
+<h1>Hello,there are your chats which you may enter! </h1>
 
 
-<h1>Hello,there will be your chats </h1>
 
-<EditForm Model="LoginDto">
-    <div class="container">
-   
-       
-    </div> 
-</EditForm>
-
-
+@code
+{
+    
+}
