@@ -8,8 +8,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
     {
         Task<CreateChatResponse> CreateRoomAsync(string chatName);
         Task<GetAllUsersResponse> GetAllUsersAsync();
-
         Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId);
+        Task<GetAllChatsResponse> GetAllUserChats();
+        void Check();
 
     }
 }

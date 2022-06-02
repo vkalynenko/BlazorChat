@@ -2,11 +2,9 @@
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using BlazorChatApp.BLL.Responses
 @using Microsoft.AspNetCore.Identity
-@using System.Net
 @inject NavigationManager NavManager
 @inject IRequestService RequestService
-@inherits BaseComponent
-
+@inherits BaseComponent 
 
 <h1>There you can start messaging in private chat with defined user!</h1>
 
@@ -25,37 +23,19 @@
 @code
 {
     List<IdentityUser> users = new List<IdentityUser>();
-    string notification = "";
-
+   
     protected override async Task OnParametersSetAsync()
     {
-
         GetAllUsersResponse getAllUsersResponse = await RequestService.GetAllUsersAsync();
-
-        if (getAllUsersResponse.StatusCode == HttpStatusCode.Unauthorized || getAllUsersResponse.StatusCode == HttpStatusCode.Forbidden)
-        {
-            NavManager.NavigateTo("/login");
-        }
-        else
-        {
-            users = await getAllUsersResponse.Users;
-        }
+        CheckIfUserHasAccess(getAllUsersResponse, async() => { users = await getAllUsersResponse.Users;});
     }
 
     protected async void CreatePrivateChat(string userId)
     {
         CreateChatResponse isAllowedAccessToCreateChat =  await RequestService.CreatePrivateRoomAsync(userId);
-
- 
-        if (isAllowedAccessToCreateChat.StatusCode == HttpStatusCode.Unauthorized 
-            || isAllowedAccessToCreateChat.StatusCode == HttpStatusCode.Forbidden)
+        CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () =>
         {
-            NavManager.NavigateTo("/login");
-        }
-        else
-        {
-            notification = "Chat was created successfully!";
-            NavManager.NavigateTo("/myChats");
-        }
+            NavManager.NavigateTo("/chats");
+        });
     }
 }

@@ -79,7 +79,7 @@ public class ChatController : BaseController
         }
     }
 
-    [HttpGet("getAllUserChats}")]
+    [HttpGet("getAllUserChats")]
     public async Task<IEnumerable<Chat>> GetAllUserChats()
     {
         try

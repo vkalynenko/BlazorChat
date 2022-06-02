@@ -1,0 +1,22 @@
+﻿@page "/base"
+@using BlazorChatApp.BLL.Responses
+@using System.Net
+@using BlazorChatApp.BLL.Helpers
+@inject NavigationManager NavManager
+
+@code
+{
+    protected void CheckIfUserHasAccess(BaseResponse response, Action action)
+    {
+        if (response.StatusCode == HttpStatusCode.Unauthorized 
+            || response.StatusCode == HttpStatusCode.Forbidden)
+        {
+            TokenHolder.Token = null;
+            NavManager.NavigateTo("/login");
+        }
+        else
+        {
+            action.Invoke();
+        }
+    }
+}

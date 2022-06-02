@@ -45,7 +45,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             try
             {
-                var chats = _unitOfWork.Chat.GetChats(userId);
+                var chats = _unitOfWork.Chat.GetAllMyChats(userId);
                 await _unitOfWork.SaveChangesAsync();
                 return chats;
             }

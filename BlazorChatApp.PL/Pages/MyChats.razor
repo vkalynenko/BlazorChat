@@ -1,17 +1,38 @@
 ﻿@page "/myChats"
 @using Blazored.LocalStorage
+@using BlazorChatApp.BLL.Responses
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using System.Net
 @inject NavigationManager NavManager
 @inject ILocalStorageService StorageService
-
-
+@inject IRequestService RequestService
+<div class="container">
+    <div class="align-content-xl-center">
+        <form>
+            @foreach (var chat in chats)
+            {  
+               @* <input type="hidden" id="userId" @bind-value=""/>*@
+                <button type="submit" class="room-button">@chat.ChatName</button>
+            }
+        </form>
+    </div>
+</div>
 
 @code
 {
-    protected override async Task OnInitializedAsync()
+    List<DAL.Domain.Entities.Chat> chats = new List<DAL.Domain.Entities.Chat>();
+
+    protected async Task OnAfterRenderAsync()
     {
-        if (!await StorageService.ContainKeyAsync("token"))
+        GetAllChatsResponse getAllChats = await RequestService.GetAllUserChats();
+        if (getAllChats.StatusCode == HttpStatusCode.Unauthorized
+            || getAllChats.StatusCode == HttpStatusCode.Forbidden)
         {
             NavManager.NavigateTo("/login");
+        }
+        else
+        {
+            chats = await getAllChats.Chats;
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿@page "/createRoom"
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using BlazorChatApp.BLL.Responses
 @using Blazored.LocalStorage
+@using System.Net
 @inject IRequestService RequestService
 @inject NavigationManager NavManager
 @inject ILocalStorageService StorageService
-@inherits BaseComponent
 
 <h1>Creating new chat</h1>
 
@@ -21,26 +22,29 @@
     private string chatName;
     private string notification = "";
 
+   
     private async void CreateChat()
     {
+
         try
         {
-            var roomIsCreated = await RequestService.CreateRoomAsync(chatName);
+            CreateChatResponse roomIsCreated = await RequestService.CreateRoomAsync(chatName);
 
-            if (roomIsCreated)
+            if (roomIsCreated.StatusCode == HttpStatusCode.Unauthorized || 
+                roomIsCreated.StatusCode == HttpStatusCode.Forbidden)
             {   
                 
-                notification = $"Room {chatName} was successfully created!";
+               NavManager.NavigateTo("/login");
 
             }
             else
             {
-                notification = $"Failed to create room {chatName}!";
+                NavManager.NavigateTo("/chats");
             }
         }
         catch
         {
-            notification = "Something went wrong!";
+            notification = $"Failed to create room {chatName}!";
 
         }
     }

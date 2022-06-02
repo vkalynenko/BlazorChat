@@ -35,37 +35,29 @@ namespace BlazorChatApp.PL.Controllers
 
             try
             {
-                var check = _userManager.Users.FirstOrDefault(x => x.UserName == model.UserName);
+                var user = await _userService.Login(model);
+                var userRoles = await _userManager.GetRolesAsync(user);
 
-                if (check != null)
+                var authClaims = new List<Claim>
                 {
-                    var user = await _userService.Login(model);
-                    var userRoles = await _userManager.GetRolesAsync(user);
+                    new(ClaimTypes.Name, user.UserName),
+                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
 
-                    var authClaims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    };
+                foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
-                    foreach (var userRole in userRoles)
+                return Ok(new
                     {
-                        authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                        GeneratedToken = _tokenService.GenerateJwtToken(authClaims)
                     }
-
-                    return Ok(new
-                        {
-                            GeneratedToken = _tokenService.GenerateJwtToken(authClaims)
-                        }
-                    );
-                }
+                );
+              
             }
             catch
             {
                 return NotFound("User wasn't found!");
             }
 
-            return NotFound("Something went wrong!");
         }
 
         [AllowAnonymous]
