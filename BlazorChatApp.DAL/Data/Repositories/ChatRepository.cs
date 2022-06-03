@@ -81,8 +81,9 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public IEnumerable<Chat> GetAllUserChats(string userId)
         {
-            return  _context.Chats.Include(x => x.Users)
-                .Where(x => x.Users.All(y => y.UserId == userId)).ToList();
+      
+            return _context.Chats.Include(chatUser => chatUser.Users)
+                .Where(chat => chat.Users.Any(user => user.UserId != userId)).ToList();
         }
 
 
