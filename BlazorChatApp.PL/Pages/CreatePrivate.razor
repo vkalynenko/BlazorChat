@@ -38,9 +38,9 @@
         CreateChatResponse isAllowedAccessToCreateChat =  await RequestService.CreatePrivateRoomAsync(userId);
         CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () =>
         {
-            NavManager.NavigateTo("/chats");
+            NavManager.NavigateTo("/MyChats");
         });
-        NavManager.NavigateTo("/chats");
+        NavManager.NavigateTo("/MyChats");
     }
 
 }

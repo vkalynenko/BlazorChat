@@ -9,5 +9,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
         IEnumerable<Chat> GetAllUserChats(string userId);
         Task<Chat> GetCurrentChat(string userId, int chatId);
         IEnumerable<Chat> GetAllChats(string userId);
+        Task<bool> JoinRoom(int chatId, string userId);
     }
 }

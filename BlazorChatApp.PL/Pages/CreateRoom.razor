@@ -25,7 +25,7 @@
         try
         {
             CreateChatResponse roomIsCreated = await RequestService.CreateRoomAsync(chatName);
-            CheckIfUserHasAccess(roomIsCreated, async () => NavManager.NavigateTo("/chats"));//todo: change to "/myChats"
+            CheckIfUserHasAccess(roomIsCreated, async () => NavManager.NavigateTo("/MyChats"));
         }
         catch
         {

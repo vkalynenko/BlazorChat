@@ -123,6 +123,19 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 Chats = httpsResponse.Content.ReadFromJsonAsync<List<Chat>>(),
             };
         }
+
+        public async Task<BaseResponse> JoinRoom(int chatId)
+        {
+            var client = _clientFactory.CreateClient("Authorization");
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
+                return new BaseResponse {IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized};
+            var path = $"{client.BaseAddress}/chat/joinRoom/{chatId}";
+            var httpResponse = await client.GetAsync(path);
+            return new BaseResponse
+                {StatusCode = httpResponse.StatusCode, IsAuthenticated = httpResponse.IsSuccessStatusCode};
+
+        }
     }
 
    

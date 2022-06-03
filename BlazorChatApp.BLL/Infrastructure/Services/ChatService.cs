@@ -78,5 +78,19 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 return new List<Chat>();
             }
         }
+
+        public async Task<bool> JoinRoom(int chatId, string userId)
+        {
+            try
+            {
+                await _unitOfWork.Chat.JoinRoom(chatId, userId);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

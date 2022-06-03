@@ -12,7 +12,7 @@
             @foreach (var chat in chats)
             {  
                 <input type="hidden" id="userId" @bind-value="@chat.Id"/>
-                <button type="submit" class="room-button">@chat.ChatName</button>
+                <button type="submit" class="room-button" @onclick="() => JoinRoom(chat.Id)">@chat.ChatName</button>
             }
         </form>
     </div>
@@ -28,6 +28,15 @@
             GetAllChatsResponse isAllowedToGetChats = await RequestService.GetAllChats();
             CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats;});
         }
+        StateHasChanged();
+    }
+
+    protected async void JoinRoom(int chatId)
+    {
+        var isAllowedAccessToJoinChat = await RequestService.JoinRoom(chatId);
+
+        CheckIfUserHasAccess(isAllowedAccessToJoinChat, async () => { NavManager.NavigateTo("/myChats"); });
+        NavManager.NavigateTo("/myChats");
         StateHasChanged();
     }
 

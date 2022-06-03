@@ -120,4 +120,24 @@ public class ChatController : BaseController
             return new List<Chat>();
         }
     }
+
+    [HttpGet("joinRoom/{chatId}")]
+    public async Task<IActionResult> JoinRoom(int chatId)
+    {
+        try
+        {
+            string userId = await GetUserId();
+            bool result = await _chatService.JoinRoom(chatId, userId);
+            if (result)
+            {
+                return Ok();
+            }
+        }
+        catch
+        {
+            return BadRequest();
+        }
+
+        return BadRequest();
+    }
 }
