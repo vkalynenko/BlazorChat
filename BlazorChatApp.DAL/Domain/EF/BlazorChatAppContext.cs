@@ -16,5 +16,5 @@ public class BlazorChatAppContext : IdentityDbContext<IdentityUser>
     public DbSet<Message> Messages { get; set; }   
     public DbSet<ChatUser> ChatUsers { get; set; }
 
-
+   
 }

@@ -1,31 +1,33 @@
 ﻿@inject NavigationManager NavManager
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using Blazored.LocalStorage
+@using BlazorChatApp.BLL.Helpers
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
+@inject ILocalStorageService localStorage
 <PageTitle>BlazorChatApp.PL</PageTitle>
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu/>
     </div>
     <main>
         <div class="top-row px-4">
-          <p>@notification</p>
-            <AuthorizeView>
-                <Authorized>
-                    <h1 >Hello, @context.User.Identity?.Name!</h1>
-                    <a class="nav-link" onclick="LogoutAsync">
-                        <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
-                    </a>
-                </Authorized>
-                <NotAuthorized>
-                    <NavLink class="nav-link" href="login">
-                        <span class="oi oi-account-login" aria-hidden="true"></span> Log in
-                    </NavLink>
-                    <NavLink class="nav-link" href="register">
-                        <span class="oi oi-pencil" href="/register" aria-hidden="true"></span> Register
-                    </NavLink>
-                </NotAuthorized>
-            </AuthorizeView>
+            <p>@notification</p>
+            @if (status)
+            {
+                <NavLink class="nav-link" @onclick="Logout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+                </NavLink>
+            }
+            else
+            {
+                <NavLink class="nav-link" href="login">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Log in
+                </NavLink>
+                <NavLink class="nav-link" href="register">
+                    <span class="oi oi-pencil" href="/register" aria-hidden="true"></span> Register
+                </NavLink>
+            }
 
 
         </div>
@@ -34,21 +36,34 @@
         </article>
     </main>
 </div>
+
 @code
 {
-    private string notification = ""; 
-    public async Task LogoutAsync()
+    private bool status;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        var userIsAuthed = await localStorage.GetItemAsync<string>("token");
+
+        if (userIsAuthed == null)
         {
-            await AuthService.LogOutAsync();
-            NavManager.NavigateTo("/login");
+            status = false;
+            StateHasChanged();
         }
-        catch
+
+        else
         {
-            notification = "Logout was failed!";
+            status = true;
+            StateHasChanged();
         }
-       
     }
 
-  }
+    private string notification = "";
+    protected async Task Logout()
+    {
+        if (TokenHolder.Token == null)
+        {
+            NavManager.NavigateTo("/login");
+        }
+        await AuthService.LogOutAsync();
+    }
+}

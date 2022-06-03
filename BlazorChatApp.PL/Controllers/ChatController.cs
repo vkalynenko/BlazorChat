@@ -10,7 +10,7 @@ namespace BlazorChatApp.PL.Controllers;
 [ApiController]
 [Route("/api/chat")]
 public class ChatController : BaseController
-{
+{   
     private readonly IChatService _chatService;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserService _userService;

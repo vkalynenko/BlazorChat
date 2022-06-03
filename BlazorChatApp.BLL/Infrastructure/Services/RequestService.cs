@@ -4,6 +4,7 @@ using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
@@ -11,10 +12,12 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     public class RequestService : AuthHelper, IRequestService
     {
     private readonly IHttpClientFactory _clientFactory;
-    public RequestService(IHttpClientFactory clientFactory)
-        {
-            _clientFactory = clientFactory;
-        }
+    private readonly ILocalStorageService _localStorageService;
+    public RequestService(IHttpClientFactory clientFactory, ILocalStorageService localStorageService) : base(localStorageService)
+    {
+        _clientFactory = clientFactory;
+        _localStorageService = localStorageService;
+    }
         public async Task<CreateChatResponse> CreateRoomAsync(string chatName)
         {
             var client = _clientFactory.CreateClient("Authorization");

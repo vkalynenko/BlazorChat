@@ -23,16 +23,25 @@
 @code
 {
     List<IdentityUser> users = new List<IdentityUser>();
-   
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        GetAllUsersResponse getAllUsersResponse = await RequestService.GetAllUsersAsync();
-        CheckIfUserHasAccess(getAllUsersResponse, async() => { users = await getAllUsersResponse.Users;});
+        if (firstRender)
+        {
+            GetAllUsersResponse getAllUsersResponse = await RequestService.GetAllUsersAsync();
+            CheckIfUserHasAccess(getAllUsersResponse, async() => { users = await getAllUsersResponse.Users;});
+        }
+        StateHasChanged();
     }
 
     protected async void CreatePrivateChat(string userId)
     {
         CreateChatResponse isAllowedAccessToCreateChat =  await RequestService.CreatePrivateRoomAsync(userId);
-        CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () =>  NavManager.NavigateTo("/chats"));
+        CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () =>
+        {
+            NavManager.NavigateTo("/chats");
+        });
+        NavManager.NavigateTo("/chats");
     }
+
 }
+    

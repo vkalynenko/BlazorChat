@@ -10,7 +10,6 @@
         <form>
             @foreach (var chat in chats)
             {  
-               @* <input type="hidden" id="userId" @bind-value=""/>*@
                 <button type="submit" class="room-button">@chat.ChatName</button>
             }
         </form>
@@ -21,9 +20,13 @@
 {
     List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        GetAllUserChatsResponse getAllChats = await RequestService.GetAllUserChats();
-        CheckIfUserHasAccess(getAllChats, async()=> chats = await getAllChats.Chats);
+        if (firstRender)
+        {
+            GetAllUserChatsResponse getAllChats = await RequestService.GetAllUserChats();
+            CheckIfUserHasAccess(getAllChats, async()=> chats = await getAllChats.Chats);
+        }
+        StateHasChanged();
     }
 }

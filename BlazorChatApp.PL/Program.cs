@@ -10,12 +10,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BlazorChatApp.BLL.CustomFeatures;
 using BlazorChatApp.BLL.Hubs;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration
@@ -28,7 +31,11 @@ builder.Services.AddDbContext<BlazorChatAppContext>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers().AddNewtonsoftJson(
+    options => {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    }); ;
+
 
 builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();

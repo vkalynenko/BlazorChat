@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using BlazorChatApp.BLL.Contracts.DTOs;
-using BlazorChatApp.BLL.CustomFeatures;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Blazored.LocalStorage;
@@ -43,7 +42,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 var token = await _localStorage.GetItemAsync<string>("token");
                 TokenHolder.Token = token;
                 await SetTokenToLocalStorage(httpResponse);
-                //(_customAuthenticationProvider as CustomAuthenticateProvider)?.Notify();
                 return "OK";
             }
 
@@ -85,7 +83,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             {
                 TokenHolder.Token = null;
                 await _localStorage.ClearAsync();
-                (_customAuthenticationProvider as CustomAuthenticateProvider)?.Notify();
                 return "Ok";
             }
 

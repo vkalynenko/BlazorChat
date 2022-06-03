@@ -76,13 +76,13 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             return _context.Chats
                 .Include(x => x.Users)
-                .Where(x => x.Users.All(y => y.UserId != userId) && x.Type != ChatType.Private);
+                .Where(x => x.Users.All(y => y.UserId != userId) && x.Type != ChatType.Private).ToList();
         }
 
         public IEnumerable<Chat> GetAllUserChats(string userId)
         {
             return  _context.Chats.Include(x => x.Users)
-                .Where(x => x.Users.All(y => y.UserId == userId));
+                .Where(x => x.Users.All(y => y.UserId == userId)).ToList();
         }
 
 

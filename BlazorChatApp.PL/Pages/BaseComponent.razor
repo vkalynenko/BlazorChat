@@ -2,8 +2,9 @@
 @using BlazorChatApp.BLL.Responses
 @using System.Net
 @using BlazorChatApp.BLL.Helpers
+@using Blazored.LocalStorage
 @inject NavigationManager NavManager
-
+@inject ILocalStorageService LocalStorage
 @code
 {
     protected void CheckIfUserHasAccess(BaseResponse response, Action action)
@@ -12,6 +13,7 @@
             || response.StatusCode == HttpStatusCode.Forbidden)
         {
             TokenHolder.Token = null;
+            LocalStorage.ClearAsync();
             NavManager.NavigateTo("/login");
         }
         else
