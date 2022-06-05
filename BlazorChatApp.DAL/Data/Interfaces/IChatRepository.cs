@@ -10,6 +10,6 @@ namespace BlazorChatApp.DAL.Data.Interfaces
         IEnumerable<Chat> GetChats(string userId);
         Task<int> CreatePrivateChat(string rootId, string targetId);
         Task<Chat> GetPrivateChat(string user1Id, string user2Id);
-        IEnumerable<Chat> GetAllUserChats(string userId);
+        Task<IEnumerable<Chat>> GetAllUserChats(string userId);
     }
 }

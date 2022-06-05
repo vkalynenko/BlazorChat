@@ -5,28 +5,36 @@
 @inject IRequestService RequestService
 @inherits BaseComponent
 
-<div class="container">
-    <div class="align-content-xl-center">
-        <form>
-            @foreach (var chat in chats)
-            {  
-                <input type="hidden" id="chatId" @bind-value="@chat.Id"/>
-                <button type="submit" class="room-button" @onclick="() => NavigateToChat(chat.Id)" >@chat.ChatName</button>
-            }
-        </form>
+@if (isLoaded==false)
+{
+    <div class="loader" style="position: center">
+    </div> <p>Loading...</p>
+}
+else
+{
+    <div class="container">
+        <div class="align-content-xl-center">
+            <form>
+                @foreach (var chat in chats)
+                {
+                    <input type="hidden" id="chatId" @bind-value="@chat.Id"/>
+                    <button type="submit" class="room-button" @onclick="() => NavigateToChat(chat.Id)">@chat.ChatName</button>
+                }
+            </form>
+        </div>
     </div>
-</div>
-
+}
 @code
 {
     List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
-
+    bool isLoaded = false;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             GetAllUserChatsResponse getAllChats = await RequestService.GetAllUserChats();
             CheckIfUserHasAccess(getAllChats, async() => chats = await getAllChats.Chats);
+            isLoaded = true;
             StateHasChanged();
         }
     }

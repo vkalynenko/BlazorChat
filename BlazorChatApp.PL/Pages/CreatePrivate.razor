@@ -8,7 +8,14 @@
 
 <h1>There you can start messaging in private chat with defined user!</h1>
 
-<div class="container">
+@if (isLoaded==false)
+{
+    <div class="loader" style="position: center">
+    </div> <p>Loading...</p>
+}
+else
+{
+    <div class="container">
     <div class="align-content-xl-center">
         <form>
         @foreach (var user in users)
@@ -19,9 +26,10 @@
         </form>
     </div>
 </div>
-
+}
 @code
 {
+    bool isLoaded = false;
     List<IdentityUser> users = new List<IdentityUser>();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -29,6 +37,7 @@
         {
             GetAllUsersResponse getAllUsersResponse = await RequestService.GetAllUsersAsync();
             CheckIfUserHasAccess(getAllUsersResponse, async() => { users = await getAllUsersResponse.Users;});
+            isLoaded = true;
             StateHasChanged();
         }
     }

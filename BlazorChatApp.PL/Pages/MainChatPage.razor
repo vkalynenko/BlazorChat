@@ -11,23 +11,35 @@
 @inherits BaseComponent
 
 <h2 style="text-align: center">@chat.ChatName</h2>
-<div class="chat-body">
-    @foreach (var msg in chat.Messages)
-    {
-        <div class="message">
 
-            <header>@msg.SenderName: </header>
-            <p>
-                @msg.MessageText
-            </p>
-            <footer>@msg.SentTime</footer>
-        </div>
-    }
-</div>
+@if (isLoaded==false)
+{
+    <div class="loader"></div>
+    <p>Loading...</p>
+}
+else
+{
+    <div class="chat-body">
+        @foreach (var msg in chat.Messages)
+        {
+            <div class="message">
+                <header>@msg.SenderName: </header>
+                <p>
+                    @msg.MessageText
+                </p>
+                <footer>@msg.SentTime</footer>
+            </div>
+        }
+    </div>
+
+
+
 <EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
     <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
     <button disabled="@(!IsConnected)" type="submit">Send</button>
 </EditForm>
+
+}
 
 @code
 {
@@ -36,7 +48,7 @@
     HubConnection hubConnection;
     public bool IsConnected =>
         hubConnection?.State == HubConnectionState.Connected;
-
+    bool isLoaded = false;
     private DAL.Domain.Entities.Chat? chat = new DAL.Domain.Entities.Chat();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -44,6 +56,7 @@
         {
             GetCurrentChatResponse getCurrentChatResponse = await RequestService.GetCurrentChat(chatId);
             CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
+            isLoaded = true;
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(NavManager.ToAbsoluteUri("/chatHub"), options =>
                 {

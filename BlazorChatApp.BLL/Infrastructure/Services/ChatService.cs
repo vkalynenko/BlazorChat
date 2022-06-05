@@ -41,11 +41,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             }
         }
 
-        public IEnumerable<Chat> GetAllUserChats(string userId)
+        public async Task<IEnumerable<Chat>> GetAllUserChats(string userId)
         {
             try
             {
-                IEnumerable<Chat> chats = _unitOfWork.Chat.GetAllUserChats(userId);
+                IEnumerable<Chat> chats = await _unitOfWork.Chat.GetAllUserChats(userId);
                 return chats;
             }
             catch

@@ -79,20 +79,15 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 .Where(x => x.Users.All(y => y.UserId != userId) && x.Type != ChatType.Private).ToList();
         }
 
-        public IEnumerable<Chat> GetAllUserChats(string userId)
+        public async Task<IEnumerable<Chat>> GetAllUserChats(string userId)
         {
-            return _context.Chats
-                .Include(x => x.Users)
-                .Where(x => x.Users.All(y => y.UserId == userId)&& x.Type==ChatType.Private ||x.Type == ChatType.Public).ToList();
-        }
+            return await _context.Chats
+                .Where(x => x.Users
+                    .Any(y => y.UserId == userId))
+                .ToListAsync();
+           }
         
-
-        //public Chat GetPrivateChat(string user1Id, string user2Id)
-        //{
-        //    return  _context.Chats.Include(x => x.Users)
-        //        .Where(chat => chat.Type.Equals(ChatType.Private))
-        //        .FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id));
-        //}
+     
         public async Task<Chat> GetPrivateChat(string user1Id, string user2Id)
         {
             var chats = await _context.Chats.Include(x => x.Users)

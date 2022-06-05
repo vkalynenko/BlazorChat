@@ -6,6 +6,11 @@
 @inherits BaseComponent
 
 <h1>Hello,there are your chats which you may enter! </h1>
+@if (isLoaded==false)
+{
+    <div class="loader" style="position: center">
+    </div> <p>Loading...</p>
+}
 <div class="container">
     <div class="align-content-xl-center">
         <form>
@@ -20,6 +25,7 @@
 
 @code
 {
+    bool isLoaded = false;
     List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -28,6 +34,7 @@
         {
             GetAllChatsResponse isAllowedToGetChats = await RequestService.GetAllChats();
             CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats; });
+            isLoaded = true;
         }
         StateHasChanged();
     }

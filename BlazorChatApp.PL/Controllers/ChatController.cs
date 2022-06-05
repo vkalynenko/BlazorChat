@@ -83,7 +83,7 @@ public class ChatController : BaseController
         try
         {
             var currentUser = await GetUserId();
-            IEnumerable<Chat> chats = _chatService.GetAllUserChats(currentUser);
+            IEnumerable<Chat> chats = await _chatService.GetAllUserChats(currentUser);
             return chats;
         }
         catch(Exception message)
