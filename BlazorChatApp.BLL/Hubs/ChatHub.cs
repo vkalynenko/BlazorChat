@@ -1,30 +1,27 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BlazorChatApp.BLL.Hubs
 {
-    [Authorize]
     public class ChatHub : Hub
     {
-        //public async Task Send(string message, string userName)
-        //{
-        //    await Clients.All.SendAsync("Send", message, userName);
-        //}
+        
         public string GetConnectionId() => Context.ConnectionId;
 
-        public Task JoinRoom(string roomId)
+        public Task JoinRoom(int chatId)
         {
-            return Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+            return Groups.AddToGroupAsync(GetConnectionId(), chatId.ToString());
         }
 
-        public Task LeaveRoom(string roomId)
+        public Task LeaveRoom(string chatId)
         {
-            return Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
         }
 
-        public async Task SendMessage(string message, string userName)
+        public async Task SendMessage(int chatId, Message message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", message, userName);
+            await Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", message);
         }
 
 

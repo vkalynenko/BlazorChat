@@ -1,11 +1,15 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text;
+using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -135,6 +139,34 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             return new BaseResponse
                 {StatusCode = httpResponse.StatusCode, IsAuthenticated = httpResponse.IsSuccessStatusCode};
 
+        }
+
+        public async Task<GetCurrentChatResponse> GetCurrentChat(int chatId)
+        {
+            HttpClient client = _clientFactory.CreateClient("Authorization");
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
+                return new GetCurrentChatResponse {IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized, Chat = null};
+            var path = $"{client.BaseAddress}/chat/getCurrentChat/{chatId}";
+            var httpResponse = await client.GetAsync(path);
+            return new GetCurrentChatResponse
+                {StatusCode = httpResponse.StatusCode, Chat = await httpResponse.Content.ReadFromJsonAsync<Chat>()};
+        }
+
+        public async Task<CreateMessageResponse> SendMessage(int chatId, string roomName, string message)
+        {
+            MessageDto messageDto = new MessageDto {ChatId = chatId, Message = message, RoomName = roomName};
+            HttpClient client = _clientFactory.CreateClient("Authorization");
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
+                return new CreateMessageResponse {IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized};
+            var path = $"{client.BaseAddress}/message/sendMessage";
+            var httpResponse = await client.PostAsync(path,
+                new StringContent(JsonConvert.SerializeObject(messageDto), Encoding.UTF8, "application/json"));
+            var content = await httpResponse.Content.ReadAsStringAsync();
+            return new CreateMessageResponse {StatusCode = httpResponse.StatusCode, 
+                Message = JsonConvert.DeserializeObject<Message>(content),
+        };
         }
     }
 

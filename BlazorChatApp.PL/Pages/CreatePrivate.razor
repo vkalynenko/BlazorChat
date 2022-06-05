@@ -29,18 +29,14 @@
         {
             GetAllUsersResponse getAllUsersResponse = await RequestService.GetAllUsersAsync();
             CheckIfUserHasAccess(getAllUsersResponse, async() => { users = await getAllUsersResponse.Users;});
+            StateHasChanged();
         }
-        StateHasChanged();
     }
 
     protected async void CreatePrivateChat(string userId)
     {
         CreateChatResponse isAllowedAccessToCreateChat =  await RequestService.CreatePrivateRoomAsync(userId);
-        CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () =>
-        {
-            NavManager.NavigateTo("/MyChats");
-        });
-        NavManager.NavigateTo("/MyChats");
+        CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () => NavManager.NavigateTo("/MyChats", true));
     }
 
 }

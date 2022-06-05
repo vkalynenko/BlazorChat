@@ -10,7 +10,8 @@
         <form>
             @foreach (var chat in chats)
             {  
-                <button type="submit" class="room-button">@chat.ChatName</button>
+                <input type="hidden" id="chatId" @bind-value="@chat.Id"/>
+                <button type="submit" class="room-button" @onclick="() => NavigateToChat(chat.Id)" >@chat.ChatName</button>
             }
         </form>
     </div>
@@ -25,8 +26,14 @@
         if (firstRender)
         {
             GetAllUserChatsResponse getAllChats = await RequestService.GetAllUserChats();
-            CheckIfUserHasAccess(getAllChats, async()=> chats = await getAllChats.Chats);
+            CheckIfUserHasAccess(getAllChats, async() => chats = await getAllChats.Chats);
+            StateHasChanged();
         }
-        StateHasChanged();
     }
+
+    private void NavigateToChat(int chatId)
+    {
+        NavManager.NavigateTo("/mainChatPage/"+ chatId, true);
+    }
+
 }

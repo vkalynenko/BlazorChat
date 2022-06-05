@@ -92,5 +92,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 return false;
             }
         }
+
+        public async Task<Chat> GetPrivateChat(string rootId, string targetId)
+        {
+            Chat chat = await  _unitOfWork.Chat.GetPrivateChat(rootId, targetId);
+            return chat;
+        }
     }
 }

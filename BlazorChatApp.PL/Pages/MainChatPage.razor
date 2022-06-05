@@ -1,0 +1,78 @@
+﻿@page "/mainChatPage/{chatId:int}"
+@using Microsoft.AspNetCore.SignalR.Client
+@using BlazorChatApp.DAL.Domain.Entities
+@using BlazorChatApp.BLL.Responses
+@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using BlazorChatApp.BLL.Contracts.DTOs
+@inject NavigationManager NavManager
+@inject IRequestService RequestService
+@inject MessageDto Model
+
+@inherits BaseComponent
+
+<h2 style="text-align: center">@chat.ChatName</h2>
+<div class="chat-body">
+    @foreach (var msg in chat.Messages)
+    {
+        <div class="message">
+
+            <header>@msg.SenderName: </header>
+            <p>
+                @msg.MessageText
+            </p>
+            <footer>@msg.SentTime</footer>
+        </div>
+    }
+</div>
+<EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
+    <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
+    <button disabled="@(!IsConnected)" type="submit">Send</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int chatId { get; set; }
+    HubConnection hubConnection;
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    private DAL.Domain.Entities.Chat? chat = new DAL.Domain.Entities.Chat();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetCurrentChatResponse getCurrentChatResponse = await RequestService.GetCurrentChat(chatId);
+            CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavManager.ToAbsoluteUri("/chatHub"), options =>
+                {
+                    options.UseDefaultCredentials = true;
+                })
+                .Build();
+            hubConnection.On<Message>("ReceiveMessage", msg =>
+            {
+                chat.Messages.Add(msg);
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+            await hubConnection.SendAsync("JoinRoom", chatId);
+
+            StateHasChanged();
+        }
+    }
+
+    private async void SendMessage()
+    {
+        Model.RoomName = chat.ChatName;
+        Model.ChatId = chatId;
+        CreateMessageResponse response = await RequestService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
+        var message = response.Message;
+        await hubConnection.SendAsync("SendMessage",chatId, message);
+        Model.Message = string.Empty;
+        
+    }
+  
+
+}

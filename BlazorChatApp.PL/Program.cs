@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using BlazorChatApp.BLL.Contracts.DTOs;
+﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Infrastructure.Services;
 using BlazorChatApp.DAL.Data.Interfaces;
@@ -10,13 +9,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using BlazorChatApp.BLL.CustomFeatures;
 using BlazorChatApp.BLL.Hubs;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
 
@@ -29,7 +25,7 @@ builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString)); ;
 
 builder.Services.AddRazorPages();
-builder.Services.AddSignalR();
+builder.Services.AddSignalRCore();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers().AddNewtonsoftJson(
     options => {
@@ -46,11 +42,13 @@ builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IChatService, ChatService>();
+builder.Services.AddTransient<IMessageService, MessageService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
+builder.Services.AddScoped<MessageDto>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
@@ -124,11 +122,11 @@ app.UseCookiePolicy();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers();
+
     endpoints.MapBlazorHub();
-    endpoints.MapDefaultControllerRoute();
-    endpoints.MapHub<ChatHub>("/chatHub");
     endpoints.MapFallbackToPage("/_Host");
+    endpoints.MapControllers();
+    endpoints.MapHub<ChatHub>("/chatHub");
 });
 
 app.Run();

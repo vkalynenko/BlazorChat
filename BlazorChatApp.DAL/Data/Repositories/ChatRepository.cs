@@ -81,17 +81,25 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public IEnumerable<Chat> GetAllUserChats(string userId)
         {
-      
-            return _context.Chats.Include(chatUser => chatUser.Users)
-                .Where(chat => chat.Users.Any(user => user.UserId != userId)).ToList();
+            return _context.Chats
+                .Include(x => x.Users)
+                .Where(x => x.Users.All(y => y.UserId == userId)&& x.Type==ChatType.Private ||x.Type == ChatType.Public).ToList();
         }
+        
 
-
-        public Chat GetPrivateChat(string user1Id, string user2Id)
+        //public Chat GetPrivateChat(string user1Id, string user2Id)
+        //{
+        //    return  _context.Chats.Include(x => x.Users)
+        //        .Where(chat => chat.Type.Equals(ChatType.Private))
+        //        .FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id));
+        //}
+        public async Task<Chat> GetPrivateChat(string user1Id, string user2Id)
         {
-            return  _context.Chats.Include(x => x.Users)
+            var chats = await _context.Chats.Include(x => x.Users)
                 .Where(chat => chat.Type.Equals(ChatType.Private))
-                .FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id));
+                .ToListAsync();
+
+            return await Task.Run(() => chats.FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id)));
         }
 
         public async Task JoinRoom(int chatId, string userId)

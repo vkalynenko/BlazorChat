@@ -21,12 +21,13 @@
 @code
 {
     List<DAL.Domain.Entities.Chat>? chats = new List<DAL.Domain.Entities.Chat>();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             GetAllChatsResponse isAllowedToGetChats = await RequestService.GetAllChats();
-            CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats;});
+            CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats; });
         }
         StateHasChanged();
     }
@@ -35,9 +36,6 @@
     {
         var isAllowedAccessToJoinChat = await RequestService.JoinRoom(chatId);
 
-        CheckIfUserHasAccess(isAllowedAccessToJoinChat, async () => { NavManager.NavigateTo("/myChats"); });
-        NavManager.NavigateTo("/myChats");
-        StateHasChanged();
+        CheckIfUserHasAccess(isAllowedAccessToJoinChat, async () => { NavManager.NavigateTo("/myChats", true);});
     }
-
 }

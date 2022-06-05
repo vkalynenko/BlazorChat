@@ -10,5 +10,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
         Task<GetAllUserChatsResponse> GetAllUserChats();
         Task<GetAllChatsResponse> GetAllChats();
         Task<BaseResponse> JoinRoom(int chatId);
+        Task<GetCurrentChatResponse> GetCurrentChat(int chatId);
+        Task<CreateMessageResponse> SendMessage(int chatId, string roomName, string message);
     }
 }

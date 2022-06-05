@@ -49,8 +49,10 @@ public class ChatController : BaseController
     {
         try
         {
+
             var rootId = await  GetUserId();
-            if (rootId != null)
+            var privateChat = await _chatService.GetPrivateChat(rootId, targetId);
+            if (rootId != null && privateChat ==null)
                 await _chatService.CreatePrivateChat(rootId, targetId);
             return Ok();
         }
@@ -139,5 +141,20 @@ public class ChatController : BaseController
         }
 
         return BadRequest();
+    }
+
+    [HttpGet("getCurrentChat/{chatId}")]
+    public async Task<Chat> GetCurrentChat(int chatId)
+    {
+        try
+        {
+            string userId = await GetUserId();
+            Chat chat = await _chatService.GetCurrentChat(userId, chatId);
+            return chat;
+        }
+        catch
+        {
+            return new Chat();
+        }
     }
 }
