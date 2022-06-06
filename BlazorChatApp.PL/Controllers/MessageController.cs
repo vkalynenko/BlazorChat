@@ -1,6 +1,7 @@
 ﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Hubs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -62,6 +63,31 @@ namespace BlazorChatApp.PL.Controllers
             catch
             {
                 return new Message();
+            }
+        }
+
+        [HttpGet("getUserId")]
+        public async Task<string> GetId()
+        {
+            try
+            {
+                return await GetUserId();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        [HttpGet("getUserName")]
+        public async Task<string> GetName()
+        {
+            try
+            {
+                return await GetUserName();
+            }
+            catch
+            {
+                return null;
             }
         }
     }

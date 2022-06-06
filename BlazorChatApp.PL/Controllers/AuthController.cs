@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.BLL.Responses;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +33,6 @@ namespace BlazorChatApp.PL.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(LoginDto model)
         {
-
             try
             {
                 var user = await _userService.Login(model);
@@ -75,5 +75,7 @@ namespace BlazorChatApp.PL.Controllers
             }
 
         }
+
+      
     }
 }

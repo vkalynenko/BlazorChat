@@ -9,5 +9,8 @@ namespace BlazorChatApp.DAL.Data.Interfaces
         Task UpdateMessage(int id, string newMessage);
         Task<Message> FindMessage(int id);
         Task<Message> CreateMessage(int chatId, string message, string userName, string userId);
+        Task<Message?> GetById(int id);
+        Task<Message> ReplyToGroup(string reply, string message, string userName, 
+            string senderName, string senderId, int chatId);
     }
 }

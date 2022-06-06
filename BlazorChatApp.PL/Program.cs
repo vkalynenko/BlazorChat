@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BlazorChatApp.BLL.CustomFeatures;
 using BlazorChatApp.BLL.Hubs;
+using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -49,10 +49,9 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
 builder.Services.AddScoped<MessageDto>();
+builder.Services.AddScoped<ReplyToGroupModel>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
-
-builder.Services.AddTransient<CustomAuthenticateProvider>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<BlazorChatAppContext>()

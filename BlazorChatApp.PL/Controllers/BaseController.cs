@@ -26,7 +26,11 @@ namespace BlazorChatApp.PL.Controllers
 
             return userId;
         }
+        protected async Task<string> GetUserName()
+        {
 
-       
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+            return userName;
+        }
     }
 }

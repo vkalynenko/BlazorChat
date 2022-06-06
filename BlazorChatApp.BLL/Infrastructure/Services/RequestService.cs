@@ -7,7 +7,6 @@ using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 
@@ -167,6 +166,25 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             return new CreateMessageResponse {StatusCode = httpResponse.StatusCode, 
                 Message = JsonConvert.DeserializeObject<Message>(content),
         };
+        }
+
+        public async Task<GetCurrentUserInfo> GetUserInfo()
+        {
+            HttpClient client = _clientFactory.CreateClient("Authorization");
+            await SetAuthorizationHeader(client);
+            if (client.DefaultRequestHeaders.Authorization == null)
+                return new GetCurrentUserInfo{StatusCode = HttpStatusCode.Unauthorized};
+            var pathToGetUserId = $"{client.BaseAddress}/message/getUserId";
+            var userId = await client.GetAsync(pathToGetUserId);
+            var pathToGetUserName = $"{client.BaseAddress}/message/getUserName";
+            var userName = await client.GetAsync(pathToGetUserName);
+            return new GetCurrentUserInfo
+            {
+                StatusCode = userId.StatusCode,
+                UserId = await userId.Content.ReadAsStringAsync(),
+                UserName = await userName.Content.ReadAsStringAsync(),
+            };
+
         }
     }
 

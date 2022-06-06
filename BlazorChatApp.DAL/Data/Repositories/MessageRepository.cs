@@ -32,6 +32,29 @@ namespace BlazorChatApp.DAL.Data.Repositories
             return message;
         }
 
+        public async Task<Message?> GetById(int id)
+        {
+            return await _context.Messages.FindAsync(id);
+        }
+
+        public async Task<Message> ReplyToGroup(string reply, string message, string userName, 
+            string senderName, string senderId, int chatId)
+        {
+            Message newReply = new Message
+            {
+                MessageText = $"Replied to {userName}: {message} \n" +
+                              $"{reply}",
+                SenderName = senderName,
+                UserId = senderId,
+                SentTime = DateTime.Now,
+                ChatId = chatId,
+
+            };
+           await _context.Messages.AddAsync(newReply);
+           await _context.SaveChangesAsync();
+           return newReply;
+        }
+
         public async Task DeleteMessageFromAll(int id)
         {
             var entity = await _context.Messages.FindAsync(id);

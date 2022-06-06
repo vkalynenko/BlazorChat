@@ -1,7 +1,9 @@
 ﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.DAL.Data.Interfaces;
+using BlazorChatApp.DAL.Domain.EF;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -10,6 +12,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUnitOfWork _unitOfWork;
+
         public UserService(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
@@ -37,13 +40,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<IdentityUser> Login(LoginDto model)
         {
-            var user = _userManager.Users.FirstOrDefault(x => x.UserName == model.UserName);
-
+            var user = await _userManager.FindByNameAsync(model.UserName);
             if (user != null)
             {
                 return await _userManager.CheckPasswordAsync(user, model.Password) ? user : null;
             }
-
             throw new Exception("Incorrect login or password!");
 
         }

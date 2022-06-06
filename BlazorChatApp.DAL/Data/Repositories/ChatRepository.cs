@@ -85,7 +85,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 .Where(x => x.Users
                     .Any(y => y.UserId == userId))
                 .ToListAsync();
-           }
+        }
         
      
         public async Task<Chat> GetPrivateChat(string user1Id, string user2Id)

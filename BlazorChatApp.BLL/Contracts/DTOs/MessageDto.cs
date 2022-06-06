@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BlazorChatApp.BLL.Responses;
 
 namespace BlazorChatApp.BLL.Contracts.DTOs
 {
@@ -8,5 +9,6 @@ namespace BlazorChatApp.BLL.Contracts.DTOs
         [Required]
         public string Message { get; set; }
         public string RoomName { get; set; }
+        public int MessageId { get; set; }
     }
 }

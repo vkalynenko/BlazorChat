@@ -4,14 +4,18 @@
 @using BlazorChatApp.BLL.Responses
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using BlazorChatApp.BLL.Contracts.DTOs
+@using BlazorChatApp.BLL.Models
 @inject NavigationManager NavManager
 @inject IRequestService RequestService
 @inject MessageDto Model
+@inject ReplyToGroupModel ReplyModel
+@inject IMessageService MessageService
 
 @inherits BaseComponent
 
 <h2 style="text-align: center">@chat.ChatName</h2>
-
+<link rel="stylesheet" 
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 @if (isLoaded==false)
 {
     <div class="loader"></div>
@@ -23,6 +27,15 @@ else
         @foreach (var msg in chat.Messages)
         {
             <div class="message">
+                <button type="button" class="btn btn-outline-warning" @onclick="() => ChangeSendToReply(msg.SenderName, msg.MessageText)">
+                    <i class="fa fa-reply" style="font-size: 15px"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger" @onclick="() => DeleteMessageFromAll(msg.Id)">
+                    <i class="fa fa-trash" style="font-size: 15px"></i>
+                </button>
+                <button type="submit" class="btn btn-outline-success" @onclick="() => ChangeSendToEdit(msg.Id, msg.MessageText)">
+                    <i class="fa fa-edit" style="font-size: 13px"></i>
+                </button>
                 <header>@msg.SenderName: </header>
                 <p>
                     @msg.MessageText
@@ -32,13 +45,24 @@ else
         }
     </div>
 
-
-
-<EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
-    <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
-    <button disabled="@(!IsConnected)" type="submit">Send</button>
-</EditForm>
-
+    <EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
+        <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
+        @if (!showEdit && !showReply)
+        {
+            <button disabled="@(!IsConnected && showEdit)" type="submit">Send</button>
+        }
+    </EditForm>
+    @if (showEdit && !showReply)
+    {
+        <div class="chat-input">
+            <button disabled="@(!IsConnected)" @onclick="() => EditMessage()">Edit</button>
+        </div>
+    }else if (!showEdit && showReply)
+    {
+        <div class="chat-input">
+            <button disabled="@(!IsConnected)" @onclick="() => ReplyToGroup()">Reply</button>
+        </div>
+    }
 }
 
 @code
@@ -75,17 +99,64 @@ else
             StateHasChanged();
         }
     }
-
     private async void SendMessage()
     {
         Model.RoomName = chat.ChatName;
         Model.ChatId = chatId;
-        CreateMessageResponse response = await RequestService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
-        var message = response.Message;
-        await hubConnection.SendAsync("SendMessage",chatId, message);
-        Model.Message = string.Empty;
-        
+        if (showEdit==false)
+        {
+            CreateMessageResponse response = await RequestService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
+            var message = response.Message;
+            await hubConnection.SendAsync("SendMessage",chatId, message);
+            Model.Message = string.Empty;
+        }
     }
-  
+    private async Task DeleteMessageFromAll(int messageId)
+    {
+        await hubConnection.SendAsync("DeleteFromAll", chatId, messageId);
+        NavManager.NavigateTo("/mainChatPage/"+chatId, true);
+        await InvokeAsync(StateHasChanged);
+    }
 
+    private bool showEdit = false;
+    private async void ChangeSendToEdit(int messageId, string messageText)
+    {
+        showEdit = true;
+        Model.Message = messageText;
+        Model.MessageId = messageId;
+    }
+
+    private async Task EditMessage()
+    {
+        await hubConnection.SendAsync("Edit", Model.MessageId, Model.Message);
+        showEdit = false;
+        Model.Message = String.Empty;
+        NavManager.NavigateTo("/mainChatPage/"+chatId, true);
+        await InvokeAsync(StateHasChanged);
+    }
+    bool showReply = false;
+    
+    private void ChangeSendToReply(string userName, string repliedMsg)
+    {
+        showReply = true;
+        ReplyModel.Reply = Model.Message;
+        ReplyModel.Message = repliedMsg;
+        ReplyModel.UserName = userName;
+    }
+   
+    private async Task ReplyToGroup()
+    {
+        GetCurrentUserInfo response = await RequestService.GetUserInfo();
+        CheckIfUserHasAccess(response, async () =>
+        {
+            ReplyModel.SenderId =  response.UserId;
+            ReplyModel.SenderName = response.UserName;
+        });
+
+        ReplyModel.ChatId = chatId;
+        await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
+        showReply = false;
+        Model.Message=String.Empty;
+        await InvokeAsync(StateHasChanged);
+    }
 }

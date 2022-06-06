@@ -28,8 +28,4 @@
     <ProjectReference Include="..\BlazorChatApp.DAL\BlazorChatApp.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CustomFeatures\" />
-  </ItemGroup>
-
 </Project>

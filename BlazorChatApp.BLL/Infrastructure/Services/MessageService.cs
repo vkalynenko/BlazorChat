@@ -1,5 +1,7 @@
 ﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.Data.Interfaces;
+using BlazorChatApp.DAL.Domain.Entities;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -24,6 +26,45 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             {
                 return false;
             }
+        }
+        public async Task<bool> DeleteMessageFromAll(int messageId)
+        {
+            try
+            {
+                await _unitOfWork.Message.DeleteMessageFromAll(messageId);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<Message?> GetMessage(int id)
+        {
+            return await _unitOfWork.Message.GetById(id);
+        }
+
+        public async Task<bool> EditMessage(int id, string message)
+        {
+            try
+            {
+                await _unitOfWork.Message.UpdateMessage(id, message);
+                return true;
+
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<Message> ReplyToGroup(ReplyToGroupModel model)
+        {
+            var message = await _unitOfWork.Message.ReplyToGroup(model.Reply, model.Message, 
+                model.UserName, model.SenderName, model.SenderId, model.ChatId);
+            return message;
         }
     }
 }
