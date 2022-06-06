@@ -10,5 +10,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
         Task<Message?> GetMessage(int id);
         Task<bool> EditMessage(int id, string message);
         Task<Message> ReplyToGroup(ReplyToGroupModel model);
+        Task<Message> ReplyToUser(ReplyToUserModel model);
+        Task<int> FindPrivateChat(string senderId, string userId);
     }
 }

@@ -46,6 +46,11 @@ namespace BlazorChatApp.BLL.Hubs
             await SendMessage(model.ChatId, message);
         }
 
+        public async Task ReplyToUser(ReplyToUserModel model)
+        {
+            var message = await _messageService.ReplyToUser(model);
+            await SendMessage(model.ChatId, message);
+        }
 
     }
 }

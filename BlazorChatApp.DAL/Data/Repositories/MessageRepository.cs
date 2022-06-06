@@ -8,10 +8,11 @@ namespace BlazorChatApp.DAL.Data.Repositories
     public class MessageRepository : IMessageRepository
     {
         private readonly BlazorChatAppContext _context;
-
-        public MessageRepository(BlazorChatAppContext context)
+        private readonly IChatRepository _chatRepository;
+        public MessageRepository(BlazorChatAppContext context, IChatRepository chatRepository)
         {
             _context = context;
+            _chatRepository = chatRepository;
         }
 
         public async Task<Message> CreateMessage(
@@ -55,6 +56,23 @@ namespace BlazorChatApp.DAL.Data.Repositories
            return newReply;
         }
 
+        public async Task<Message> ReplyToUser(string reply, string message, string userName, string userId, string senderName, string senderId)
+        {
+            var chatId =  await FindPrivateChat(senderId, userId);
+            Message newReply = new Message
+            {
+                MessageText = $"Replied to {userName}: {message} \n" +
+                              $"{reply}",
+                SenderName = senderName,
+                SentTime = DateTime.Now,
+                UserId = userId,
+                ChatId = chatId
+            };
+            await _context.Messages.AddAsync(newReply);
+            await _context.SaveChangesAsync();
+            return newReply;
+        }
+
         public async Task DeleteMessageFromAll(int id)
         {
             var entity = await _context.Messages.FindAsync(id);
@@ -79,6 +97,21 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             var message = await _context.Messages.FindAsync(id);
             return message;
+        }
+
+        public async Task<int> FindPrivateChat(string senderId, string userId)
+        {
+            var chats = await _context.Chats.Include(x => x.Users).Where(c => c.Type.Equals(ChatType.Private))
+                .ToListAsync();
+            var chat =  chats.FirstOrDefault(x => x.IsUserInChat(senderId) && x.IsUserInChat(senderId));
+
+            if (chat == null)
+            {
+                var chatId = await _chatRepository.CreatePrivateChat(userId, senderId);
+                return chatId;
+            }
+
+            return chat.Id;
         }
     }
 }

@@ -50,6 +50,7 @@ builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
 builder.Services.AddScoped<MessageDto>();
 builder.Services.AddScoped<ReplyToGroupModel>();
+builder.Services.AddScoped<ReplyToUserModel>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 

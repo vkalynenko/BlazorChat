@@ -12,5 +12,8 @@ namespace BlazorChatApp.DAL.Data.Interfaces
         Task<Message?> GetById(int id);
         Task<Message> ReplyToGroup(string reply, string message, string userName, 
             string senderName, string senderId, int chatId);
+        Task<Message> ReplyToUser(string reply, string message, string userName, 
+            string userId, string senderName, string senderId);
+        Task<int> FindPrivateChat(string senderId, string userId);
     }
 }

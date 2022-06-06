@@ -9,6 +9,7 @@
 @inject IRequestService RequestService
 @inject MessageDto Model
 @inject ReplyToGroupModel ReplyModel
+@inject ReplyToUserModel ReplyToUserModel
 @inject IMessageService MessageService
 
 @inherits BaseComponent
@@ -27,6 +28,12 @@ else
         @foreach (var msg in chat.Messages)
         {
             <div class="message">
+                @if (chat.Type != ChatType.Private)
+                {
+                    <button type="button" class="btn btn-outline-info" @onclick="() => ChangeSendToReplyToUser(msg.UserId, msg.MessageText, msg.SenderName)">
+                        <i class="fa fa-reply" style="font-size: 15px"></i>
+                    </button>
+                }
                 <button type="button" class="btn btn-outline-warning" @onclick="() => ChangeSendToReply(msg.SenderName, msg.MessageText)">
                     <i class="fa fa-reply" style="font-size: 15px"></i>
                 </button>
@@ -47,20 +54,25 @@ else
 
     <EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
         <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
-        @if (!showEdit && !showReply)
+        @if (!showEdit && !showReply && !showReplyToUser)
         {
             <button disabled="@(!IsConnected && showEdit)" type="submit">Send</button>
         }
     </EditForm>
-    @if (showEdit && !showReply)
+    @if (showEdit && !showReply && !showReplyToUser)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => EditMessage()">Edit</button>
         </div>
-    }else if (!showEdit && showReply)
+    }else if (!showEdit && showReply && !showReplyToUser)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => ReplyToGroup()">Reply</button>
+        </div>
+    }else if (showReplyToUser && !showEdit && !showReply)
+    {
+        <div class="chat-input">
+            <button disabled="@(!IsConnected)" @onclick="() => ReplyToUser()">Reply to user</button>
         </div>
     }
 }
@@ -157,6 +169,46 @@ else
         await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
         showReply = false;
         Model.Message=String.Empty;
+        ReplyModel = null;
         await InvokeAsync(StateHasChanged);
+    }
+
+    bool showReplyToUser = false;
+
+    private void ChangeSendToReplyToUser(string userId, string repliedMsg, string userName)
+    {
+        showReplyToUser = true;
+        ReplyToUserModel.Reply = Model.Message;
+        ReplyToUserModel.Message = repliedMsg;
+        ReplyToUserModel.SenderId= userId;
+        ReplyToUserModel.SenderName = userName;
+    }
+
+    private async Task ReplyToUser()
+    {
+        GetCurrentUserInfo response = await RequestService.GetUserInfo();
+        CheckIfUserHasAccess(response, async () =>
+        {
+            ReplyToUserModel.UserId =  response.UserId;
+            ReplyToUserModel.UserName = response.UserName;
+        });
+        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId)
+        {
+            int chatWithUserId = await 
+                MessageService.FindPrivateChat(ReplyToUserModel.SenderId, ReplyToUserModel.UserId);
+            ReplyToUserModel.ChatId = chatWithUserId;
+            await MessageService.ReplyToUser(ReplyToUserModel);
+            showReplyToUser = false;
+            Model.Message=String.Empty;
+        
+            ReplyToUserModel = null;
+            NavManager.NavigateTo("/mainChatPage/"+ chatWithUserId, true);
+        }
+        else
+        {
+            NavManager.NavigateTo("/mainChatPage/"+ chatId, true);
+        }
+        
+
     }
 }

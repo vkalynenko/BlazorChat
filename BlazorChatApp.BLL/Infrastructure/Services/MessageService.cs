@@ -64,7 +64,21 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             var message = await _unitOfWork.Message.ReplyToGroup(model.Reply, model.Message, 
                 model.UserName, model.SenderName, model.SenderId, model.ChatId);
+            await _unitOfWork.SaveChangesAsync();
             return message;
+        }
+
+        public async Task<Message> ReplyToUser(ReplyToUserModel model)
+        {
+            var message = await _unitOfWork.Message.ReplyToUser(model.Reply, model.Message, model.UserName, model.UserId,
+                model.SenderName, model.SenderId);
+            await _unitOfWork.SaveChangesAsync();
+            return message;
+        }
+
+        public async Task<int> FindPrivateChat(string senderId, string userId)
+        {
+            return await _unitOfWork.Message.FindPrivateChat(senderId, userId);
         }
     }
 }
