@@ -14,6 +14,7 @@ namespace BlazorChatApp.DAL.Domain.Entities
         public string UserId { get; set; }
         public string SenderName { get; set; }
         public bool DeletedOnlyFromMyChat { get; set; }
+        public bool IsItReply { get; set; }
         public Message()
         {
             SentTime = DateTime.Now;
