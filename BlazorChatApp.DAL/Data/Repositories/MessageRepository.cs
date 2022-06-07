@@ -43,13 +43,11 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             Message newReply = new Message
             {
-                MessageText = $"Replied to {userName}: {message} \n" +
-                              $"{reply}",
+                MessageText = $"Replied to {userName}:{message} - {reply}",
                 SenderName = senderName,
                 UserId = senderId,
                 SentTime = DateTime.Now,
                 ChatId = chatId,
-
             };
            await _context.Messages.AddAsync(newReply);
            await _context.SaveChangesAsync();
@@ -61,8 +59,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             var chatId =  await FindPrivateChat(senderId, userId);
             Message newReply = new Message
             {
-                MessageText = $"Replied to {userName}: {message} \n" +
-                              $"{reply}",
+                MessageText = $"Replied to {userName}:{message} - {reply}",
                 SenderName = senderName,
                 SentTime = DateTime.Now,
                 UserId = userId,

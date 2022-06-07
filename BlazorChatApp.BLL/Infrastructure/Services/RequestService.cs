@@ -23,10 +23,8 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     }
         public async Task<CreateChatResponse> CreateRoomAsync(string chatName)
         {
-            var client = _clientFactory.CreateClient("Authorization");
+            var client = await ClientWithAuthHeader();
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
-
-            await SetAuthorizationHeader(client);
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateChatResponse()
                 {
@@ -46,10 +44,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<GetAllUsersResponse> GetAllUsersAsync()
         {
-            var client = _clientFactory.CreateClient("Authorization");
+            var client = await ClientWithAuthHeader();
             var path = $"{client.BaseAddress}/chat/getAllUsers";
 
-            await SetAuthorizationHeader(client);
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllUsersResponse
                 {
@@ -69,8 +66,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<CreateChatResponse> CreatePrivateRoomAsync(string targetId)
         {
-            var client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            var client = await ClientWithAuthHeader();
 
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateChatResponse
@@ -90,8 +86,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<GetAllUserChatsResponse> GetAllUserChats()
         {
-            var client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllUserChatsResponse
                 {
@@ -113,8 +108,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<GetAllChatsResponse> GetAllChats()
         {
-            var client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllChatsResponse {StatusCode = HttpStatusCode.Unauthorized, Chats = null};
             var path = $"{client.BaseAddress}/chat/getAllChats";
@@ -129,8 +123,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<BaseResponse> JoinRoom(int chatId)
         {
-            var client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new BaseResponse {IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized};
             var path = $"{client.BaseAddress}/chat/joinRoom/{chatId}";
@@ -142,8 +135,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<GetCurrentChatResponse> GetCurrentChat(int chatId)
         {
-            HttpClient client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            HttpClient client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetCurrentChatResponse {IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized, Chat = null};
             var path = $"{client.BaseAddress}/chat/getCurrentChat/{chatId}";
@@ -155,8 +147,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task<CreateMessageResponse> SendMessage(int chatId, string roomName, string message)
         {
             MessageDto messageDto = new MessageDto {ChatId = chatId, Message = message, RoomName = roomName};
-            HttpClient client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            HttpClient client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateMessageResponse {IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized};
             var path = $"{client.BaseAddress}/message/sendMessage";
@@ -170,8 +161,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<GetCurrentUserInfo> GetUserInfo()
         {
-            HttpClient client = _clientFactory.CreateClient("Authorization");
-            await SetAuthorizationHeader(client);
+            HttpClient client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetCurrentUserInfo{StatusCode = HttpStatusCode.Unauthorized};
             var pathToGetUserId = $"{client.BaseAddress}/message/getUserId";
@@ -185,6 +175,13 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 UserName = await userName.Content.ReadAsStringAsync(),
             };
 
+        }
+
+        private async Task<HttpClient> ClientWithAuthHeader()
+        {
+            var client = _clientFactory.CreateClient("Authorization");
+            await SetAuthorizationHeader(client);
+            return client;
         }
     }
 

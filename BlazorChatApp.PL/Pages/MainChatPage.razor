@@ -11,7 +11,6 @@
 @inject ReplyToGroupModel ReplyModel
 @inject ReplyToUserModel ReplyToUserModel
 @inject IMessageService MessageService
-
 @inherits BaseComponent
 
 <h2 style="text-align: center">@chat.ChatName</h2>
@@ -37,9 +36,9 @@ else
                 <button type="button" class="btn btn-outline-warning" @onclick="() => ChangeSendToReply(msg.SenderName, msg.MessageText)">
                     <i class="fa fa-reply" style="font-size: 15px"></i>
                 </button>
-                <button type="button" class="btn btn-outline-danger" @onclick="() => DeleteMessageFromAll(msg.Id)">
-                    <i class="fa fa-trash" style="font-size: 15px"></i>
-                </button>
+              <button type="button" class="btn btn-outline-danger" @onclick="() => DeleteMessageFromAll(msg.Id)">
+                        <i class="fa fa-trash" style="font-size: 15px"></i>
+                    </button>
                 <button type="submit" class="btn btn-outline-success" @onclick="() => ChangeSendToEdit(msg.Id, msg.MessageText)">
                     <i class="fa fa-edit" style="font-size: 13px"></i>
                 </button>
@@ -164,7 +163,7 @@ else
             ReplyModel.SenderId =  response.UserId;
             ReplyModel.SenderName = response.UserName;
         });
-
+        ReplyModel.Reply = Model.Message;
         ReplyModel.ChatId = chatId;
         await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
         showReply = false;
@@ -192,8 +191,9 @@ else
             ReplyToUserModel.UserId =  response.UserId;
             ReplyToUserModel.UserName = response.UserName;
         });
-        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId)
+        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId && Model.Message!=null)
         {
+            ReplyToUserModel.Reply = Model.Message;
             int chatWithUserId = await 
                 MessageService.FindPrivateChat(ReplyToUserModel.SenderId, ReplyToUserModel.UserId);
             ReplyToUserModel.ChatId = chatWithUserId;
@@ -208,7 +208,15 @@ else
         {
             NavManager.NavigateTo("/mainChatPage/"+ chatId, true);
         }
-        
+    }
 
+    private async Task<string> GetCurrentUserId()
+    {
+        var result = "";
+        GetCurrentUserInfo response = await RequestService.GetUserInfo();
+        CheckIfUserHasAccess(response, async () =>
+        {  var result =  response.UserId;
+        });
+        return result;
     }
 }
