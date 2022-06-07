@@ -77,17 +77,20 @@ namespace BlazorChatApp.DAL.Data.Repositories
             await _context.SaveChangesAsync();
 
         }
-        public async Task UpdateMessage(int id, string newMessage)
+        public async Task<Message?> UpdateMessage(int id, string newMessage)
         {
             var entity = await _context.Messages
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (entity != null)
-            {
+            { 
                 entity.MessageText = newMessage;
                 _context.Messages.Update(entity);
+              await _context.SaveChangesAsync();
+              //entity = await _context.Messages
+              //    .FirstOrDefaultAsync(c => c.Id == id); //todo: if doesn't work
+                return entity;
             }
-
-            await _context.SaveChangesAsync();
+            return new Message();
         }
 
         public async Task<Message> FindMessage(int id)

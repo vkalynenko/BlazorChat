@@ -16,7 +16,8 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
     {
     private readonly IHttpClientFactory _clientFactory;
     private readonly ILocalStorageService _localStorageService;
-    public RequestService(IHttpClientFactory clientFactory, ILocalStorageService localStorageService) : base(localStorageService)
+    public RequestService(IHttpClientFactory clientFactory,
+        ILocalStorageService localStorageService) : base(localStorageService)
     {
         _clientFactory = clientFactory;
         _localStorageService = localStorageService;

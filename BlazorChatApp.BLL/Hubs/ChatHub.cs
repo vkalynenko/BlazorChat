@@ -34,10 +34,12 @@ namespace BlazorChatApp.BLL.Hubs
         public async Task DeleteFromAll(int chatId, int messageId)
         {
             await _messageService.DeleteMessageFromAll(messageId);
+            await Clients.Groups(chatId.ToString()).SendAsync("DeleteMessageFromAll", messageId);
         }
-        public async Task Edit(int messageId, string messageText)
+        public async Task Edit(int chatId, int messageId, string messageText)
         {
-            await _messageService.EditMessage(messageId, messageText);
+            var message = await _messageService.EditMessage(messageId, messageText);
+            await Clients.Groups(chatId.ToString()).SendAsync("ReceiveEditedMessage", message);
         }
 
         public async Task ReplyToGroup(ReplyToGroupModel model)

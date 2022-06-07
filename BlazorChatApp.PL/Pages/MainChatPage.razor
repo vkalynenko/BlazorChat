@@ -103,7 +103,17 @@ else
                 chat.Messages.Add(msg);
                 InvokeAsync(StateHasChanged);
             });
-
+            hubConnection.On<Message>("ReceiveEditedMessage", (msg) =>
+            {
+                chat.Messages.Where(x => x.Id == msg.Id).ToList().ForEach(s => s.MessageText = msg.MessageText);
+                InvokeAsync(StateHasChanged);
+            });
+            hubConnection.On<int>("DeleteMessageFromAll", (Id) =>
+            {
+                var message = chat.Messages.FirstOrDefault(x => x.Id == Id);
+                chat.Messages.Remove(message);
+                InvokeAsync(StateHasChanged);
+            });
             await hubConnection.StartAsync();
             await hubConnection.SendAsync("JoinRoom", chatId);
 
@@ -125,7 +135,6 @@ else
     private async Task DeleteMessageFromAll(int messageId)
     {
         await hubConnection.SendAsync("DeleteFromAll", chatId, messageId);
-        NavManager.NavigateTo("/mainChatPage/"+chatId, true);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -139,10 +148,9 @@ else
 
     private async Task EditMessage()
     {
-        await hubConnection.SendAsync("Edit", Model.MessageId, Model.Message);
+        await hubConnection.SendAsync("Edit", chatId, Model.MessageId, Model.Message);
         showEdit = false;
         Model.Message = String.Empty;
-        NavManager.NavigateTo("/mainChatPage/"+chatId, true);
         await InvokeAsync(StateHasChanged);
     }
     bool showReply = false;
@@ -210,13 +218,6 @@ else
         }
     }
 
-    private async Task<string> GetCurrentUserId()
-    {
-        var result = "";
-        GetCurrentUserInfo response = await RequestService.GetUserInfo();
-        CheckIfUserHasAccess(response, async () =>
-        {  var result =  response.UserId;
-        });
-        return result;
-    }
+
+   
 }

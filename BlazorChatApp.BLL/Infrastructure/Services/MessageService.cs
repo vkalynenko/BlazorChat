@@ -46,17 +46,17 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             return await _unitOfWork.Message.GetById(id);
         }
 
-        public async Task<bool> EditMessage(int id, string message)
+        public async Task<Message?> EditMessage(int id, string message)
         {
             try
             {
-                await _unitOfWork.Message.UpdateMessage(id, message);
-                return true;
+                var entity = await _unitOfWork.Message.UpdateMessage(id, message);
+                return entity;
 
             }
             catch
             {
-                return false;
+                return new Message();
             }
         }
 
