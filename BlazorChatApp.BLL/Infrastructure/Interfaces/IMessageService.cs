@@ -12,5 +12,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
         Task<Message> ReplyToGroup(ReplyToGroupModel model);
         Task<Message> ReplyToUser(ReplyToUserModel model);
         Task<int> FindPrivateChat(string senderId, string userId);
+        Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad);
     }
 }

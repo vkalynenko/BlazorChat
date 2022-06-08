@@ -1,7 +1,6 @@
 ﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Hubs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
-using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -50,6 +49,7 @@ namespace BlazorChatApp.PL.Controllers
                     MessageText = messageDto.Message,
                     SenderName = User.Identity.Name,
                     SentTime = DateTime.Now,
+                    WhoDeleted = "e6ca90d7-8a78-44eb-8d1a-3a93305b8af7",
                 };
                 bool result =
                     await _messageService.CreateMessage(messageDto.ChatId, 
@@ -63,6 +63,19 @@ namespace BlazorChatApp.PL.Controllers
             catch
             {
                 return new Message();
+            }
+        }
+
+        [HttpGet("getAllMessages/{chatId}/{quantityToSkip}/{quantityToLoad}")]
+        public async Task<IEnumerable<Message>> GetAllMessages(int chatId, int quantityToSkip, int quantityToLoad)
+        {
+            try
+            {
+                return await _messageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
+            }
+            catch
+            {
+                return new List<Message>();
             }
         }
 

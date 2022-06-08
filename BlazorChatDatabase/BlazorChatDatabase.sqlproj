@@ -76,6 +76,7 @@
     <Build Include="dbo\Tables\AspNetUserTokens.sql" />
     <Build Include="dbo\Tables\ChatUsers.sql" />
     <Build Include="dbo\Tables\Messages.sql" />
+    <Build Include="dbo\Tables\UsersDeletedMessage.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\BlazorChatApp.PL\Pages\Form.razor">

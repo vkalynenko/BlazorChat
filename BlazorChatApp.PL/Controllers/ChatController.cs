@@ -93,21 +93,6 @@ public class ChatController : BaseController
         }
     }
 
-    [HttpGet("getChat/{userId}/{chatId}")]
-    public async Task<Chat> GetChat(int chatId)
-    {
-        try
-        {
-            var currentUser = await GetUserId();
-            Chat chat = await _chatService.GetCurrentChat(currentUser, chatId);
-            return chat;
-        }
-        catch
-        {
-            return new Chat();
-        }
-    }
-
     [HttpGet("getAllChats")]
     public async Task<IEnumerable<Chat>> GetAllChats()
     {
@@ -144,12 +129,12 @@ public class ChatController : BaseController
     }
 
     [HttpGet("getCurrentChat/{chatId}")]
-    public async Task<Chat> GetCurrentChat(int chatId)
+    public async Task<Chat> GetCurrentChat(int chatId, int messageToLoad)
     {
         try
         {
             string userId = await GetUserId();
-            Chat chat = await _chatService.GetCurrentChat(userId, chatId);
+            Chat chat = await _chatService.GetCurrentChat(chatId);
             return chat;
         }
         catch

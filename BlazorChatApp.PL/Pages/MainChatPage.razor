@@ -1,10 +1,10 @@
 ﻿@page "/mainChatPage/{chatId:int}"
 @using Microsoft.AspNetCore.SignalR.Client
 @using BlazorChatApp.DAL.Domain.Entities
-@using BlazorChatApp.BLL.Responses
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using BlazorChatApp.BLL.Contracts.DTOs
 @using BlazorChatApp.BLL.Models
+@using Castle.Core.Internal
 @inject NavigationManager NavManager
 @inject IRequestService RequestService
 @inject MessageDto Model
@@ -16,7 +16,7 @@
 <h2 style="text-align: center">@chat.ChatName</h2>
 <link rel="stylesheet" 
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-@if (isLoaded==false)
+@if (isLoaded == false)
 {
     <div class="loader"></div>
     <p>Loading...</p>
@@ -24,29 +24,41 @@
 else
 {
     <div class="chat-body">
-        @foreach (var msg in chat.Messages)
+        @foreach (var msg in messages)
         {
             <div class="message">
                 @if (chat.Type != ChatType.Private)
                 {
                     <button type="button" class="btn btn-outline-info" @onclick="() => ChangeSendToReplyToUser(msg.UserId, msg.MessageText, msg.SenderName)">
-                        <i class="fa fa-reply" style="font-size: 15px"></i>
+                        <i class="fa fa-reply" style="font-size: 12px"></i>
                     </button>
                 }
                 <button type="button" class="btn btn-outline-warning" @onclick="() => ChangeSendToReply(msg.SenderName, msg.MessageText)">
-                    <i class="fa fa-reply" style="font-size: 15px"></i>
+                    <i class="fa fa-reply" style="font-size: 12px"></i>
                 </button>
-              <button type="button" class="btn btn-outline-danger" @onclick="() => DeleteMessageFromAll(msg.Id)">
-                        <i class="fa fa-trash" style="font-size: 15px"></i>
-                    </button>
+                <button type="button" class="btn btn-outline-danger" @onclick="() => DeleteMessageFromAll(msg.Id)">
+                    <i class="fa fa-trash" style="font-size: 14px"></i>
+                </button>
                 <button type="submit" class="btn btn-outline-success" @onclick="() => ChangeSendToEdit(msg.Id, msg.MessageText)">
-                    <i class="fa fa-edit" style="font-size: 13px"></i>
+                    <i class="fa fa-edit" style="font-size: 12px"></i>
                 </button>
-                <header>@msg.SenderName: </header>
-                <p>
-                    @msg.MessageText
-                </p>
-                <footer>@msg.SentTime</footer>
+                @if (msg.IsItReply)
+                {
+                    <header style="background-color: #e6dfe8">@msg.SenderName: </header>
+                    <p style="background-color: #e6dfe8">
+                        @msg.MessageText
+                    </p>
+                    <footer style="background-color: #e6dfe8">@msg.SentTime</footer>
+                }
+                else
+                {
+                    <header>@msg.SenderName: </header>
+                    <p>
+                        @msg.MessageText
+                    </p>
+                    <footer>@msg.SentTime</footer>
+                }
+
             </div>
         }
     </div>
@@ -55,20 +67,23 @@ else
         <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
         @if (!showEdit && !showReply && !showReplyToUser)
         {
-            <button disabled="@(!IsConnected && showEdit)" type="submit">Send</button>
+            <button disabled="@(!IsConnected && showEdit && Model.Message.IsNullOrEmpty())" type="submit">Send</button>
         }
     </EditForm>
+    <button disabled="@(!IsConnected)" @onclick="() => ReadMore()">Read more</button>
     @if (showEdit && !showReply && !showReplyToUser)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => EditMessage()">Edit</button>
         </div>
-    }else if (!showEdit && showReply && !showReplyToUser)
+    }
+    else if (!showEdit && showReply && !showReplyToUser)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => ReplyToGroup()">Reply</button>
         </div>
-    }else if (showReplyToUser && !showEdit && !showReply)
+    }
+    else if (showReplyToUser && !showEdit && !showReply)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => ReplyToUser()">Reply to user</button>
@@ -80,39 +95,54 @@ else
 {
     [Parameter]
     public int chatId { get; set; }
+    private bool isLoaded = false;
+    private bool showEdit = false;
+    private bool showReply = false;
+    private bool showReplyToUser = false;
+
+    private int quantityToSkip = 0;
+    private int quantityToLoad = 20;
+
     HubConnection hubConnection;
+
     public bool IsConnected =>
         hubConnection?.State == HubConnectionState.Connected;
-    bool isLoaded = false;
-    private DAL.Domain.Entities.Chat? chat = new DAL.Domain.Entities.Chat();
+
+    List<Message>? messages = new List<Message>();
+    private DAL.Domain.Entities.Chat? chat = new();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            GetCurrentChatResponse getCurrentChatResponse = await RequestService.GetCurrentChat(chatId);
+            var getCurrentChatResponse = await RequestService.GetCurrentChat(chatId);
             CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
+            messages = (List<Message>?) await MessageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
+            messages.Reverse();
             isLoaded = true;
             hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavManager.ToAbsoluteUri("/chatHub"), options =>
-                {
-                    options.UseDefaultCredentials = true;
-                })
+                .WithUrl(NavManager.ToAbsoluteUri("/chatHub"), options => { options.UseDefaultCredentials = true; })
                 .Build();
             hubConnection.On<Message>("ReceiveMessage", msg =>
             {
-                chat.Messages.Add(msg);
+                messages.Add(msg);
                 InvokeAsync(StateHasChanged);
             });
-            hubConnection.On<Message>("ReceiveEditedMessage", (msg) =>
+            hubConnection.On<Message>("ReceiveEditedMessage", msg =>
             {
-                chat.Messages.Where(x => x.Id == msg.Id).ToList().ForEach(s => s.MessageText = msg.MessageText);
+                messages.Where(x => x.Id == msg.Id).ToList().ForEach(s => s.MessageText = msg.MessageText);
                 InvokeAsync(StateHasChanged);
             });
-            hubConnection.On<int>("DeleteMessageFromAll", (Id) =>
+            hubConnection.On<int>("DeleteMessageFromAll", Id =>
             {
-                var message = chat.Messages.FirstOrDefault(x => x.Id == Id);
-                chat.Messages.Remove(message);
+                var message = messages.FirstOrDefault(x => x.Id == Id);
+                messages.Remove(message);
                 InvokeAsync(StateHasChanged);
+            });
+            hubConnection.On<List<Message>>("ReceiveLoadedMessages", messageList =>
+            {
+                foreach (var message in messageList)
+                    messages.Insert(0, message);
             });
             await hubConnection.StartAsync();
             await hubConnection.SendAsync("JoinRoom", chatId);
@@ -120,25 +150,26 @@ else
             StateHasChanged();
         }
     }
+
     private async void SendMessage()
     {
         Model.RoomName = chat.ChatName;
         Model.ChatId = chatId;
-        if (showEdit==false)
+        if (showEdit == false)
         {
-            CreateMessageResponse response = await RequestService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
+            var response = await RequestService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
             var message = response.Message;
-            await hubConnection.SendAsync("SendMessage",chatId, message);
+            await hubConnection.SendAsync("SendMessage", chatId, message);
             Model.Message = string.Empty;
         }
     }
+
     private async Task DeleteMessageFromAll(int messageId)
     {
         await hubConnection.SendAsync("DeleteFromAll", chatId, messageId);
         await InvokeAsync(StateHasChanged);
     }
 
-    private bool showEdit = false;
     private async void ChangeSendToEdit(int messageId, string messageText)
     {
         showEdit = true;
@@ -150,11 +181,10 @@ else
     {
         await hubConnection.SendAsync("Edit", chatId, Model.MessageId, Model.Message);
         showEdit = false;
-        Model.Message = String.Empty;
+        Model.Message = string.Empty;
         await InvokeAsync(StateHasChanged);
     }
-    bool showReply = false;
-    
+
     private void ChangeSendToReply(string userName, string repliedMsg)
     {
         showReply = true;
@@ -162,62 +192,73 @@ else
         ReplyModel.Message = repliedMsg;
         ReplyModel.UserName = userName;
     }
-   
+
     private async Task ReplyToGroup()
     {
-        GetCurrentUserInfo response = await RequestService.GetUserInfo();
+        var response = await RequestService.GetUserInfo();
         CheckIfUserHasAccess(response, async () =>
         {
-            ReplyModel.SenderId =  response.UserId;
+            ReplyModel.SenderId = response.UserId;
             ReplyModel.SenderName = response.UserName;
         });
-        ReplyModel.Reply = Model.Message;
-        ReplyModel.ChatId = chatId;
-        await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
-        showReply = false;
-        Model.Message=String.Empty;
-        ReplyModel = null;
-        await InvokeAsync(StateHasChanged);
+        if (Model.Message != null)
+        {
+            ReplyModel.Reply = Model.Message;
+            ReplyModel.ChatId = chatId;
+            await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
+            showReply = false;
+            Model.Message = string.Empty;
+            ReplyModel = null;
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            showReply = false;
+            Model.Message = string.Empty;
+        }
     }
-
-    bool showReplyToUser = false;
 
     private void ChangeSendToReplyToUser(string userId, string repliedMsg, string userName)
     {
         showReplyToUser = true;
         ReplyToUserModel.Reply = Model.Message;
         ReplyToUserModel.Message = repliedMsg;
-        ReplyToUserModel.SenderId= userId;
+        ReplyToUserModel.SenderId = userId;
         ReplyToUserModel.SenderName = userName;
     }
 
     private async Task ReplyToUser()
     {
-        GetCurrentUserInfo response = await RequestService.GetUserInfo();
+        var response = await RequestService.GetUserInfo();
         CheckIfUserHasAccess(response, async () =>
         {
-            ReplyToUserModel.UserId =  response.UserId;
+            ReplyToUserModel.UserId = response.UserId;
             ReplyToUserModel.UserName = response.UserName;
         });
-        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId && Model.Message!=null)
+        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId && Model.Message != null)
         {
             ReplyToUserModel.Reply = Model.Message;
-            int chatWithUserId = await 
+            var chatWithUserId = await
                 MessageService.FindPrivateChat(ReplyToUserModel.SenderId, ReplyToUserModel.UserId);
             ReplyToUserModel.ChatId = chatWithUserId;
             await MessageService.ReplyToUser(ReplyToUserModel);
             showReplyToUser = false;
-            Model.Message=String.Empty;
-        
+            Model.Message = string.Empty;
+
             ReplyToUserModel = null;
-            NavManager.NavigateTo("/mainChatPage/"+ chatWithUserId, true);
+            NavManager.NavigateTo("/mainChatPage/" + chatWithUserId, true);
         }
         else
         {
-            NavManager.NavigateTo("/mainChatPage/"+ chatId, true);
+            showReplyToUser = false;
+            Model.Message = string.Empty;
         }
     }
 
+    private async Task ReadMore()
+    {
+        quantityToSkip += quantityToLoad;
+        await hubConnection.SendAsync("ReadMore", chatId, quantityToSkip, quantityToLoad);
+    }
 
-   
 }

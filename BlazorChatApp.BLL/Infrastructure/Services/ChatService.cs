@@ -53,7 +53,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 return new List<Chat>();
             }
         }
-        public async Task<Chat> GetCurrentChat(string userId, int chatId)
+        public async Task<Chat> GetCurrentChat(int chatId)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<Chat> GetPrivateChat(string rootId, string targetId)
         {
-            Chat chat = await  _unitOfWork.Chat.GetPrivateChat(rootId, targetId);
+            Chat chat = await _unitOfWork.Chat.GetPrivateChat(rootId, targetId);
             return chat;
         }
     }

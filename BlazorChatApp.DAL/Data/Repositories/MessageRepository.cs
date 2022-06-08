@@ -24,7 +24,9 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 MessageText = msgText,
                 SenderName = userName,
                 UserId = userId,
-                SentTime = DateTime.Now
+                SentTime = DateTime.Now,
+                IsItReply = false,
+                WhoDeleted = "e6ca90d7-8a78-44eb-8d1a-3a93305b8af7",
             };
 
             _context.Messages.Add(message);
@@ -32,7 +34,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
             return message;
         }
-
         public async Task<Message?> GetById(int id)
         {
             return await _context.Messages.FindAsync(id);
@@ -48,10 +49,19 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 UserId = senderId,
                 SentTime = DateTime.Now,
                 ChatId = chatId,
+                IsItReply = true
             };
            await _context.Messages.AddAsync(newReply);
            await _context.SaveChangesAsync();
            return newReply;
+        }
+
+        public async Task DeleteMessageFromAll(int id)
+        {
+            var entity = await _context.Messages.FindAsync(id);
+            if (entity != null) _context.Messages.Remove(entity);
+            await _context.SaveChangesAsync();
+
         }
 
         public async Task<Message> ReplyToUser(string reply, string message, string userName, string userId, string senderName, string senderId)
@@ -63,20 +73,15 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 SenderName = senderName,
                 SentTime = DateTime.Now,
                 UserId = userId,
-                ChatId = chatId
+                ChatId = chatId,
+                IsItReply = true
             };
             await _context.Messages.AddAsync(newReply);
             await _context.SaveChangesAsync();
             return newReply;
         }
 
-        public async Task DeleteMessageFromAll(int id)
-        {
-            var entity = await _context.Messages.FindAsync(id);
-            if (entity != null) _context.Messages.Remove(entity);
-            await _context.SaveChangesAsync();
 
-        }
         public async Task<Message?> UpdateMessage(int id, string newMessage)
         {
             var entity = await _context.Messages
@@ -86,9 +91,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 entity.MessageText = newMessage;
                 _context.Messages.Update(entity);
               await _context.SaveChangesAsync();
-              //entity = await _context.Messages
-              //    .FirstOrDefaultAsync(c => c.Id == id); //todo: if doesn't work
-                return entity;
+              return entity;
             }
             return new Message();
         }
@@ -101,7 +104,8 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<int> FindPrivateChat(string senderId, string userId)
         {
-            var chats = await _context.Chats.Include(x => x.Users).Where(c => c.Type.Equals(ChatType.Private))
+            var chats = await _context.Chats.Include(x => x.Users)
+                .Where(c => c.Type.Equals(ChatType.Private))
                 .ToListAsync();
             var chat =  chats.FirstOrDefault(x => x.IsUserInChat(senderId) && x.IsUserInChat(senderId));
 
@@ -112,6 +116,12 @@ namespace BlazorChatApp.DAL.Data.Repositories
             }
 
             return chat.Id;
+        }
+
+        public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)
+        {
+            return await _context.Messages.OrderByDescending(x=>x.SentTime).Where(chat => chat.ChatId == chatId).Skip(quantityToSkip).Take(quantityToLoad)
+                .ToListAsync();//todo: drop column from table messages
         }
     }
 }

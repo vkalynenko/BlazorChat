@@ -8,7 +8,6 @@ namespace BlazorChatApp.BLL.Hubs
     public class ChatHub : Hub
     {
         private readonly IMessageService _messageService;
-
         public ChatHub(IMessageService messageService)
         {
             _messageService = messageService;
@@ -36,6 +35,7 @@ namespace BlazorChatApp.BLL.Hubs
             await _messageService.DeleteMessageFromAll(messageId);
             await Clients.Groups(chatId.ToString()).SendAsync("DeleteMessageFromAll", messageId);
         }
+
         public async Task Edit(int chatId, int messageId, string messageText)
         {
             var message = await _messageService.EditMessage(messageId, messageText);
@@ -53,6 +53,13 @@ namespace BlazorChatApp.BLL.Hubs
             var message = await _messageService.ReplyToUser(model);
             await SendMessage(model.ChatId, message);
         }
+
+        public async Task ReadMore(int chatId, int quantityToSkip, int quantityToLoad)
+        {
+            var messages = await _messageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
+            await Clients.Caller.SendAsync("ReceiveLoadedMessages", messages);
+        }
+       
 
     }
 }

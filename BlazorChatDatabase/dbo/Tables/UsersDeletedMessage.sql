@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[UsersDeletedMessage]
+(
+	[Id] INT IDENTITY (1, 1) NOT NULL,
+	[MessageId] INT NOT NULL FOREIGN KEY REFERENCES Messages(Id),
+	[UserId] NVARCHAR(450) NOT NULL FOREIGN KEY REFERENCES AspNetUsers(Id),
+)

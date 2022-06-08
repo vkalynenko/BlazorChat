@@ -3,6 +3,7 @@ using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace BlazorChatApp.DAL.Data.Repositories
 {
@@ -65,10 +66,9 @@ namespace BlazorChatApp.DAL.Data.Repositories
             return chat.Id;
         }
 
-        public async Task<Chat?> GetChat(int id)
+        public async Task<Chat?> GetChat(int id) 
         {
             return await _context.Chats
-                .Include(x => x.Messages)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 

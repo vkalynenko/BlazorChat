@@ -29,5 +29,6 @@ namespace BlazorChatApp.DAL.Data
         {
            GC.SuppressFinalize(this);
         }
+
     }
 }

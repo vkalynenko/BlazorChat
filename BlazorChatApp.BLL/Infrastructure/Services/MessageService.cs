@@ -80,5 +80,10 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             return await _unitOfWork.Message.FindPrivateChat(senderId, userId);
         }
+
+        public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)
+        {
+            return await _unitOfWork.Message.GetMessages(chatId, quantityToSkip, quantityToLoad);
+        }
     }
 }
