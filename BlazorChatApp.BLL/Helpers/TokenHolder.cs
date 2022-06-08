@@ -1,8 +1,7 @@
 ﻿
-namespace BlazorChatApp.BLL.Helpers
+namespace BlazorChatApp.BLL.Helpers;
+
+public class TokenHolder
 {
-     public  class TokenHolder
-    {
-       public static string Token { get; set; }
-    }
+    public static string Token { get; set; }
 }

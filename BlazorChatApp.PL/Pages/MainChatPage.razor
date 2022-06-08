@@ -65,28 +65,28 @@ else
             </div>
         }
     </div>
-
+    <button class="btn btn-dark" style="flex-direction: row-reverse"disabled="@(!IsConnected)" @onclick="() => ReadMore()">Read more</button>
     <EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
-        <InputText id="chat-input" @bind-Value="Model.Message"></InputText>
-        @if (!showEdit && !showReply && !showReplyToUser)
+        <InputText id="chat-input" @bind-Value="Model.InputField"></InputText>
+        @if (!showEditBtn && !showReplyBtn && !showReplyToUserBtn)
         {
-            <button disabled="@(!IsConnected && showEdit && Model.Message.IsNullOrEmpty())" type="submit">Send</button>
+            <button disabled="@(!IsConnected && showEditBtn && Model.InputField.IsNullOrEmpty())" type="submit">Send</button>
         }
     </EditForm>
-    <button disabled="@(!IsConnected)" @onclick="() => ReadMore()">Read more</button>
-    @if (showEdit && !showReply && !showReplyToUser)
+    
+    @if (showEditBtn && !showReplyBtn && !showReplyToUserBtn)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => EditMessage()">Edit</button>
         </div>
     }
-    else if (!showEdit && showReply && !showReplyToUser)
+    else if (!showEditBtn && showReplyBtn && !showReplyToUserBtn)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => ReplyToGroup()">Reply</button>
         </div>
     }
-    else if (showReplyToUser && !showEdit && !showReply)
+    else if (showReplyToUserBtn && !showEditBtn && !showReplyBtn)
     {
         <div class="chat-input">
             <button disabled="@(!IsConnected)" @onclick="() => ReplyToUser()">Reply to user</button>
@@ -99,9 +99,9 @@ else
     [Parameter]
     public int chatId { get; set; }
     private bool isLoaded = false;
-    private bool showEdit = false;
-    private bool showReply = false;
-    private bool showReplyToUser = false;
+    private bool showEditBtn = false;
+    private bool showReplyBtn = false;
+    private bool showReplyToUserBtn = false;
 
     private int quantityToSkip = 0;
     private int quantityToLoad = 20;
@@ -158,12 +158,12 @@ else
     {
         Model.RoomName = chat.ChatName;
         Model.ChatId = chatId;
-        if (showEdit == false)
+        if (showEditBtn == false)
         {
-            var response = await RequestMessageService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
+            var response = await RequestMessageService.SendMessage(Model.ChatId, Model.RoomName, Model.InputField);
             var message = response.Message;
             await hubConnection.SendAsync("SendMessage", chatId, message);
-            Model.Message = string.Empty;
+            Model.InputField = string.Empty;
         }
     }
 
@@ -175,23 +175,23 @@ else
 
     private async void ChangeSendToEdit(int messageId, string messageText)
     {
-        showEdit = true;
-        Model.Message = messageText;
+        showEditBtn = true;
+        Model.InputField = messageText;
         Model.MessageId = messageId;
     }
 
     private async Task EditMessage()
     {
-        await hubConnection.SendAsync("Edit", chatId, Model.MessageId, Model.Message);
-        showEdit = false;
-        Model.Message = string.Empty;
+        await hubConnection.SendAsync("Edit", chatId, Model.MessageId, Model.InputField);
+        showEditBtn = false;
+        Model.InputField = string.Empty;
         await InvokeAsync(StateHasChanged);
     }
 
     private void ChangeSendToReply(string userName, string repliedMsg)
     {
-        showReply = true;
-        ReplyModel.Reply = Model.Message;
+        showReplyBtn = true;
+        ReplyModel.Reply = Model.InputField;
         ReplyModel.Message = repliedMsg;
         ReplyModel.UserName = userName;
     }
@@ -204,26 +204,26 @@ else
             ReplyModel.SenderId = response.UserId;
             ReplyModel.SenderName = response.UserName;
         });
-        if (Model.Message != null)
+        if (Model.InputField != null)
         {
-            ReplyModel.Reply = Model.Message;
+            ReplyModel.Reply = Model.InputField;
             ReplyModel.ChatId = chatId;
             await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
-            showReply = false;
-            Model.Message = string.Empty;
+            showReplyBtn = false;
+            Model.InputField = string.Empty;
             await InvokeAsync(StateHasChanged);
         }
         else
         {
-            showReply = false;
-            Model.Message = string.Empty;
+            showReplyBtn = false;
+            Model.InputField = string.Empty;
         }
     }
 
     private void ChangeSendToReplyToUser(string userId, string repliedMsg, string userName)
     {
-        showReplyToUser = true;
-        ReplyToUserModel.Reply = Model.Message;
+        showReplyToUserBtn = true;
+        ReplyToUserModel.Reply = Model.InputField;
         ReplyToUserModel.Message = repliedMsg;
         ReplyToUserModel.SenderId = userId;
         ReplyToUserModel.SenderName = userName;
@@ -237,23 +237,23 @@ else
             ReplyToUserModel.UserId = response.UserId;
             ReplyToUserModel.UserName = response.UserName;
         });
-        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId && Model.Message != null)
+        if (ReplyToUserModel.SenderId != ReplyToUserModel.UserId && Model.InputField != null)
         {
-            ReplyToUserModel.Reply = Model.Message;
+            ReplyToUserModel.Reply = Model.InputField;
             var chatWithUserId = await
                 MessageService.FindPrivateChat(ReplyToUserModel.SenderId, ReplyToUserModel.UserId);
             ReplyToUserModel.ChatId = chatWithUserId;
             await MessageService.ReplyToUser(ReplyToUserModel);
-            showReplyToUser = false;
-            Model.Message = string.Empty;
+            showReplyToUserBtn = false;
+            Model.InputField = string.Empty;
 
             ReplyToUserModel = null;
             NavManager.NavigateTo("/mainChatPage/" + chatWithUserId, true);
         }
         else
         {
-            showReplyToUser = false;
-            Model.Message = string.Empty;
+            showReplyToUserBtn = false;
+            Model.InputField = string.Empty;
         }
     }
 

@@ -29,8 +29,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
             };
 
             _context.Messages.Add(message);
-            await _context.SaveChangesAsync();
-
             return message;
         }
         public async Task<Message?> GetById(int id)
@@ -38,20 +36,19 @@ namespace BlazorChatApp.DAL.Data.Repositories
             return await _context.Messages.FindAsync(id);
         }
 
-        public async Task<Message> ReplyToGroup(string reply, string message, string userName, 
-            string senderName, string senderId, int chatId)
+        public async Task<Message> ReplyToGroup(string newMessage, string oldMessage, string userName, 
+            string currentName, string currentId, int chatId)
         {
             Message newReply = new Message
             {
-                MessageText = $"Replied to {userName}:{message} - {reply}",
-                SenderName = senderName,
-                UserId = senderId,
+                MessageText = $"Replied to {userName}:{oldMessage} - {newMessage}",
+                SenderName = currentName,
+                UserId = currentId,
                 SentTime = DateTime.Now,
                 ChatId = chatId,
                 IsItReply = true
             };
            await _context.Messages.AddAsync(newReply);
-           await _context.SaveChangesAsync();
            return newReply;
         }
 
@@ -59,24 +56,22 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             var entity = await _context.Messages.FindAsync(id);
             if (entity != null) _context.Messages.Remove(entity);
-            await _context.SaveChangesAsync();
-
         }
 
-        public async Task<Message> ReplyToUser(string reply, string message, string userName, string userId, string senderName, string senderId)
+        public async Task<Message> ReplyToUser(string newMessage, string oldMessage, string currentName, 
+            string currentId, string userName, string senderId)
         {
-            var chatId =  await FindPrivateChat(senderId, userId);
+            var chatId =  await FindPrivateChat(senderId, currentId);
             Message newReply = new Message
             {
-                MessageText = $"Replied to {userName}:{message} - {reply}",
-                SenderName = senderName,
+                MessageText = $"Replied to {userName}:{oldMessage} - {newMessage}",
+                SenderName = currentName,
                 SentTime = DateTime.Now,
-                UserId = userId,
+                UserId = currentId,
                 ChatId = chatId,
                 IsItReply = true
             };
             await _context.Messages.AddAsync(newReply);
-            await _context.SaveChangesAsync();
             return newReply;
         }
 
@@ -89,16 +84,14 @@ namespace BlazorChatApp.DAL.Data.Repositories
             { 
                 entity.MessageText = newMessage;
                 _context.Messages.Update(entity);
-              await _context.SaveChangesAsync();
-              return entity;
+                return entity;
             }
             return new Message();
         }
 
         public async Task<Message> FindMessage(int id)
         {
-            var message = await _context.Messages.FindAsync(id);
-            return message;
+            return await _context.Messages.FindAsync(id);
         }
 
         public async Task<int> FindPrivateChat(string senderId, string userId)
@@ -119,8 +112,9 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)
         {
-            return await _context.Messages.OrderByDescending(x=>x.SentTime).Where(chat => chat.ChatId == chatId).Skip(quantityToSkip).Take(quantityToLoad)
-                .ToListAsync();//todo: drop column from table messages
+            return await _context.Messages.OrderByDescending(x=>x.SentTime)
+                .Where(chat => chat.ChatId == chatId).Skip(quantityToSkip).Take(quantityToLoad)
+                .ToListAsync();
         }
     }
 }

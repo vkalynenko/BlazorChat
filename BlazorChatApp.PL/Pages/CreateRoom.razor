@@ -7,13 +7,15 @@
 <h1>Creating new chat</h1>
 
 <div class="container">
-    <p>@notification</p>
-    <input @bind:event="oninput" @bind="chatName"/>
-    <br />
-    <button class="btn btn-primary" type="submit" @onclick="CreateChat" >
+    <div class="input-group">
+        <input class="input-group-text" @bind:event="oninput" @bind="chatName"/>
+    </div>
+    <button class="btn btn-outline-dark" type="submit" @onclick="CreateChat">
         Create new room
     </button>
-    </div>
+</div>
+
+
 @code
 {
     private string chatName;

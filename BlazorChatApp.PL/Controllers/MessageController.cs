@@ -39,20 +39,20 @@ namespace BlazorChatApp.PL.Controllers
         {
             try
             {
-                if (messageDto.Message == null)
+                if (messageDto.InputField == null)
                 {
                     new Message();
                 }
                 var entity = new Message
                 {
                     ChatId = messageDto.ChatId,
-                    MessageText = messageDto.Message,
+                    MessageText = messageDto.InputField,
                     SenderName = User.Identity.Name,
                     SentTime = DateTime.Now,
                 };
                 bool result =
                     await _messageService.CreateMessage(messageDto.ChatId, 
-                        messageDto.Message, User.Identity.Name, await GetUserId());
+                        messageDto.InputField, User.Identity.Name, await GetUserId());
                 if (result)
                 {
                     return entity;

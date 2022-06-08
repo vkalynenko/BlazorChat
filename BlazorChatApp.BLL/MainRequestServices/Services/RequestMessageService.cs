@@ -24,7 +24,7 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
         }
         public async Task<CreateMessageResponse> SendMessage(int chatId, string roomName, string message)
         {
-            var messageDto = new MessageDto { ChatId = chatId, Message = message, RoomName = roomName };
+            var messageDto = new MessageDto { ChatId = chatId, InputField = message, RoomName = roomName };
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateMessageResponse { IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized };

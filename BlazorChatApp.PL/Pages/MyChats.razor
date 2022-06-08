@@ -5,6 +5,7 @@
 @inject IRequestChatService RequestChatService
 @inherits BaseComponent
 
+<h1>There are your chats!</h1>
 @if (isLoaded==false)
 {
     <div class="loader" style="position: center">
@@ -13,7 +14,7 @@
 else
 {
     <div class="container">
-        <div class="align-content-xl-center">
+        <div class="align-content-xl-center" >
             <form>
                 @foreach (var chat in chats)
                 {
@@ -43,5 +44,4 @@ else
     {
         NavManager.NavigateTo("/mainChatPage/"+ chatId, true);
     }
-
 }

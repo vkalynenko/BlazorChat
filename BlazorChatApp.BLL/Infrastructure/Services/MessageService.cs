@@ -51,6 +51,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             try
             {
                 var entity = await _unitOfWork.Message.UpdateMessage(id, message);
+                await _unitOfWork.SaveChangesAsync();
                 return entity;
 
             }

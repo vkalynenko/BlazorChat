@@ -2,8 +2,11 @@
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using Blazored.LocalStorage
 @using BlazorChatApp.BLL.Helpers
+@using BlazorChatApp.BLL.MainRequestServices.Interfaces
+@using BlazorChatApp.BLL.Responses
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
+@inject IRequestUserService RequestUserService
 @inject ILocalStorageService localStorage
 <PageTitle>BlazorChatApp.PL</PageTitle>
 <div class="page">
@@ -15,6 +18,8 @@
             <p>@notification</p>
             @if (status)
             {
+                @*<span class="oi oi-align-left" aria-hidden="true">Hello, @userName!</span> *@
+            
                 <NavLink class="nav-link" @onclick="Logout">
                     <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
                 </NavLink>
@@ -39,17 +44,18 @@
 
 @code
 {
+   // private string userName { get; set; }
     private bool status;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var userIsAuthed = await localStorage.GetItemAsync<string>("token");
-
+        //GetCurrentUserInfo userInfo = await RequestUserService.GetUserInfo();
+        //userName = userInfo.UserName;
         if (userIsAuthed == null)
         {
             status = false;
             StateHasChanged();
         }
-
         else
         {
             status = true;
