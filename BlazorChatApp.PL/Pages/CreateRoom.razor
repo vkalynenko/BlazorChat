@@ -1,10 +1,8 @@
 ﻿@page "/createRoom"
-@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using BlazorChatApp.BLL.MainRequestServices.Interfaces
 @using BlazorChatApp.BLL.Responses
-@using Blazored.LocalStorage
-@inject IRequestService RequestService
+@inject IRequestChatService RequestChatService
 @inject NavigationManager NavManager
-@inject ILocalStorageService StorageService
 @inherits BaseComponent
 <h1>Creating new chat</h1>
 
@@ -24,7 +22,7 @@
     {
         try
         {
-            CreateChatResponse roomIsCreated = await RequestService.CreateRoomAsync(chatName);
+            CreateChatResponse roomIsCreated = await RequestChatService.CreateRoomAsync(chatName);
             CheckIfUserHasAccess(roomIsCreated, async () => NavManager.NavigateTo("/MyChats"));
         }
         catch

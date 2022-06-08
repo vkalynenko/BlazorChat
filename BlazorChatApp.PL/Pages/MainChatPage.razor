@@ -3,14 +3,17 @@
 @using BlazorChatApp.DAL.Domain.Entities
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using BlazorChatApp.BLL.Contracts.DTOs
+@using BlazorChatApp.BLL.MainRequestServices.Interfaces
 @using BlazorChatApp.BLL.Models
 @using Castle.Core.Internal
 @inject NavigationManager NavManager
-@inject IRequestService RequestService
+@inject IRequestChatService RequestChatService
+@inject IRequestMessageService RequestMessageService
 @inject MessageDto Model
 @inject ReplyToGroupModel ReplyModel
 @inject ReplyToUserModel ReplyToUserModel
 @inject IMessageService MessageService
+@inject IRequestUserService RequestUserService
 @inherits BaseComponent
 
 <h2 style="text-align: center">@chat.ChatName</h2>
@@ -115,7 +118,7 @@ else
     {
         if (firstRender)
         {
-            var getCurrentChatResponse = await RequestService.GetCurrentChat(chatId);
+            var getCurrentChatResponse = await RequestChatService.GetCurrentChat(chatId);
             CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
             messages = (List<Message>?) await MessageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
             messages.Reverse();
@@ -157,7 +160,7 @@ else
         Model.ChatId = chatId;
         if (showEdit == false)
         {
-            var response = await RequestService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
+            var response = await RequestMessageService.SendMessage(Model.ChatId, Model.RoomName, Model.Message);
             var message = response.Message;
             await hubConnection.SendAsync("SendMessage", chatId, message);
             Model.Message = string.Empty;
@@ -195,7 +198,7 @@ else
 
     private async Task ReplyToGroup()
     {
-        var response = await RequestService.GetUserInfo();
+        var response = await RequestUserService.GetUserInfo();
         CheckIfUserHasAccess(response, async () =>
         {
             ReplyModel.SenderId = response.UserId;
@@ -208,7 +211,6 @@ else
             await hubConnection.SendAsync("ReplyToGroup", ReplyModel);
             showReply = false;
             Model.Message = string.Empty;
-            ReplyModel = null;
             await InvokeAsync(StateHasChanged);
         }
         else
@@ -229,7 +231,7 @@ else
 
     private async Task ReplyToUser()
     {
-        var response = await RequestService.GetUserInfo();
+        var response = await RequestUserService.GetUserInfo();
         CheckIfUserHasAccess(response, async () =>
         {
             ReplyToUserModel.UserId = response.UserId;

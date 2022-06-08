@@ -49,7 +49,6 @@ namespace BlazorChatApp.PL.Controllers
                     MessageText = messageDto.Message,
                     SenderName = User.Identity.Name,
                     SentTime = DateTime.Now,
-                    WhoDeleted = "e6ca90d7-8a78-44eb-8d1a-3a93305b8af7",
                 };
                 bool result =
                     await _messageService.CreateMessage(messageDto.ChatId, 

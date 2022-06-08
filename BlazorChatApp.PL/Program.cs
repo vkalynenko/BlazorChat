@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BlazorChatApp.BLL.Hubs;
+using BlazorChatApp.BLL.MainRequestServices.Interfaces;
+using BlazorChatApp.BLL.MainRequestServices.Services;
 using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
@@ -37,7 +39,6 @@ builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 
-builder.Services.AddTransient<IRequestService, RequestService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
@@ -45,6 +46,10 @@ builder.Services.AddTransient<IChatService, ChatService>();
 builder.Services.AddTransient<IMessageService, MessageService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddTransient<IRequestChatService, RequestChatService>();
+builder.Services.AddTransient<IRequestMessageService, RequestMessageService>();
+builder.Services.AddTransient<IRequestUserService, RequestUserService>();
 
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();

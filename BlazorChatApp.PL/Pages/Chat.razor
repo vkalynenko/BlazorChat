@@ -1,8 +1,8 @@
 ﻿@page "/chats"
 @inject NavigationManager NavManager
 @using BlazorChatApp.BLL.Responses
-@using BlazorChatApp.BLL.Infrastructure.Interfaces
-@inject IRequestService RequestService
+@using BlazorChatApp.BLL.MainRequestServices.Interfaces
+@inject IRequestChatService RequestChatService
 @inherits BaseComponent
 
 <h1>Hello,there are your chats which you may enter! </h1>
@@ -32,7 +32,7 @@
     {
         if (firstRender)
         {
-            GetAllChatsResponse isAllowedToGetChats = await RequestService.GetAllChats();
+            GetAllChatsResponse isAllowedToGetChats = await RequestChatService.GetAllChats();
             CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats; });
             isLoaded = true;
         }
@@ -41,7 +41,7 @@
 
     protected async void JoinRoom(int chatId)
     {
-        var isAllowedAccessToJoinChat = await RequestService.JoinRoom(chatId);
+        var isAllowedAccessToJoinChat = await RequestChatService.JoinRoom(chatId);
 
         CheckIfUserHasAccess(isAllowedAccessToJoinChat, async () => { NavManager.NavigateTo("/myChats", true);});
     }

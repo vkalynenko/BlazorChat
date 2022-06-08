@@ -1,8 +1,8 @@
 ﻿@page "/myChats"
 @using BlazorChatApp.BLL.Responses
-@using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using BlazorChatApp.BLL.MainRequestServices.Interfaces
 @inject NavigationManager NavManager
-@inject IRequestService RequestService
+@inject IRequestChatService RequestChatService
 @inherits BaseComponent
 
 @if (isLoaded==false)
@@ -32,7 +32,7 @@ else
     {
         if (firstRender)
         {
-            GetAllUserChatsResponse getAllChats = await RequestService.GetAllUserChats();
+            GetAllUserChatsResponse getAllChats = await RequestChatService.GetAllUserChats();
             CheckIfUserHasAccess(getAllChats, async() => chats = await getAllChats.Chats);
             isLoaded = true;
             StateHasChanged();

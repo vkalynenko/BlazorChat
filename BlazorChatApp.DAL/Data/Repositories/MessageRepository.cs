@@ -26,7 +26,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 UserId = userId,
                 SentTime = DateTime.Now,
                 IsItReply = false,
-                WhoDeleted = "e6ca90d7-8a78-44eb-8d1a-3a93305b8af7",
             };
 
             _context.Messages.Add(message);

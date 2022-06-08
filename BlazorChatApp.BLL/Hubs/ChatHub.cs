@@ -59,7 +59,5 @@ namespace BlazorChatApp.BLL.Hubs
             var messages = await _messageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
             await Clients.Caller.SendAsync("ReceiveLoadedMessages", messages);
         }
-       
-
     }
 }
