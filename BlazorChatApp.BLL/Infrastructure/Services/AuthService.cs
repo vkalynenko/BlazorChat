@@ -40,7 +40,7 @@ public class AuthService : IAuthService
             var token = await _localStorage.GetItemAsync<string>("token");
             TokenHolder.Token = token;
             await SetTokenToLocalStorage(httpResponse);
-            return "OK";
+            return "Ok";
         }
 
         return "Not Ok";

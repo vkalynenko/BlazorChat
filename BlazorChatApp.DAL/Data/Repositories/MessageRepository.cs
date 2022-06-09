@@ -29,6 +29,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             };
 
             _context.Messages.Add(message);
+            await _context.SaveChangesAsync();
             return message;
         }
         public async Task<Message?> GetById(int id)
@@ -49,7 +50,8 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 IsItReply = true
             };
            await _context.Messages.AddAsync(newReply);
-           return newReply;
+           await _context.SaveChangesAsync();
+            return newReply;
         }
 
         public async Task DeleteMessageFromAll(int id)
@@ -72,6 +74,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 IsItReply = true
             };
             await _context.Messages.AddAsync(newReply);
+            await _context.SaveChangesAsync();
             return newReply;
         }
 
@@ -86,6 +89,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 {
                   entity.MessageText = newMessage;
                   _context.Messages.Update(entity);
+                  await _context.SaveChangesAsync();
                   return entity;
                 }
             }

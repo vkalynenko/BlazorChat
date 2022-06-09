@@ -1,13 +1,14 @@
 ﻿@page "/createPrivate"
-@using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using BlazorChatApp.BLL.MainRequestServices.Interfaces
 @using BlazorChatApp.BLL.Responses
 @using Microsoft.AspNetCore.Identity
 @inject NavigationManager NavManager
 @inject IRequestChatService RequestChatService
 @inject IRequestUserService RequestUserService
+@inject IToastService ToastService
 @inherits BaseComponent 
-
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <h1>There you can start messaging in private chat with defined user!</h1>
 
 @if (isLoaded==false)
@@ -19,13 +20,11 @@ else
 {
     <div class="container">
     <div class="align-content-xl-center">
-        <form>
         @foreach (var user in users)
         {  
             <input type="hidden" id="userId" @bind-value="@user.Id"/>
-            <button type="submit" class="room-button" @onclick="() => CreatePrivateChat(user.Id)">@user.UserName</button>
+            <button type="submit" class="room-button" @onclick="() => CreatePrivateChat(user.Id, user.UserName)">@user.UserName</button>
         }
-        </form>
     </div>
 </div>
 }
@@ -44,11 +43,17 @@ else
         }
     }
 
-    protected async void CreatePrivateChat(string userId)
+    protected async void CreatePrivateChat(string userId, string userName)
     {
         CreateChatResponse isAllowedAccessToCreateChat =  await RequestChatService.CreatePrivateRoomAsync(userId);
-        CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () => NavManager.NavigateTo("/MyChats", true));
+        try
+        {
+            CheckIfUserHasAccess(isAllowedAccessToCreateChat, async () => ToastService.ShowSuccess($"User {userName} was added to your chats!"));
+        }
+        catch
+        {
+            ToastService.ShowError("Failed to add user!");
+        }
     }
-
 }
     

@@ -4,7 +4,9 @@
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @inject NavigationManager NavManager
 @inject LoginDto LoginDto
-
+@inject IToastService ToastService
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <h1>Enter to chat</h1>
 <EditForm Model="LoginDto" OnSubmit="LoginAsync">
     <div class="container">
@@ -30,8 +32,17 @@
     {
         try
         {
-            await _service.LoginAsync(LoginDto.UserName, LoginDto.Password);
-            NavManager.NavigateTo("/MyChats");
+            var isLoggedIn = await _service.LoginAsync(LoginDto.UserName, LoginDto.Password);
+            if (isLoggedIn == "Ok")
+            {
+                ToastService.ShowSuccess("You are successfully logged in!");
+                NavManager.NavigateTo("/");
+            }
+            else
+            {
+                ToastService.ShowError("Incorrect login or password!");
+            }
+           
         }
         catch 
         {

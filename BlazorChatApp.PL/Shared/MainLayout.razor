@@ -3,12 +3,15 @@
 @using Blazored.LocalStorage
 @using BlazorChatApp.BLL.Helpers
 @using BlazorChatApp.BLL.MainRequestServices.Interfaces
-@using BlazorChatApp.BLL.Responses
+@using Blazored.Toast.Configuration
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
 @inject IRequestUserService RequestUserService
 @inject ILocalStorageService localStorage
-<PageTitle>BlazorChatApp.PL</PageTitle>
+@inject IToastService ToastService
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+<PageTitle>BlazorChatApp</PageTitle>
 <div class="page">
     <div class="sidebar">
         <NavMenu/>
@@ -18,9 +21,6 @@
             <p>@notification</p>
             @if (status)
             {
-               @* <NavLink class="nav-link">
-                <span class="oi oi-align-left" aria-hidden="true">Hello, @userName!</span> 
-                </NavLink>*@
                 <NavLink class="nav-link" @onclick="Logout">
                     <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
                 </NavLink>
@@ -34,27 +34,19 @@
                     <span class="oi oi-pencil" href="/register" aria-hidden="true"></span> Register
                 </NavLink>
             }
-
-
         </div>
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+<BlazoredToasts Position="ToastPosition.TopRight" IconType="IconType.Material" Timeout=7 ShowProgressBar="true" />
 
 @code
 {
-    //private string userName { get; set; }
     private bool status;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //if (firstRender)
-        //{
-        //GetCurrentUserInfo userInfo = await RequestUserService.GetUserInfo();
-        //userName = userInfo.UserName;
-        //    StateHasChanged();
-        //}
         var userIsAuthed = await localStorage.GetItemAsync<string>("token");
        
         if (userIsAuthed == null)
@@ -76,6 +68,8 @@
         {
             NavManager.NavigateTo("/login");
         }
+        ToastService.ShowSuccess("You are log out!");
+        ToastService.ShowInfo("Log in to continue chatting!");
         await AuthService.LogOutAsync();
     }
 }

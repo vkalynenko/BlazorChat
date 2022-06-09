@@ -15,7 +15,8 @@
 @inject IMessageService MessageService
 @inject IRequestUserService RequestUserService
 @inherits BaseComponent
-
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <h2 style="text-align: center">@chat.ChatName</h2>
 <link rel="stylesheet" 
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -247,8 +248,6 @@ else
             await MessageService.ReplyToUser(ReplyToUserModel);
             showReplyToUserBtn = false;
             Model.InputField = string.Empty;
-
-            ReplyToUserModel = null;
             NavManager.NavigateTo("/mainChatPage/" + chatWithUserId, true);
         }
         else

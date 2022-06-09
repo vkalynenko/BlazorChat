@@ -6,6 +6,9 @@
 @using Blazored.LocalStorage
 @inject NavigationManager NavManager
 @inject ILocalStorageService LocalStorage
+@inject IToastService ToastService
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 @code
 {
     protected void CheckIfUserHasAccess(BaseResponse response, Action action)
@@ -15,6 +18,7 @@
         {
             TokenHolder.Token = null;
             LocalStorage.ClearAsync();
+            ToastService.ShowWarning("You are not authorized!");
             NavManager.NavigateTo("/login");
         }
         else
@@ -29,6 +33,7 @@
         {
             TokenHolder.Token = null;
             LocalStorage.ClearAsync();
+            ToastService.ShowWarning("You are not authorized!");
             NavManager.NavigateTo("/login");
         }
         else

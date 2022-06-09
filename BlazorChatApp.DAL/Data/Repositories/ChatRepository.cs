@@ -30,6 +30,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             });
 
            await _context.Chats.AddAsync(chat);
+           await _context.SaveChangesAsync();
         }
 
         public async Task<int> CreatePrivateChat(string rootId, string targetId)
@@ -39,10 +40,8 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
             var chat = new Chat
             {
-
                 ChatName = $"{name1} and {name2}",
                 Type = ChatType.Private,
-
             };
 
             chat.Users.Add(new ChatUser
@@ -57,6 +56,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             });
 
             await _context.Chats.AddAsync(chat);
+            await _context.SaveChangesAsync();
             return chat.Id;
         }
 
@@ -99,6 +99,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             };
 
            await _context.ChatUsers.AddAsync(chatUser);
+           await _context.SaveChangesAsync();
         }
     }
 }

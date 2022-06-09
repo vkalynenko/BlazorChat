@@ -15,6 +15,7 @@ using BlazorChatApp.BLL.MainRequestServices.Services;
 using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
+using Blazored.Toast;
 using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
 
@@ -54,8 +55,10 @@ builder.Services.AddTransient<IRequestUserService, RequestUserService>();
 builder.Services.AddSingleton<LoginDto>();
 builder.Services.AddSingleton<RegisterDto>();
 builder.Services.AddScoped<MessageDto>();
+
 builder.Services.AddScoped<ReplyToGroupModel>();
 builder.Services.AddScoped<ReplyToUserModel>();
+builder.Services.AddScoped<RoomModel>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
@@ -64,6 +67,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredToast();
 
 builder.Services.AddHttpClient("Authorization",  client =>
 {

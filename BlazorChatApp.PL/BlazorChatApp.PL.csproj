@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+    <PackageReference Include="Blazored.Toast" Version="3.2.2" />
     <PackageReference Include="EmbeddedBlazorContent" Version="1.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />

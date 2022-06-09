@@ -3,8 +3,10 @@
 @using BlazorChatApp.BLL.Responses
 @using BlazorChatApp.BLL.MainRequestServices.Interfaces
 @inject IRequestChatService RequestChatService
+@inject IToastService ToastService
 @inherits BaseComponent
-
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <h1>Hello,there are your chats which you may enter! </h1>
 @if (isLoaded==false)
 {
@@ -13,13 +15,12 @@
 }
 <div class="container">
     <div class="align-content-xl-center">
-        <form>
-            @foreach (var chat in chats)
+        @foreach (var chat in chats)
             {  
                 <input type="hidden" id="userId" @bind-value="@chat.Id"/>
-                <button type="submit" class="room-button" @onclick="() => JoinRoom(chat.Id)">@chat.ChatName</button>
+                <button type="submit" class="room-button" @onclick="() => JoinRoom(chat.Id, chat.ChatName)">@chat.ChatName</button>
+
             }
-        </form>
     </div>
 </div>
 
@@ -39,10 +40,11 @@
         StateHasChanged();
     }
 
-    protected async void JoinRoom(int chatId)
+    protected async void JoinRoom(int chatId, string chatName)
     {
         var isAllowedAccessToJoinChat = await RequestChatService.JoinRoom(chatId);
 
-        CheckIfUserHasAccess(isAllowedAccessToJoinChat, async () => { NavManager.NavigateTo("/myChats", true);});
+        CheckIfUserHasAccess(isAllowedAccessToJoinChat, async () => {ToastService.ShowSuccess($"You're successfully joined the room {chatName}!");});
+        StateHasChanged();
     }
 }

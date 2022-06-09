@@ -3,12 +3,13 @@
 @using BlazorChatApp.BLL.Contracts.DTOs
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @inject NavigationManager NavManager
+@inject IToastService ToastService
 @inject RegisterDto RegisterDto
-
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 
 <h1>Registration</h1>
 <EditForm Model="RegisterDto" OnSubmit="RegisterAsync">
-    <p>@notification</p>
     <div class="container">
         <div class="message">
             <label for="login">Enter your username</label>
@@ -30,26 +31,27 @@
 @code{
 
     [Inject] private IAuthService _service { get; set; }
-    private string notification = "";
     private async Task RegisterAsync()
     {
         try
-
         {
             var response = await _service.RegisterAsync(RegisterDto.UserName, RegisterDto.Password, RegisterDto.ConfirmPassword);
             if (response == "Registration was successful!")
             {
+                ToastService.ShowSuccess("You are registered successfully!");
+                ToastService.ShowInfo("Log in to start chatting!");
                 NavManager.NavigateTo("/login");
             }
             else
             {
-                notification = "Registration failed!";
+                ToastService.ShowError("Registration failed!");
                 NavManager.NavigateTo("/register");
             }
           
         }
         catch
         {
+            ToastService.ShowError("Registration failed!");
             NavManager.NavigateTo("/register");
         }
     }

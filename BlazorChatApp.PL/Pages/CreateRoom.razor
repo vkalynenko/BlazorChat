@@ -1,35 +1,51 @@
 ﻿@page "/createRoom"
 @using BlazorChatApp.BLL.MainRequestServices.Interfaces
+@using BlazorChatApp.BLL.Models
 @using BlazorChatApp.BLL.Responses
+@using Castle.Core.Internal
 @inject IRequestChatService RequestChatService
-@inject NavigationManager NavManager
+@inject RoomModel Room
 @inherits BaseComponent
+@inject IToastService ToastService
 <h1>Creating new chat</h1>
 
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <div class="container">
-    <div class="input-group">
-        <input class="input-group-text" @bind:event="oninput" @bind="chatName"/>
-    </div>
-    <button class="btn btn-outline-dark" type="submit" @onclick="CreateChat">
-        Create new room
-    </button>
+    <EditForm Model="Room">
+        <div class="input-group">
+            <InputText id="chatName" @bind-Value="Room.InputField"/>
+        </div>
+        <button class="btn btn-outline-dark" type="submit" @onclick="CreateChat">
+            Create new room
+        </button>
+        </EditForm>
 </div>
 
 
 @code
 {
-    private string chatName;
-    private string notification = "";
     private async void CreateChat()
     {
         try
         {
-            CreateChatResponse roomIsCreated = await RequestChatService.CreateRoomAsync(chatName);
-            CheckIfUserHasAccess(roomIsCreated, async () => NavManager.NavigateTo("/MyChats"));
+            if (Room.InputField.IsNullOrEmpty())
+            {
+                ToastService.ShowWarning("Fill up the input field to create room!");
+            }
+            else
+            {
+                CreateChatResponse roomIsCreated = await RequestChatService.CreateRoomAsync(Room.InputField);
+                CheckIfUserHasAccess(roomIsCreated, async () => ToastService.ShowSuccess($"Room {Room.InputField} was successfully created!"));
+                Room.InputField=String.Empty;
+                StateHasChanged();
+            }
         }
         catch
         {
-            notification = $"Failed to create room {chatName}!";
+            ToastService.ShowError($"Failed to create a room {Room.InputField}!");
         }
     }
+
+   
 }
