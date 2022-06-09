@@ -14,6 +14,7 @@
 @inject ReplyToUserModel ReplyToUserModel
 @inject IMessageService MessageService
 @inject IRequestUserService RequestUserService
+@inject IToastService ToastService
 @inherits BaseComponent
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
 <link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
@@ -66,7 +67,10 @@ else
             </div>
         }
     </div>
-    <button class="btn btn-dark" style="flex-direction: row-reverse"disabled="@(!IsConnected)" @onclick="() => ReadMore()">Read more</button>
+    @if (!showEditBtn && !showReplyBtn && !showReplyToUserBtn)
+    {
+        <button class="btn btn-dark" style="flex-direction: row-reverse"disabled="@(!IsConnected)" @onclick="() => ReadMore()">Read more</button>
+    }
     <EditForm Model="Model" class="chat-input" OnSubmit="SendMessage">
         <InputText id="chat-input" @bind-Value="Model.InputField"></InputText>
         @if (!showEditBtn && !showReplyBtn && !showReplyToUserBtn)
@@ -108,7 +112,6 @@ else
     private int quantityToLoad = 20;
 
     HubConnection hubConnection;
-
     public bool IsConnected =>
         hubConnection?.State == HubConnectionState.Connected;
 
@@ -150,7 +153,6 @@ else
             });
             await hubConnection.StartAsync();
             await hubConnection.SendAsync("JoinRoom", chatId);
-
             StateHasChanged();
         }
     }
@@ -252,6 +254,7 @@ else
         }
         else
         {
+            ToastService.ShowWarning("You are not allowed to send private message to yourself!");
             showReplyToUserBtn = false;
             Model.InputField = string.Empty;
         }
