@@ -25,17 +25,11 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             var path = $"{client.BaseAddress}/chat/getAllUsers";
 
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new GetAllUsersResponse
-                {
-                    IsAuthenticated = false,
-                    StatusCode = HttpStatusCode.Unauthorized,
-                    Users = null
-                };
+                return new GetAllUsersResponse {StatusCode = HttpStatusCode.Unauthorized};
 
             var httpResponse = await client.GetAsync(path);
             return new GetAllUsersResponse
             {
-                IsAuthenticated = httpResponse.IsSuccessStatusCode,
                 StatusCode = httpResponse.StatusCode,
                 Users = httpResponse.Content.ReadFromJsonAsync<List<IdentityUser>>()
             };
@@ -44,7 +38,7 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
         {
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new GetCurrentUserInfo { StatusCode = HttpStatusCode.Unauthorized };
+                return new GetCurrentUserInfo { StatusCode = HttpStatusCode.Unauthorized};
             var pathToGetUserId = $"{client.BaseAddress}/message/getUserId";
             var userId = await client.GetAsync(pathToGetUserId);
             var pathToGetUserName = $"{client.BaseAddress}/message/getUserName";

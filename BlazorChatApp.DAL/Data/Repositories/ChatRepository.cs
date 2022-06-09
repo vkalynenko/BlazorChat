@@ -3,7 +3,6 @@ using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace BlazorChatApp.DAL.Data.Repositories
 {
@@ -30,7 +29,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 UserId = userId,
             });
 
-            _context.Chats.Add(chat);
+           await _context.Chats.AddAsync(chat);
         }
 
         public async Task<int> CreatePrivateChat(string rootId, string targetId)
@@ -57,7 +56,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
             });
 
-            _context.Chats.Add(chat);
+            await _context.Chats.AddAsync(chat);
             return chat.Id;
         }
 
@@ -81,15 +80,14 @@ namespace BlazorChatApp.DAL.Data.Repositories
                     .Any(y => y.UserId == userId))
                 .ToListAsync();
         }
-        
-     
+
         public async Task<Chat> GetPrivateChat(string user1Id, string user2Id)
         {
             var chats = await _context.Chats.Include(x => x.Users)
                 .Where(chat => chat.Type.Equals(ChatType.Private))
                 .ToListAsync();
 
-            return await Task.Run(() => chats.FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id)));
+            return chats.FirstOrDefault(chat => chat.IsUserInChat(user1Id) && chat.IsUserInChat(user2Id));
         }
 
         public async Task JoinRoom(int chatId, string userId)
@@ -100,7 +98,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 UserId = userId,
             };
 
-            _context.ChatUsers.Add(chatUser);
+           await _context.ChatUsers.AddAsync(chatUser);
         }
     }
 }

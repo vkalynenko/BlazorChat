@@ -1,13 +1,10 @@
 ﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.DAL.Data.Interfaces;
-using BlazorChatApp.DAL.Domain.EF;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
-
     public class UserService : IUserService
     {
         private readonly UserManager<IdentityUser> _userManager;

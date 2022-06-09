@@ -102,14 +102,12 @@ builder.Services.AddResponseCompression(opts =>
 
 var app = builder.Build();
 
-
 if (!app.Environment.IsDevelopment())
 {
 
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 
@@ -120,8 +118,6 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-
 
 app.UseCookiePolicy();
 

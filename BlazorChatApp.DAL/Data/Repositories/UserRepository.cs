@@ -1,7 +1,6 @@
 ﻿using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.DAL.Data.Repositories
 {

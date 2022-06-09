@@ -76,15 +76,18 @@ namespace BlazorChatApp.DAL.Data.Repositories
         }
 
 
-        public async Task<Message?> UpdateMessage(int id, string newMessage)
+        public async Task<Message?> UpdateMessage(int id, string newMessage, string userId)
         {
             var entity = await _context.Messages
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (entity != null)
-            { 
-                entity.MessageText = newMessage;
-                _context.Messages.Update(entity);
-                return entity;
+            {
+                if (userId == entity.UserId)
+                {
+                  entity.MessageText = newMessage;
+                  _context.Messages.Update(entity);
+                  return entity;
+                }
             }
             return new Message();
         }

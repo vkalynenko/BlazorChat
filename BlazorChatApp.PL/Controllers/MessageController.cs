@@ -34,25 +34,25 @@ namespace BlazorChatApp.PL.Controllers
             return Ok();
         }
 
-        [HttpPost("sendMessage")]
-        public async Task<Message> SendMessage(MessageDto messageDto)
+        [HttpGet("sendMessage/{chatId}/{roomName}/{message}")]
+        public async Task<Message> SendMessage(int chatId, string roomName, string message)
         {
             try
             {
-                if (messageDto.InputField == null)
+                if (message == null)
                 {
-                    new Message();
+                    return new Message();
                 }
                 var entity = new Message
                 {
-                    ChatId = messageDto.ChatId,
-                    MessageText = messageDto.InputField,
+                    ChatId = chatId,
+                    MessageText = message,
                     SenderName = User.Identity.Name,
                     SentTime = DateTime.Now,
                 };
                 bool result =
-                    await _messageService.CreateMessage(messageDto.ChatId, 
-                        messageDto.InputField, User.Identity.Name, await GetUserId());
+                    await _messageService.CreateMessage(chatId,
+                        message, User.Identity.Name, await GetUserId());
                 if (result)
                 {
                     return entity;
@@ -64,6 +64,7 @@ namespace BlazorChatApp.PL.Controllers
                 return new Message();
             }
         }
+
 
         [HttpGet("getAllMessages/{chatId}/{quantityToSkip}/{quantityToLoad}")]
         public async Task<IEnumerable<Message>> GetAllMessages(int chatId, int quantityToSkip, int quantityToLoad)
@@ -90,6 +91,7 @@ namespace BlazorChatApp.PL.Controllers
                 return null;
             }
         }
+
         [HttpGet("getUserName")]
         public async Task<string> GetName()
         {

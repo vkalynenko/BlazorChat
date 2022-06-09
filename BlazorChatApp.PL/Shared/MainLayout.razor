@@ -18,8 +18,9 @@
             <p>@notification</p>
             @if (status)
             {
-                @*<span class="oi oi-align-left" aria-hidden="true">Hello, @userName!</span> *@
-            
+               @* <NavLink class="nav-link">
+                <span class="oi oi-align-left" aria-hidden="true">Hello, @userName!</span> 
+                </NavLink>*@
                 <NavLink class="nav-link" @onclick="Logout">
                     <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
                 </NavLink>
@@ -44,13 +45,18 @@
 
 @code
 {
-   // private string userName { get; set; }
+    //private string userName { get; set; }
     private bool status;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var userIsAuthed = await localStorage.GetItemAsync<string>("token");
+        //if (firstRender)
+        //{
         //GetCurrentUserInfo userInfo = await RequestUserService.GetUserInfo();
         //userName = userInfo.UserName;
+        //    StateHasChanged();
+        //}
+        var userIsAuthed = await localStorage.GetItemAsync<string>("token");
+       
         if (userIsAuthed == null)
         {
             status = false;

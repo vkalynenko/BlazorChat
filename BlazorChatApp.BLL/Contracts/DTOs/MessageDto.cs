@@ -10,5 +10,6 @@ namespace BlazorChatApp.BLL.Contracts.DTOs
         public string InputField { get; set; }
         public string RoomName { get; set; }
         public int MessageId { get; set; }
+        public string UserId { get; set; }
     }
 }

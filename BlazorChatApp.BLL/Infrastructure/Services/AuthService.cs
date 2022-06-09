@@ -3,7 +3,6 @@ using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services;
@@ -13,16 +12,13 @@ public class AuthService : IAuthService
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly IHttpClientFactory _clientFactory;
-    private readonly AuthenticationStateProvider _customAuthenticationProvider;
 
     public AuthService(HttpClient httpClient,
-        ILocalStorageService localStorage, IHttpClientFactory clientFactory,
-        AuthenticationStateProvider customAuthenticationProvider)
+        ILocalStorageService localStorage, IHttpClientFactory clientFactory)
     {
         _httpClient = httpClient;
         _localStorage = localStorage;
         _clientFactory = clientFactory;
-        _customAuthenticationProvider = customAuthenticationProvider;
     }
 
     public async Task<string> LoginAsync(string userName, string password)

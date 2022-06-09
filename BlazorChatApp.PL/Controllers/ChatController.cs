@@ -49,10 +49,9 @@ public class ChatController : BaseController
     {
         try
         {
-
             var rootId = await  GetUserId();
             var privateChat = await _chatService.GetPrivateChat(rootId, targetId);
-            if (rootId != null && privateChat ==null)
+            if (rootId != null && privateChat == null)
                 await _chatService.CreatePrivateChat(rootId, targetId);
             return Ok();
         }

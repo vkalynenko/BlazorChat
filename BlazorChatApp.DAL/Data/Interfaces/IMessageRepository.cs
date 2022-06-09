@@ -5,7 +5,7 @@ namespace BlazorChatApp.DAL.Data.Interfaces
     public interface IMessageRepository
     {
         Task DeleteMessageFromAll(int id);
-        Task<Message?> UpdateMessage(int id, string newMessage);
+        Task<Message?> UpdateMessage(int id, string newMessage, string userId);
         Task<Message> FindMessage(int id);
         Task<Message> CreateMessage(int chatId, string message, string userName, string userId);
         Task<Message?> GetById(int id);

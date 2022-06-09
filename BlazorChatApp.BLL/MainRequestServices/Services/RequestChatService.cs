@@ -26,11 +26,10 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             var path = $"{client.BaseAddress}/chat/createRoom/{chatName}";
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new CreateChatResponse
-                    { IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized };
+                    {StatusCode = HttpStatusCode.Unauthorized };
             var httpResponse = await client.GetAsync(path);
             return new CreateChatResponse
             {
-                IsAuthenticated = httpResponse.IsSuccessStatusCode,
                 StatusCode = httpResponse.StatusCode
             };
         }
@@ -39,31 +38,18 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             var client = await ClientWithAuthHeader();
 
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new CreateChatResponse
-                {
-                    IsAuthenticated = false,
-                    StatusCode = HttpStatusCode.Unauthorized
-                };
+                return new CreateChatResponse {StatusCode = HttpStatusCode.Unauthorized};
 
             var path = $"{client.BaseAddress}/chat/createPrivateRoom/{targetId}";
             var httpResponse = await client.GetAsync(path);
-            return new CreateChatResponse
-            {
-                IsAuthenticated = httpResponse.IsSuccessStatusCode,
-                StatusCode = httpResponse.StatusCode
-            };
+            return new CreateChatResponse {StatusCode = httpResponse.StatusCode};
         }
 
         public async Task<GetAllUserChatsResponse> GetAllUserChats()
         {
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new GetAllUserChatsResponse
-                {
-                    IsAuthenticated = false,
-                    StatusCode = HttpStatusCode.Unauthorized,
-                    Chats = null
-                };
+                return new GetAllUserChatsResponse {StatusCode = HttpStatusCode.Unauthorized};
 
             var path = $"{client.BaseAddress}/chat/getAllUserChats";
             var httpResponse = await client.GetAsync(path);
@@ -71,7 +57,6 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             return new GetAllUserChatsResponse
             {
                 StatusCode = httpResponse.StatusCode,
-                IsAuthenticated = httpResponse.IsSuccessStatusCode,
                 Chats = httpResponse.Content.ReadFromJsonAsync<List<Chat>>()
             };
         }
@@ -80,13 +65,12 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
         {
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new GetAllChatsResponse { StatusCode = HttpStatusCode.Unauthorized, Chats = null };
+                return new GetAllChatsResponse { StatusCode = HttpStatusCode.Unauthorized};
             var path = $"{client.BaseAddress}/chat/getAllChats";
             var httpsResponse = await client.GetAsync(path);
             return new GetAllChatsResponse
             {
                 StatusCode = httpsResponse.StatusCode,
-                IsAuthenticated = httpsResponse.IsSuccessStatusCode,
                 Chats = httpsResponse.Content.ReadFromJsonAsync<List<Chat>>()
             };
         }
@@ -95,14 +79,10 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
         {
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
-                return new BaseResponse { IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized };
+                return new BaseResponse {StatusCode = HttpStatusCode.Unauthorized };
             var path = $"{client.BaseAddress}/chat/joinRoom/{chatId}";
             var httpResponse = await client.GetAsync(path);
-            return new BaseResponse
-            {
-                StatusCode = httpResponse.StatusCode,
-                IsAuthenticated = httpResponse.IsSuccessStatusCode
-            };
+            return new BaseResponse {StatusCode = httpResponse.StatusCode,};
         }
 
         public async Task<GetCurrentChatResponse> GetCurrentChat(int chatId)
@@ -110,7 +90,7 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetCurrentChatResponse
-                { IsAuthenticated = false, StatusCode = HttpStatusCode.Unauthorized, Chat = null };
+                {StatusCode = HttpStatusCode.Unauthorized};
             var path = $"{client.BaseAddress}/chat/getCurrentChat/{chatId}";
             var httpResponse = await client.GetAsync(path);
             return new GetCurrentChatResponse
@@ -126,6 +106,5 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             await SetAuthorizationHeader(client);
             return client;
         }
-
     }
 }

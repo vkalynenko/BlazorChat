@@ -42,9 +42,10 @@ else
                 <button type="button" class="btn btn-outline-danger" @onclick="() => DeleteMessageFromAll(msg.Id)">
                     <i class="fa fa-trash" style="font-size: 14px"></i>
                 </button>
-                <button type="submit" class="btn btn-outline-success" @onclick="() => ChangeSendToEdit(msg.Id, msg.MessageText)">
+                <button type="submit" class="btn btn-outline-success" @onclick="() => ChangeSendToEdit(msg.Id, msg.MessageText, msg.UserId)">
                     <i class="fa fa-edit" style="font-size: 12px"></i>
                 </button>
+                
                 @if (msg.IsItReply)
                 {
                     <header style="background-color: #e6dfe8">@msg.SenderName: </header>
@@ -61,7 +62,6 @@ else
                     </p>
                     <footer>@msg.SentTime</footer>
                 }
-
             </div>
         }
     </div>
@@ -173,16 +173,17 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
-    private async void ChangeSendToEdit(int messageId, string messageText)
+    private void ChangeSendToEdit(int messageId, string messageText, string userId)
     {
         showEditBtn = true;
         Model.InputField = messageText;
         Model.MessageId = messageId;
+        Model.UserId = userId;
     }
 
     private async Task EditMessage()
     {
-        await hubConnection.SendAsync("Edit", chatId, Model.MessageId, Model.InputField);
+        await hubConnection.SendAsync("Edit", chatId, Model.MessageId, Model.InputField, Model.UserId);
         showEditBtn = false;
         Model.InputField = string.Empty;
         await InvokeAsync(StateHasChanged);
@@ -256,11 +257,9 @@ else
             Model.InputField = string.Empty;
         }
     }
-
     private async Task ReadMore()
     {
         quantityToSkip += quantityToLoad;
         await hubConnection.SendAsync("ReadMore", chatId, quantityToSkip, quantityToLoad);
     }
-
 }
