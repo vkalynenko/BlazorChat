@@ -54,7 +54,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
             });
 
             await _context.Chats.AddAsync(chat);
-            await _context.SaveChangesAsync();
             return chat.Id;
         }
 
