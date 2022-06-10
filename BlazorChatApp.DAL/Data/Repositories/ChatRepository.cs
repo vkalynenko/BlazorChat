@@ -30,12 +30,11 @@ namespace BlazorChatApp.DAL.Data.Repositories
             });
 
            await _context.Chats.AddAsync(chat);
-           await _context.SaveChangesAsync();
         }
 
         public async Task<int> CreatePrivateChat(string rootId, string targetId)
         {
-            var name1 =  _userManager.FindByIdAsync(targetId).Result.UserName;
+            var name1 = _userManager.FindByIdAsync(targetId).Result.UserName;
             var name2 = _userManager.FindByIdAsync(rootId).Result.UserName;
 
             var chat = new Chat
@@ -52,12 +51,42 @@ namespace BlazorChatApp.DAL.Data.Repositories
             chat.Users.Add(new ChatUser
             {
                 UserId = rootId,
-
             });
 
             await _context.Chats.AddAsync(chat);
             await _context.SaveChangesAsync();
             return chat.Id;
+        }
+
+        public async Task<int> GetChatIdByName(string chatName)
+        {
+            var entity = await _context.Chats.FirstOrDefaultAsync(x => x.ChatName == chatName);
+            return entity.Id;
+        }
+
+        public async Task<string> CreateNewPrivateChat(string rootId, string targetId)
+        {
+            var name1 = _userManager.FindByIdAsync(targetId).Result.UserName;
+            var name2 = _userManager.FindByIdAsync(rootId).Result.UserName;
+
+            var chat = new Chat
+            {
+                ChatName = $"{name1} and {name2}",
+                Type = ChatType.Private,
+            };
+
+            chat.Users.Add(new ChatUser
+            {
+                UserId = targetId
+            });
+
+            chat.Users.Add(new ChatUser
+            {
+                UserId = rootId,
+            });
+
+            await _context.Chats.AddAsync(chat);
+            return chat.ChatName;
         }
 
         public async Task<Chat?> GetChat(int id) 
@@ -66,7 +95,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public IEnumerable<Chat> GetChats(string userId)
+        public IEnumerable<Chat> GetNotJoinedChats(string userId)
         {
             return _context.Chats
                 .Include(x => x.Users)
@@ -97,9 +126,24 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 ChatId = chatId,
                 UserId = userId,
             };
+            await _context.ChatUsers.AddAsync(chatUser);
+        }
+        public async Task<int> FindPrivateChat(string senderId, string userId)
+        {
+            var chats = await _context.Chats.Include(x => x.Users)
+                .Where(c => c.Type.Equals(ChatType.Private))
+                .ToListAsync();
+            var chat = chats.FirstOrDefault(x => x.IsUserInChat(senderId) && x.IsUserInChat(userId));
 
-           await _context.ChatUsers.AddAsync(chatUser);
-           await _context.SaveChangesAsync();
+            if (chat == null)
+            {
+                return 0;
+            }
+            else
+            {  
+                return chat.Id;
+            }
+          
         }
     }
 }

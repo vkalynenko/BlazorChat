@@ -1,11 +1,9 @@
-﻿using BlazorChatApp.BLL.Contracts.DTOs;
-using BlazorChatApp.BLL.Hubs;
-using BlazorChatApp.BLL.Infrastructure.Interfaces;
+﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace BlazorChatApp.PL.Controllers
 {
@@ -14,32 +12,21 @@ namespace BlazorChatApp.PL.Controllers
     [ApiController]
     public class MessageController : BaseController
     {
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly IMessageService _messageService;
-        private readonly IHubContext<ChatHub> _chatHub;
 
         public MessageController(IChatService chatService,
             UserManager<IdentityUser> userManager,
-            IUserService userService, IMessageService messageService, IHubContext<ChatHub> chatHub) : base(userManager)
+            IUserService userService, IMessageService messageService) : base(userManager)
         {
-            _userManager = userManager;
             _messageService = messageService;
-            _chatHub = chatHub;
         }
 
-        [HttpGet("joinRoom/{connectionId}/{chatId}")]
-        public async Task<IActionResult> JoinRoom(string connectionId, string chatId)
-        {
-            await _chatHub.Groups.AddToGroupAsync(connectionId, chatId);
-            return Ok();
-        }
-
-        [HttpGet("sendMessage/{chatId}/{roomName}/{message}")]
-        public async Task<Message> SendMessage(int chatId, string roomName, string message)
+        [HttpGet("sendMessage/{chatId}/{message}")]
+        public async Task<Message> SendMessage(int chatId, string message)
         {
             try
             {
-                if (message == null)
+                if (message.IsNullOrEmpty())
                 {
                     return new Message();
                 }
@@ -47,12 +34,12 @@ namespace BlazorChatApp.PL.Controllers
                 {
                     ChatId = chatId,
                     MessageText = message,
-                    SenderName = User.Identity.Name,
+                    SenderName = GetUserName(),
                     SentTime = DateTime.Now,
                 };
                 bool result =
                     await _messageService.CreateMessage(chatId,
-                        message, User.Identity.Name, await GetUserId());
+                        message, GetUserName(), await GetUserId());
                 if (result)
                 {
                     return entity;
@@ -65,7 +52,6 @@ namespace BlazorChatApp.PL.Controllers
             }
         }
 
-
         [HttpGet("getAllMessages/{chatId}/{quantityToSkip}/{quantityToLoad}")]
         public async Task<IEnumerable<Message>> GetAllMessages(int chatId, int quantityToSkip, int quantityToLoad)
         {
@@ -76,32 +62,6 @@ namespace BlazorChatApp.PL.Controllers
             catch
             {
                 return new List<Message>();
-            }
-        }
-
-        [HttpGet("getUserId")]
-        public async Task<string> GetId()
-        {
-            try
-            {
-                return await GetUserId();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        [HttpGet("getUserName")]
-        public async Task<string> GetName()
-        {
-            try
-            {
-                return await GetUserName();
-            }
-            catch
-            {
-                return null;
             }
         }
     }

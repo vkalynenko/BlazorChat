@@ -26,7 +26,7 @@ namespace BlazorChatApp.PL.Controllers
 
             return userId;
         }
-        protected async Task<string> GetUserName()
+        protected string GetUserName()
         {
 
             var userName = User.FindFirstValue(ClaimTypes.Name);

@@ -28,8 +28,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 IsItReply = false,
             };
 
-            _context.Messages.Add(message);
-            await _context.SaveChangesAsync();
+            await _context.Messages.AddAsync(message);
             return message;
         }
         public async Task<Message?> GetById(int id)
@@ -50,20 +49,18 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 IsItReply = true
             };
            await _context.Messages.AddAsync(newReply);
-           await _context.SaveChangesAsync();
-            return newReply;
+           return newReply;
         }
 
         public async Task DeleteMessageFromAll(int id)
         {
-            var entity = await _context.Messages.FindAsync(id);
-            if (entity != null) _context.Messages.Remove(entity);
+            var entity = await FindMessage(id);
+             _context.Messages.Remove(entity);
         }
 
-        public async Task<Message> ReplyToUser(string newMessage, string oldMessage, string currentName, 
-            string currentId, string userName, string senderId)
+        public async Task<Message> ReplyToUser(string newMessage, string oldMessage, string currentName,
+            string currentId, string userName, string senderId, int chatId)
         {
-            var chatId =  await FindPrivateChat(senderId, currentId);
             Message newReply = new Message
             {
                 MessageText = $"Replied to {userName}:{oldMessage} - {newMessage}",
@@ -74,47 +71,28 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 IsItReply = true
             };
             await _context.Messages.AddAsync(newReply);
-            await _context.SaveChangesAsync();
             return newReply;
         }
 
-
-        public async Task<Message?> UpdateMessage(int id, string newMessage, string userId)
+        public async Task<bool> UpdateMessage(int id, string newMessage, string userId)
         {
-            var entity = await _context.Messages
-                .FirstOrDefaultAsync(c => c.Id == id);
-            if (entity != null)
+            var entity = await FindMessage(id);
+
+            if (userId == entity.UserId)
             {
-                if (userId == entity.UserId)
-                {
-                  entity.MessageText = newMessage;
-                  _context.Messages.Update(entity);
-                  await _context.SaveChangesAsync();
-                  return entity;
-                }
+                entity.MessageText = newMessage;
+                _context.Messages.Update(entity);
+                return true;
             }
-            return new Message();
+            return false;
         }
 
         public async Task<Message> FindMessage(int id)
         {
-            return await _context.Messages.FindAsync(id);
-        }
-
-        public async Task<int> FindPrivateChat(string senderId, string userId)
-        {
-            var chats = await _context.Chats.Include(x => x.Users)
-                .Where(c => c.Type.Equals(ChatType.Private))
-                .ToListAsync();
-            var chat =  chats.FirstOrDefault(x => x.IsUserInChat(senderId) && x.IsUserInChat(senderId));
-
-            if (chat == null)
-            {
-                var chatId = await _chatRepository.CreatePrivateChat(userId, senderId);
-                return chatId;
-            }
-
-            return chat.Id;
+            var message = await _context.Messages.FindAsync(id);
+            if (message != null)
+                return message;
+            return new Message();
         }
 
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)

@@ -50,10 +50,15 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             try
             {
-                var entity = await _unitOfWork.Message.UpdateMessage(id, message, userId);
-                await _unitOfWork.SaveChangesAsync();
-                return entity;
+                bool result = await _unitOfWork.Message.UpdateMessage(id, message, userId);
+                if (result)
+                {
+                    await _unitOfWork.SaveChangesAsync();
+                    var entity = await _unitOfWork.Message.GetById(id);
+                    return entity;
+                }
 
+                return new Message();
             }
             catch
             {
@@ -72,14 +77,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task<Message> ReplyToUser(ReplyToUserModel model)
         {
             var message = await _unitOfWork.Message.ReplyToUser(model.Reply, model.Message, model.UserName, model.UserId,
-                model.SenderName, model.SenderId);
+                model.SenderName, model.SenderId, model.ChatId);
             await _unitOfWork.SaveChangesAsync();
             return message;
-        }
-
-        public async Task<int> FindPrivateChat(string senderId, string userId)
-        {
-            return await _unitOfWork.Message.FindPrivateChat(senderId, userId);
         }
 
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)

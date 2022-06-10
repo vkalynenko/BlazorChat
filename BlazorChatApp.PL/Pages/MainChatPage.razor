@@ -13,6 +13,7 @@
 @inject ReplyToGroupModel ReplyModel
 @inject ReplyToUserModel ReplyToUserModel
 @inject IMessageService MessageService
+@inject IChatService ChatService
 @inject IRequestUserService RequestUserService
 @inject IToastService ToastService
 @inherits BaseComponent
@@ -159,11 +160,10 @@ else
 
     private async void SendMessage()
     {
-        Model.RoomName = chat.ChatName;
         Model.ChatId = chatId;
         if (showEditBtn == false)
         {
-            var response = await RequestMessageService.SendMessage(Model.ChatId, Model.RoomName, Model.InputField);
+            var response = await RequestMessageService.SendMessage(Model.ChatId, Model.InputField);
             var message = response.Message;
             await hubConnection.SendAsync("SendMessage", chatId, message);
             Model.InputField = string.Empty;
@@ -245,7 +245,7 @@ else
         {
             ReplyToUserModel.Reply = Model.InputField;
             var chatWithUserId = await
-                MessageService.FindPrivateChat(ReplyToUserModel.SenderId, ReplyToUserModel.UserId);
+                ChatService.FindPrivateChat(ReplyToUserModel.SenderId, ReplyToUserModel.UserId);
             ReplyToUserModel.ChatId = chatWithUserId;
             await MessageService.ReplyToUser(ReplyToUserModel);
             showReplyToUserBtn = false;

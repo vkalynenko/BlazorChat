@@ -71,7 +71,7 @@ namespace BlazorChatApp.PL.Controllers
             }
             catch
             {
-                return StatusCode(400);
+                return StatusCode(404);
             }
 
         }

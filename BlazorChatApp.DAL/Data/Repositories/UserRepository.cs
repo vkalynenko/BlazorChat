@@ -12,7 +12,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             _context = context;
         }
-        public IEnumerable<IdentityUser> GetUsers(string id)
+        public IEnumerable<IdentityUser> GetOtherUsers(string id)
         {
             var users = _context.Users
                 .Where(x => x.Id != id);

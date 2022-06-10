@@ -6,19 +6,17 @@ using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
 using Blazored.LocalStorage;
 
-namespace BlazorChatApp.BLL.MainRequestServices.Services
+namespace BlazorChatApp.BLL.RequestServices.Services
 {
     public class RequestChatService : AuthHelper, IRequestChatService
     {
 
         private readonly IHttpClientFactory _clientFactory;
-        private readonly ILocalStorageService _localStorageService;
 
         public RequestChatService(IHttpClientFactory clientFactory,
             ILocalStorageService localStorageService) : base(localStorageService)
         {
             _clientFactory = clientFactory;
-            _localStorageService = localStorageService;
         }
         public async Task<CreateChatResponse> CreateRoomAsync(string chatName)
         {
@@ -61,12 +59,12 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             };
         }
 
-        public async Task<GetAllChatsResponse> GetAllChats()
+        public async Task<GetAllChatsResponse> GetNotJoinedChats()
         {
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllChatsResponse { StatusCode = HttpStatusCode.Unauthorized};
-            var path = $"{client.BaseAddress}/chat/getAllChats";
+            var path = $"{client.BaseAddress}/chat/getNotJoinedChats";
             var httpsResponse = await client.GetAsync(path);
             return new GetAllChatsResponse
             {

@@ -7,6 +7,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
     {
         Task<string> Register(RegisterDto model);
         Task<IdentityUser> Login(LoginDto model);
-        IEnumerable<IdentityUser> GetUsers(string id);
+        IEnumerable<IdentityUser> GetOtherUsers(string id);
     }
 }

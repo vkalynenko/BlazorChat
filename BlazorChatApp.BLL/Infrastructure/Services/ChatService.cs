@@ -66,11 +66,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             }
         }
 
-        public IEnumerable<Chat> GetAllChats(string userId)
+        public IEnumerable<Chat> GetNotJoinedChats(string userId)
         {
             try
             {
-                IEnumerable<Chat> chats = _unitOfWork.Chat.GetChats(userId);
+                IEnumerable<Chat> chats = _unitOfWork.Chat.GetNotJoinedChats(userId);
                 return chats;
             }
             catch
@@ -96,6 +96,18 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task<Chat> GetPrivateChat(string rootId, string targetId)
         {
             return await _unitOfWork.Chat.GetPrivateChat(rootId, targetId);
+        }
+        public async Task<int> FindPrivateChat(string senderId, string userId)
+        {
+            var chatId = await _unitOfWork.Chat.FindPrivateChat(senderId, userId);
+            if (chatId == 0)
+            {
+                var chatName = await _unitOfWork.Chat.CreateNewPrivateChat(senderId, userId);
+                await _unitOfWork.SaveChangesAsync();
+                chatId = await _unitOfWork.Chat.GetChatIdByName(chatName);
+                return chatId;
+            }
+            return chatId;
         }
     }
 }

@@ -12,15 +12,12 @@ namespace BlazorChatApp.PL.Controllers;
 public class ChatController : BaseController
 {   
     private readonly IChatService _chatService;
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserService _userService;
-
     public ChatController(IChatService chatService, 
         UserManager<IdentityUser> userManager, 
         IUserService userService) :base(userManager)
     {
         _chatService = chatService;
-        _userManager = userManager;
         _userService = userService;
     }
 
@@ -61,21 +58,6 @@ public class ChatController : BaseController
         }
     }
 
-    [HttpGet("getAllUsers")]
-    public async Task<IEnumerable<IdentityUser>> GetAllUsers()
-    {
-        try
-        {
-            var currentUser = await GetUserId();
-            var users = _userService.GetUsers(currentUser);
-            return users;
-        }
-        catch
-        {
-            return new List<IdentityUser>();
-        }
-    }
-
     [HttpGet("getAllUserChats")]
     public async Task<IEnumerable<Chat>> GetAllUserChats()
     {
@@ -92,13 +74,12 @@ public class ChatController : BaseController
         }
     }
 
-    [HttpGet("getAllChats")]
-    public async Task<IEnumerable<Chat>> GetAllChats()
+    [HttpGet("getNotJoinedChats")]
+    public async Task<IEnumerable<Chat>> GetNotJoinedChats()
     {
         try
         {
-            string currentUser = await GetUserId();
-            IEnumerable<Chat> users = _chatService.GetAllChats(currentUser);
+            IEnumerable<Chat> users = _chatService.GetNotJoinedChats(await GetUserId());
             return users;
         }
         catch
@@ -128,11 +109,10 @@ public class ChatController : BaseController
     }
 
     [HttpGet("getCurrentChat/{chatId}")]
-    public async Task<Chat> GetCurrentChat(int chatId, int messageToLoad)
+    public async Task<Chat> GetCurrentChat(int chatId)
     {
         try
         {
-            string userId = await GetUserId();
             Chat chat = await _chatService.GetCurrentChat(chatId);
             return chat;
         }

@@ -46,9 +46,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         }
 
-        public IEnumerable<IdentityUser> GetUsers(string id)
+        public IEnumerable<IdentityUser> GetOtherUsers(string id)
         {
-            return _unitOfWork.User.GetUsers(id);
+            return _unitOfWork.User.GetOtherUsers(id);
         }
     }
 }

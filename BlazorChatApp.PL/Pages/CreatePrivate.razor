@@ -2,7 +2,6 @@
 @using BlazorChatApp.BLL.MainRequestServices.Interfaces
 @using BlazorChatApp.BLL.Responses
 @using Microsoft.AspNetCore.Identity
-@inject NavigationManager NavManager
 @inject IRequestChatService RequestChatService
 @inject IRequestUserService RequestUserService
 @inject IToastService ToastService
@@ -36,7 +35,7 @@ else
     {
         if (firstRender)
         {
-            GetAllUsersResponse getAllUsersResponse = await RequestUserService.GetAllUsersAsync();
+            GetAllUsersResponse getAllUsersResponse = await RequestUserService.GetOtherUsersAsync();
             CheckIfUserHasAccess(getAllUsersResponse, async() => { users = await getAllUsersResponse.Users;});
             isLoaded = true;
             StateHasChanged();

@@ -6,23 +6,20 @@ using BlazorChatApp.BLL.Responses;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Identity;
 
-namespace BlazorChatApp.BLL.MainRequestServices.Services
+namespace BlazorChatApp.BLL.RequestServices.Services
 {
     public class RequestUserService : AuthHelper, IRequestUserService
     {
         private readonly IHttpClientFactory _clientFactory;
-        private readonly ILocalStorageService _localStorageService;
-
         public RequestUserService(IHttpClientFactory clientFactory,
             ILocalStorageService localStorageService) : base(localStorageService)
         {
             _clientFactory = clientFactory;
-            _localStorageService = localStorageService;
         }
-        public async Task<GetAllUsersResponse> GetAllUsersAsync()
+        public async Task<GetAllUsersResponse> GetOtherUsersAsync()
         {
             var client = await ClientWithAuthHeader();
-            var path = $"{client.BaseAddress}/chat/getAllUsers";
+            var path = $"{client.BaseAddress}/user/getOtherUsers";
 
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetAllUsersResponse {StatusCode = HttpStatusCode.Unauthorized};
@@ -39,9 +36,9 @@ namespace BlazorChatApp.BLL.MainRequestServices.Services
             var client = await ClientWithAuthHeader();
             if (client.DefaultRequestHeaders.Authorization == null)
                 return new GetCurrentUserInfo { StatusCode = HttpStatusCode.Unauthorized};
-            var pathToGetUserId = $"{client.BaseAddress}/message/getUserId";
+            var pathToGetUserId = $"{client.BaseAddress}/user/getUserId"; 
             var userId = await client.GetAsync(pathToGetUserId);
-            var pathToGetUserName = $"{client.BaseAddress}/message/getUserName";
+            var pathToGetUserName = $"{client.BaseAddress}/user/getUserName";
             var userName = await client.GetAsync(pathToGetUserName);
             return new GetCurrentUserInfo
             {

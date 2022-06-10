@@ -33,7 +33,7 @@
     {
         if (firstRender)
         {
-            GetAllChatsResponse isAllowedToGetChats = await RequestChatService.GetAllChats();
+            GetAllChatsResponse isAllowedToGetChats = await RequestChatService.GetNotJoinedChats();
             CheckIfUserHasAccess(isAllowedToGetChats, async () => { chats = await isAllowedToGetChats.Chats; });
             isLoaded = true;
         }

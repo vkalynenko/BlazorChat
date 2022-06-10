@@ -11,8 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BlazorChatApp.BLL.Hubs;
 using BlazorChatApp.BLL.MainRequestServices.Interfaces;
-using BlazorChatApp.BLL.MainRequestServices.Services;
 using BlazorChatApp.BLL.Models;
+using BlazorChatApp.BLL.RequestServices.Services;
 using BlazorChatApp.DAL.Data;
 using Blazored.LocalStorage;
 using Blazored.Toast;
@@ -52,13 +52,13 @@ builder.Services.AddTransient<IRequestChatService, RequestChatService>();
 builder.Services.AddTransient<IRequestMessageService, RequestMessageService>();
 builder.Services.AddTransient<IRequestUserService, RequestUserService>();
 
-builder.Services.AddSingleton<LoginDto>();
-builder.Services.AddSingleton<RegisterDto>();
-builder.Services.AddScoped<MessageDto>();
+builder.Services.AddTransient<LoginDto>();
+builder.Services.AddTransient<RegisterDto>();
+builder.Services.AddTransient<MessageDto>();
 
-builder.Services.AddScoped<ReplyToGroupModel>();
-builder.Services.AddScoped<ReplyToUserModel>();
-builder.Services.AddScoped<RoomModel>();
+builder.Services.AddTransient<ReplyToGroupModel>();
+builder.Services.AddTransient<ReplyToUserModel>();
+builder.Services.AddTransient<RoomModel>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
@@ -127,7 +127,6 @@ app.UseCookiePolicy();
 
 app.UseEndpoints(endpoints =>
 {
-
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
     endpoints.MapControllers();

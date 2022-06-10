@@ -85,7 +85,7 @@ public class AuthService : IAuthService
     {
         var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
         var token = JsonConvert.DeserializeObject<Token>(httpResponseBody);
-
-        await _localStorage.SetItemAsync("token", token.GeneratedToken);
+        if(token != null)
+            await _localStorage.SetItemAsync("token", token.GeneratedToken); 
     }
 }
