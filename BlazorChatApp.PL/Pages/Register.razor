@@ -26,31 +26,50 @@
         <button class="btn btn-primary" type="submit">Register</button>
     </div>
 </EditForm>
-
+<br/><br/>
+<div style="position:center">
+    @if (!isLoaded)
+    {
+        <div class="loader"></div>
+        <p>Loading...</p>}
+</div>
 
 @code{
-
+    private bool isLoaded = true;
     [Inject] private IAuthService _service { get; set; }
     private async Task RegisterAsync()
     {
+        isLoaded = false;
         try
         {
-            var response = await _service.RegisterAsync(RegisterDto.UserName, RegisterDto.Password, RegisterDto.ConfirmPassword);
-            if (response == "Registration was successful!")
+            if (RegisterDto.Password != RegisterDto.ConfirmPassword)
             {
-                ToastService.ShowSuccess("You are registered successfully!");
-                ToastService.ShowInfo("Log in to start chatting!");
-                NavManager.NavigateTo("/login");
+                
+                ToastService.ShowWarning("Passwords aren't match!");
             }
             else
             {
-                ToastService.ShowError("Registration failed!");
-                NavManager.NavigateTo("/register");
+                var response = await _service.RegisterAsync(RegisterDto.UserName, RegisterDto.Password, RegisterDto.ConfirmPassword);
+                if (response == "Registration was successful!")
+                {
+                    ToastService.ShowSuccess("You are registered successfully!");
+                    ToastService.ShowInfo("Log in to start chatting!");
+                    NavManager.NavigateTo("/login");
+                }
+                else
+                {
+                    ToastService.ShowError("User with this name already exists!");
+                    RegisterDto.ConfirmPassword=String.Empty; 
+                    RegisterDto.UserName=String.Empty;
+                    RegisterDto.Password=String.Empty;
+                    StateHasChanged();
+                }
             }
-          
+            isLoaded = true;
         }
         catch
         {
+            isLoaded = true;
             ToastService.ShowError("Registration failed!");
             NavManager.NavigateTo("/register");
         }
