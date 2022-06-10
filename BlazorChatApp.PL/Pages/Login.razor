@@ -22,14 +22,22 @@
         <button class="btn btn-primary" type="submit">Login</button>
     </div> 
 </EditForm>
-
+<br/><br/>
+ <div style="position:center">
+@if (!isLoaded)
+{
+    <div class="loader"></div>
+    <p>Loading...</p>}
+</div>
 
 @code
 {
+    private bool isLoaded = true;
     [Inject] private IAuthService _service { get; set; }
 
     private async void LoginAsync()
     {
+        isLoaded = false;
         try
         {
             var isLoggedIn = await _service.LoginAsync(LoginDto.UserName, LoginDto.Password);
@@ -42,11 +50,13 @@
             {
                 ToastService.ShowError("Incorrect login or password!");
             }
-           
+            isLoaded = true;
+            StateHasChanged();
         }
         catch 
         {
-          NavManager.NavigateTo("/login");
+            isLoaded = true;
+            NavManager.NavigateTo("/login");
         }
     }
 }
