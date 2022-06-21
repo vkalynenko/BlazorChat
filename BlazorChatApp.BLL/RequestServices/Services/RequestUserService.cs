@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using BlazorChatApp.BLL.Helpers;
-using BlazorChatApp.BLL.MainRequestServices.Interfaces;
+using BlazorChatApp.BLL.RequestServices.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Identity;

@@ -1,6 +1,6 @@
 ﻿ using BlazorChatApp.BLL.Responses;
 
-namespace BlazorChatApp.BLL.MainRequestServices.Interfaces
+ namespace BlazorChatApp.BLL.RequestServices.Interfaces
 {
     public interface IRequestChatService
     {

@@ -1,6 +1,7 @@
 ﻿using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
+using BlazorChatApp.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.DAL.Data.Repositories
@@ -8,16 +9,19 @@ namespace BlazorChatApp.DAL.Data.Repositories
     public class MessageRepository : IMessageRepository
     {
         private readonly BlazorChatAppContext _context;
-        private readonly IChatRepository _chatRepository;
-        public MessageRepository(BlazorChatAppContext context, IChatRepository chatRepository)
+        public MessageRepository(BlazorChatAppContext context)
         {
             _context = context;
-            _chatRepository = chatRepository;
         }
 
         public async Task<Message> CreateMessage(
             int chatId, string msgText, string userName, string userId)
         {
+            var chat = await _context.Chats.FindAsync(chatId);
+            if (chat == null)
+            {
+                throw new NullReferenceException("Chat doesn't exist!");
+            }
             var message = new Message
             {
                 ChatId = chatId,
@@ -36,16 +40,15 @@ namespace BlazorChatApp.DAL.Data.Repositories
             return await _context.Messages.FindAsync(id);
         }
 
-        public async Task<Message> ReplyToGroup(string newMessage, string oldMessage, string userName, 
-            string currentName, string currentId, int chatId)
+        public async Task<Message> ReplyToGroup(ReplyToGroupModel model)
         {
             Message newReply = new Message
             {
-                MessageText = $"Replied to {userName}:{oldMessage} - {newMessage}",
-                SenderName = currentName,
-                UserId = currentId,
+                MessageText = $"Replied to {model.UserName}:{model.Message} - {model.Reply}",
+                SenderName = model.SenderName,
+                UserId = model.SenderId,
                 SentTime = DateTime.Now,
-                ChatId = chatId,
+                ChatId = model.ChatId,
                 IsItReply = true
             };
            await _context.Messages.AddAsync(newReply);
@@ -55,36 +58,40 @@ namespace BlazorChatApp.DAL.Data.Repositories
         public async Task DeleteMessageFromAll(int id)
         {
             var entity = await FindMessage(id);
-             _context.Messages.Remove(entity);
+            if (entity == null)
+            {
+                throw new NullReferenceException("Message doesn't exist");
+            } 
+            _context.Messages.Remove(entity);
         }
 
-        public async Task<Message> ReplyToUser(string newMessage, string oldMessage, string currentName,
-            string currentId, string userName, string senderId, int chatId)
+        public async Task<Message> ReplyToUser(ReplyToUserModel model)
         {
             Message newReply = new Message
             {
-                MessageText = $"Replied to {userName}:{oldMessage} - {newMessage}",
-                SenderName = currentName,
+                MessageText = $"Replied to {model.SenderName}:{model.Message} - {model.Reply}",
+                SenderName = model.UserName,
                 SentTime = DateTime.Now,
-                UserId = currentId,
-                ChatId = chatId,
+                UserId = model.UserId,
+                ChatId = model.ChatId,
                 IsItReply = true
             };
             await _context.Messages.AddAsync(newReply);
             return newReply;
         }
 
-        public async Task<bool> UpdateMessage(int id, string newMessage, string userId)
+        public async Task UpdateMessage(int id, string newMessage, string userId)
         {
             var entity = await FindMessage(id);
-
+            if (entity == null)
+            {
+                throw new NullReferenceException();
+            }
             if (userId == entity.UserId)
             {
                 entity.MessageText = newMessage;
                 _context.Messages.Update(entity);
-                return true;
             }
-            return false;
         }
 
         public async Task<Message> FindMessage(int id)

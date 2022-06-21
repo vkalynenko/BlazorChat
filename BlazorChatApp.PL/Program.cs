@@ -10,10 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BlazorChatApp.BLL.Hubs;
-using BlazorChatApp.BLL.MainRequestServices.Interfaces;
 using BlazorChatApp.BLL.Models;
+using BlazorChatApp.BLL.RequestServices.Interfaces;
 using BlazorChatApp.BLL.RequestServices.Services;
 using BlazorChatApp.DAL.Data;
+using BlazorChatApp.DAL.Models;
 using Blazored.LocalStorage;
 using Blazored.Toast;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -101,7 +102,6 @@ builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults
         .MimeTypes.Concat(new[] {"application/octet-stream"});
-
 });
 
 var app = builder.Build();

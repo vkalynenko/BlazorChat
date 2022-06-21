@@ -2,6 +2,7 @@
 using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
+using BlazorChatApp.DAL.Models;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -14,15 +15,17 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             _unitOfWork = unitOfWork;
         }
 
+
         public async Task<bool> CreateMessage(int chatId, string message, string senderName, string userId)
         {
             try
-            {
+            { 
                 await _unitOfWork.Message.CreateMessage(chatId, message, senderName, userId);
                 await _unitOfWork.SaveChangesAsync();
+
                 return true;
             }
-            catch
+            catch (NullReferenceException)
             {
                 return false;
             }
@@ -35,32 +38,24 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch(NullReferenceException)
             {
                 return false;
             }
         }
 
-        public async Task<Message?> GetMessage(int id)
-        {
-            return await _unitOfWork.Message.GetById(id);
-        }
-
-        public async Task<Message?> EditMessage(int id, string message, string userId)
+        public async Task<Message> EditMessage(int id, string message, string userId)
         {
             try
             {
-                bool result = await _unitOfWork.Message.UpdateMessage(id, message, userId);
-                if (result)
-                {
-                    await _unitOfWork.SaveChangesAsync();
-                    var entity = await _unitOfWork.Message.GetById(id);
-                    return entity;
-                }
+                 await _unitOfWork.Message.UpdateMessage(id, message, userId);
+              
+                 await _unitOfWork.SaveChangesAsync();
+                 var entity = await _unitOfWork.Message.GetById(id);
+                 return entity;
 
-                return new Message();
             }
-            catch
+            catch(NullReferenceException)
             {
                 return new Message();
             }
@@ -68,16 +63,14 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
         public async Task<Message> ReplyToGroup(ReplyToGroupModel model)
         {
-            var message = await _unitOfWork.Message.ReplyToGroup(model.Reply, model.Message, 
-                model.UserName, model.SenderName, model.SenderId, model.ChatId);
+            var message = await _unitOfWork.Message.ReplyToGroup(model);
             await _unitOfWork.SaveChangesAsync();
             return message;
         }
 
         public async Task<Message> ReplyToUser(ReplyToUserModel model)
         {
-            var message = await _unitOfWork.Message.ReplyToUser(model.Reply, model.Message, model.UserName, model.UserId,
-                model.SenderName, model.SenderId, model.ChatId);
+            var message = await _unitOfWork.Message.ReplyToUser(model);
             await _unitOfWork.SaveChangesAsync();
             return message;
         }

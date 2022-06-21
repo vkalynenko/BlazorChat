@@ -1,6 +1,7 @@
 ﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.Domain.Entities;
+using BlazorChatApp.DAL.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BlazorChatApp.BLL.Hubs

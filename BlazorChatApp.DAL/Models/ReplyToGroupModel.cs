@@ -1,4 +1,4 @@
-﻿namespace BlazorChatApp.BLL.Models
+﻿namespace BlazorChatApp.DAL.Models
 {
     public class ReplyToGroupModel
     {

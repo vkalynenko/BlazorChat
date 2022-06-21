@@ -2,7 +2,7 @@
 using System.Net.Http.Json;
 using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Helpers;
-using BlazorChatApp.BLL.MainRequestServices.Interfaces;
+using BlazorChatApp.BLL.RequestServices.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.Domain.Entities;
 using Blazored.LocalStorage;
