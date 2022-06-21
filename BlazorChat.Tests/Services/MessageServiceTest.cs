@@ -14,7 +14,6 @@ namespace BlazorChat.Tests.Services
         private readonly MessageService _sut;
         private readonly Mock<IUnitOfWork> _mock = new Mock<IUnitOfWork>();
 
-
         public MessageServiceTest()
         {
             _sut = new MessageService(_mock.Object);
@@ -38,6 +37,7 @@ namespace BlazorChat.Tests.Services
 
             //assert
             actual.Should().BeTrue();
+            _mock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -51,14 +51,12 @@ namespace BlazorChat.Tests.Services
 
             _mock.Setup(unit => unit.Message.CreateMessage(chatId, message, senderName, userId))
                 .Throws<NullReferenceException>();
-
             // act
             var actual = await _sut.CreateMessage(chatId, message, senderName, userId);
 
             //assert
             actual.Should().BeFalse();
             _mock.Verify(unit => unit.SaveChangesAsync(), Times.Never);
-
         }
 
         [Fact]
@@ -115,6 +113,7 @@ namespace BlazorChat.Tests.Services
             //assert
             actual.Should().NotBeNull();
             actual.Should().BeOfType<Message>();
+            _mock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
             actual.Id.Should().Be(messageId);
             actual.MessageText.Should().Be(newText);
             actual.UserId.Should().Be(userId);
@@ -157,6 +156,7 @@ namespace BlazorChat.Tests.Services
             //assert 
             actual.Should().BeOfType<Message>();
             actual.Should().NotBeNull();
+            _mock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
             actual.MessageText.Should()
                 .Be($"Replied to {replyModel.UserName}:{replyModel.Message} - {replyModel.Reply}");
         }
@@ -180,6 +180,7 @@ namespace BlazorChat.Tests.Services
             // assert
             actual.Should().BeOfType<Message>();
             actual.Should().NotBeNull();
+            _mock.Verify(unit=>unit.SaveChangesAsync(), Times.Once);
             actual.MessageText.Should()
                 .Be($"Replied to {replyToUserModel.UserName}:{replyToUserModel.Message} - {replyToUserModel.Reply}");
         }
