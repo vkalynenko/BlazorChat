@@ -1,4 +1,5 @@
-﻿using BlazorChatApp.DAL.Data.Interfaces;
+﻿using BlazorChatApp.DAL.CustomExceptions;
+using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,13 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task CreateChat(string name, string userId)
         {
+            var chatFromDb = await _context.Chats
+                .FirstOrDefaultAsync(x => x.ChatName == name);
+
+            if (chatFromDb != null)
+            {
+                throw new ChatIsAlreadyExistsException("Chat is already exists!");
+            }
             var chat = new Chat
             {
                 ChatName = name,
@@ -29,7 +37,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 UserId = userId,
             });
 
-           await _context.Chats.AddAsync(chat);
+            await _context.Chats.AddAsync(chat);
         }
 
         public async Task<int> CreatePrivateChat(string rootId, string targetId)
@@ -88,10 +96,15 @@ namespace BlazorChatApp.DAL.Data.Repositories
             return chat.ChatName;
         }
 
-        public async Task<Chat?> GetChat(int id) 
+        public async Task<Chat> GetChat(int id) 
         {
-            return await _context.Chats
+            var chat = await _context.Chats
                 .FirstOrDefaultAsync(x => x.Id == id);
+            if (chat == null)
+            {
+                throw new NullReferenceException();
+            }
+            return chat;
         }
 
         public IEnumerable<Chat> GetNotJoinedChats(string userId)

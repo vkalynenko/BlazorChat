@@ -42,7 +42,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<Message> ReplyToGroup(ReplyToGroupModel model)
         {
-            Message newReply = new Message
+            Message newReply = new()
             {
                 MessageText = $"Replied to {model.UserName}:{model.Message} - {model.Reply}",
                 SenderName = model.SenderName,
@@ -67,7 +67,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<Message> ReplyToUser(ReplyToUserModel model)
         {
-            Message newReply = new Message
+            Message newReply = new()
             {
                 MessageText = $"Replied to {model.SenderName}:{model.Message} - {model.Reply}",
                 SenderName = model.UserName,

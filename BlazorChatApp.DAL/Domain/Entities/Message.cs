@@ -17,7 +17,5 @@ namespace BlazorChatApp.DAL.Domain.Entities
         {
             SentTime = DateTime.Now;
         }
-
-        public IEnumerable<Message> Messages;
     }
 }

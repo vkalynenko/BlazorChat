@@ -22,7 +22,7 @@ public class ChatController : BaseController
     }
 
     [HttpGet("createRoom/{chatName}")]
-    public async Task<IActionResult> CreateRoom(string chatName)
+    public async Task<IActionResult> CreateRoom(string chatName) // todo: push exception to the top
     {
         try
         {

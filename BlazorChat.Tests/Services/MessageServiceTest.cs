@@ -1,18 +1,15 @@
-﻿using AutoFixture;
-using BlazorChatApp.BLL.Infrastructure.Services;
+﻿using BlazorChatApp.BLL.Infrastructure.Services;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
-using FluentAssertions;
-using Moq;
 
 namespace BlazorChat.Tests.Services
 {
     public class MessageServiceTest
     {
-        private readonly Fixture _fixture = new Fixture();
+        private readonly Fixture _fixture = new();
         private readonly MessageService _sut;
-        private readonly Mock<IUnitOfWork> _mock = new Mock<IUnitOfWork>();
+        private readonly Mock<IUnitOfWork> _mock = new();
 
         public MessageServiceTest()
         {
@@ -22,6 +19,7 @@ namespace BlazorChat.Tests.Services
         }
 
         [Fact]
+        [Trait("Message", "CRUD")]
         public async Task CreateMessage_ShouldReturnTrue()
         {
             // arrange 
@@ -37,10 +35,12 @@ namespace BlazorChat.Tests.Services
 
             //assert
             actual.Should().BeTrue();
-            _mock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
+            _mock.Verify(unit=>unit.SaveChangesAsync(), Times.Once);
+            _mock.Verify(unit=>unit.Message.CreateMessage(chatId, message, senderName, userId));
         }
 
         [Fact]
+        [Trait("Message", "CRUD")]
         public async Task СreateMessage_IfIncorrectChatId_ShouldReturnFalse()
         {
             // arrange
@@ -56,10 +56,12 @@ namespace BlazorChat.Tests.Services
 
             //assert
             actual.Should().BeFalse();
+            _mock.Verify(unit=>unit.Message.CreateMessage(chatId, message, senderName, userId), Times.Once);
             _mock.Verify(unit => unit.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
+        [Trait("Message", "CRUD")]
         public async Task DeleteMessage_ShouldReturnTrue()
         {
             // arrange
@@ -71,11 +73,13 @@ namespace BlazorChat.Tests.Services
             var actual = await _sut.DeleteMessageFromAll(messageId);
 
             // assert
-            _mock.Verify(unit => unit.Message.DeleteMessageFromAll(It.IsAny<int>()), Times.Once);
+            _mock.Verify(unit => unit.Message.DeleteMessageFromAll(messageId), Times.Once);
+            _mock.Verify(unit=>unit.SaveChangesAsync(), Times.Once);
             actual.Should().BeTrue();
         }
 
         [Fact]
+        [Trait("Message", "CRUD")]
         public async Task DeleteMessage_IfIncorrectMessageId_ShouldReturnFalse()
         {
             //arrange
@@ -86,11 +90,13 @@ namespace BlazorChat.Tests.Services
             // act
             var actual = await _sut.DeleteMessageFromAll(messageId);
             //assert
+            _mock.Verify(unit=>unit.Message.DeleteMessageFromAll(messageId), Times.Once);
             _mock.Verify(unit=>unit.SaveChangesAsync(), Times.Never);
             actual.Should().BeFalse();
         }
 
         [Fact]
+        [Trait("Message", "CRUD")]
         public async Task EditMessage_ShouldReturnMessage()
         {
             // arrange
@@ -113,6 +119,7 @@ namespace BlazorChat.Tests.Services
             //assert
             actual.Should().NotBeNull();
             actual.Should().BeOfType<Message>();
+            _mock.Verify(unit=>unit.Message.UpdateMessage(messageId, newText, userId), Times.Once);
             _mock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
             actual.Id.Should().Be(messageId);
             actual.MessageText.Should().Be(newText);
@@ -120,6 +127,7 @@ namespace BlazorChat.Tests.Services
         }
 
         [Fact]
+        [Trait("Message", "CRUD")]
         public async Task EditMessage_IfIncorrectMessageId_ShouldReturnNewMessage()
         {
             // arrange 
@@ -133,11 +141,13 @@ namespace BlazorChat.Tests.Services
             // act
             var actual = await _sut.EditMessage(messageId, newText, userId);
             // assert
+            _mock.Verify(unit => unit.Message.UpdateMessage(messageId, newText, userId), Times.Once);
             actual.MessageText.Should().BeNullOrEmpty();
             actual.Should().BeOfType<Message>();
         }
 
         [Fact]
+        [Trait("Message", "Reply")]
         public async Task ReplyToGroup_ShouldReturnMessage()
         {
             // arrange
@@ -157,11 +167,13 @@ namespace BlazorChat.Tests.Services
             actual.Should().BeOfType<Message>();
             actual.Should().NotBeNull();
             _mock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
+            _mock.Verify(unit=>unit.Message.ReplyToGroup(replyModel), Times.Once);
             actual.MessageText.Should()
                 .Be($"Replied to {replyModel.UserName}:{replyModel.Message} - {replyModel.Reply}");
         }
 
         [Fact]
+        [Trait("Message", "Reply")]
         public async Task ReplyToUser_ShouldReturnMessage()
         {
             // arrange 
@@ -181,45 +193,53 @@ namespace BlazorChat.Tests.Services
             actual.Should().BeOfType<Message>();
             actual.Should().NotBeNull();
             _mock.Verify(unit=>unit.SaveChangesAsync(), Times.Once);
+            _mock.Verify(unit => unit.Message.ReplyToUser(replyToUserModel), Times.Once);
             actual.MessageText.Should()
                 .Be($"Replied to {replyToUserModel.UserName}:{replyToUserModel.Message} - {replyToUserModel.Reply}");
         }
 
-        [Fact]
-        public async Task GetMessages_ShouldReturnMessages()
+        [Theory]
+        [InlineData(0, 10)]
+        [InlineData(10, 10)]
+        [InlineData(20, 40)]
+        [Trait("Message", "CRUD")]
+        public async Task GetMessages_ShouldReturnMessages(int toSkip,int toLoad)
         {
             // arrange
             var test = _fixture.Build<Message>()
-                .Without(x => x.Messages).Create();
-
-            var toLoad = _fixture.Create<int>();
-            var toSkip = _fixture.Create<int>();
-
-            var message = new Message()
-            {
-                Id = test.Id,
-                ChatId = test.ChatId,
-                MessageText = test.MessageText,
-                SentTime = test.SentTime,
-                UserId = test.UserId,
-            };
-
-            var messages = new List<Message>();
-            for (int i = 0; i < toLoad; i++)
-            {
-                messages.Add(message);
-            }
+                .Create();
 
             _mock.Setup(unit => unit.Message.GetMessages(test.ChatId, toSkip, toLoad))
-                .ReturnsAsync(messages);
+                .ReturnsAsync(Messages(test, toSkip, toLoad));
             // act
             var actual = (await _sut.GetMessages(test.ChatId, toSkip, toLoad)).ToList();
             
             // assert
             actual.Should().NotBeNull();
             actual.Count.Should().BeLessThanOrEqualTo(toLoad);
-            actual[0].Id.Should().Be(test.Id);
-            actual[0].MessageText.Should().Be(test.MessageText);
+            actual.Should().BeOfType<List<Message>>();
+            actual[0].Id.Should().Be(toSkip + 1);
+            actual.Count.Should().BeGreaterOrEqualTo(toSkip);
+            _mock.Verify(unit=>unit.Message.GetMessages(test.ChatId, toSkip, toLoad));
+        }
+
+        private  IEnumerable<Message> Messages(Message test, int toSkip, int toTake)
+        {
+            var messages = new List<Message>();
+            for (int i = 0; i < 100; i++)
+            {
+                var message = new Message()
+                {
+                    Id = i + 1,
+                    ChatId = test.ChatId,
+                    MessageText = test.MessageText,
+                    SentTime = test.SentTime,
+                    UserId = test.UserId,
+                };
+                messages.Add(message);
+            }
+            var result = messages.Skip(toSkip).Take(toTake);
+            return result;
         }
     }
 }

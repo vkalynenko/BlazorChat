@@ -1,4 +1,5 @@
 ﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 
@@ -21,7 +22,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (ChatIsAlreadyExistsException)
             {
                 return false;
             }
@@ -35,7 +36,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch 
             {
                 return false;
             }
@@ -60,7 +61,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 Chat chat = await _unitOfWork.Chat.GetChat(chatId);
                 return chat;
             }
-            catch
+            catch(NullReferenceException)
             {
                 return new Chat();
             }
