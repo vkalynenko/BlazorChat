@@ -49,7 +49,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 IEnumerable<Chat> chats = await _unitOfWork.Chat.GetAllUserChats(userId);
                 return chats;
             }
-            catch
+            catch(UserDoesNotExistException)
             {
                 return new List<Chat>();
             }
@@ -61,7 +61,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 Chat chat = await _unitOfWork.Chat.GetChat(chatId);
                 return chat;
             }
-            catch(NullReferenceException)
+            catch(ChatDoesNotExistException)
             {
                 return new Chat();
             }
@@ -74,7 +74,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 IEnumerable<Chat> chats = _unitOfWork.Chat.GetNotJoinedChats(userId);
                 return chats;
             }
-            catch
+            catch (ChatsDoNotExistException)
             {
                 return new List<Chat>();
             }
@@ -88,7 +88,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (ChatDoesNotExistException)
+            {
+                return false;
+            }
+            catch (UserDoesNotExistException)
             {
                 return false;
             }
@@ -98,9 +102,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         {
             return await _unitOfWork.Chat.GetPrivateChat(rootId, targetId);
         }
+
         public async Task<int> FindPrivateChat(string senderId, string userId)
         {
             var chatId = await _unitOfWork.Chat.FindPrivateChat(senderId, userId);
+
             if (chatId == 0)
             {
                 var chatName = await _unitOfWork.Chat.CreateNewPrivateChat(senderId, userId);

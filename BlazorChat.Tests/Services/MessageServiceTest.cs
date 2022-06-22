@@ -1,4 +1,5 @@
 ﻿using BlazorChatApp.BLL.Infrastructure.Services;
+using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
@@ -50,7 +51,7 @@ namespace BlazorChat.Tests.Services
             var userId = _fixture.Create<string>();
 
             _mock.Setup(unit => unit.Message.CreateMessage(chatId, message, senderName, userId))
-                .Throws<NullReferenceException>();
+                .Throws<ChatDoesNotExistException>();
             // act
             var actual = await _sut.CreateMessage(chatId, message, senderName, userId);
 
@@ -86,7 +87,7 @@ namespace BlazorChat.Tests.Services
             var messageId = 0;
 
             _mock.Setup(unit => unit.Message.DeleteMessageFromAll(messageId))
-                .Throws<NullReferenceException>();
+                .Throws<MessageDoesNotExistException>();
             // act
             var actual = await _sut.DeleteMessageFromAll(messageId);
             //assert
@@ -137,7 +138,7 @@ namespace BlazorChat.Tests.Services
 
             _mock.Setup(unit => unit.Message.UpdateMessage(messageId, newText, userId));
             _mock.Setup(unit => unit.Message.GetById(messageId))
-                .Throws<NullReferenceException>();
+                .Throws<MessageDoesNotExistException>();
             // act
             var actual = await _sut.EditMessage(messageId, newText, userId);
             // assert
@@ -223,7 +224,7 @@ namespace BlazorChat.Tests.Services
             _mock.Verify(unit=>unit.Message.GetMessages(test.ChatId, toSkip, toLoad));
         }
 
-        private  IEnumerable<Message> Messages(Message test, int toSkip, int toTake)
+        private static IEnumerable<Message> Messages(Message test, int toSkip, int toTake)
         {
             var messages = new List<Message>();
             for (int i = 0; i < 100; i++)

@@ -1,4 +1,5 @@
-﻿using BlazorChatApp.DAL.Data.Interfaces;
+﻿using BlazorChatApp.DAL.CustomExceptions;
+using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
@@ -18,9 +19,10 @@ namespace BlazorChatApp.DAL.Data.Repositories
             int chatId, string msgText, string userName, string userId)
         {
             var chat = await _context.Chats.FindAsync(chatId);
+
             if (chat == null)
             {
-                throw new NullReferenceException("Chat doesn't exist!");
+                throw new ChatDoesNotExistException("Chat doesn't exist!");
             }
             var message = new Message
             {
@@ -60,7 +62,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             var entity = await FindMessage(id);
             if (entity == null)
             {
-                throw new NullReferenceException("Message doesn't exist");
+                throw new MessageDoesNotExistException("Message doesn't exist");
             } 
             _context.Messages.Remove(entity);
         }
@@ -85,7 +87,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
             var entity = await FindMessage(id);
             if (entity == null)
             {
-                throw new NullReferenceException();
+                throw new MessageDoesNotExistException();
             }
             if (userId == entity.UserId)
             {

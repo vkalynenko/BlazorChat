@@ -1,5 +1,6 @@
 ﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Models;
+using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
@@ -25,7 +26,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
 
                 return true;
             }
-            catch (NullReferenceException)
+            catch (ChatDoesNotExistException)
             {
                 return false;
             }
@@ -38,7 +39,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
-            catch(NullReferenceException)
+            catch(MessageDoesNotExistException)
             {
                 return false;
             }
@@ -55,7 +56,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                  return entity;
 
             }
-            catch(NullReferenceException)
+            catch(MessageDoesNotExistException)
             {
                 return new Message();
             }
