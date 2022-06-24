@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
-using BlazorChatApp.BLL.Responses;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,14 +16,12 @@ namespace BlazorChatApp.PL.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ITokenService _tokenService;
-        private readonly ILocalStorageService _localStorage;
         private readonly IUserService _userService;
 
-        public AuthController(UserManager<IdentityUser> userManager, ILocalStorageService localStorage,
+        public AuthController(UserManager<IdentityUser> userManager,
             ITokenService tokenService, IUserService userService)
         {
             _userManager = userManager;
-            _localStorage = localStorage;
             _tokenService = tokenService;
             _userService = userService;
         }
@@ -53,9 +50,9 @@ namespace BlazorChatApp.PL.Controllers
                 );
               
             }
-            catch
+            catch (Exception ex)
             {
-                return NotFound("User wasn't found!");
+                return BadRequest(ex);
             }
 
         }
@@ -69,13 +66,10 @@ namespace BlazorChatApp.PL.Controllers
                 await _userService.Register(model);
                 return Ok(model);
             }
-            catch
+            catch(Exception ex)
             {
-                return StatusCode(404);
+                return BadRequest(ex);
             }
-
         }
-
-      
     }
 }

@@ -1,9 +1,11 @@
-﻿using BlazorChatApp.BLL.Infrastructure.Interfaces;
+﻿using System.Data;
+using BlazorChatApp.BLL.Infrastructure.Interfaces;
 using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -37,9 +39,14 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             {
                 await _unitOfWork.Message.DeleteMessageFromAll(messageId);
                 await _unitOfWork.SaveChangesAsync();
+
                 return true;
             }
-            catch(MessageDoesNotExistException)
+            catch (MessageDoesNotExistException)
+            {
+                return false;
+            }
+            catch(DbUpdateConcurrencyException)
             {
                 return false;
             }
@@ -50,9 +57,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             try
             {
                  await _unitOfWork.Message.UpdateMessage(id, message, userId);
-              
                  await _unitOfWork.SaveChangesAsync();
                  var entity = await _unitOfWork.Message.GetById(id);
+                 
                  return entity;
 
             }

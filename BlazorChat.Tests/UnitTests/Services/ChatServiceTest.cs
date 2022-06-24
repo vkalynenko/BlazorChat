@@ -3,7 +3,7 @@ using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 
-namespace BlazorChat.Tests.Services
+namespace BlazorChat.Tests.UnitTests.Services
 {
     public class ChatServiceTest
     {

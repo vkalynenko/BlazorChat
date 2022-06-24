@@ -4,7 +4,7 @@ using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
 
-namespace BlazorChat.Tests.Services
+namespace BlazorChat.Tests.UnitTests.Services
 {
     public class MessageServiceTest
     {

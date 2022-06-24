@@ -3,6 +3,7 @@ using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.DAL.Data.Repositories
@@ -60,6 +61,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
         public async Task DeleteMessageFromAll(int id)
         {
             var entity = await FindMessage(id);
+
             if (entity == null)
             {
                 throw new MessageDoesNotExistException("Message doesn't exist");
@@ -85,12 +87,15 @@ namespace BlazorChatApp.DAL.Data.Repositories
         public async Task UpdateMessage(int id, string newMessage, string userId)
         {
             var entity = await FindMessage(id);
+            //var userName = _userManager.FindByIdAsync(userId).Result.UserName;
+            var userName =  _context.Users.FirstOrDefaultAsync(x => x.Id == userId).Result?.UserName;
             if (entity == null)
             {
                 throw new MessageDoesNotExistException();
             }
             if (userId == entity.UserId)
             {
+                entity.SenderName = userName;
                 entity.MessageText = newMessage;
                 _context.Messages.Update(entity);
             }
@@ -98,10 +103,8 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<Message> FindMessage(int id)
         {
-            var message = await _context.Messages.FindAsync(id);
-            if (message != null)
-                return message;
-            return new Message();
+            var message = await _context.Messages.FirstOrDefaultAsync(x=>x.Id==id);
+            return message;
         }
 
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)

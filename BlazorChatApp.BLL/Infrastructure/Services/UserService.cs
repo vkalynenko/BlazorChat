@@ -43,7 +43,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 return await _userManager.CheckPasswordAsync(user, model.Password) ? user : null;
             }
             throw new Exception("Incorrect login or password!");
-
         }
 
         public IEnumerable<IdentityUser> GetOtherUsers(string id)
