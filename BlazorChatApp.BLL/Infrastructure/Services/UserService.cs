@@ -21,7 +21,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             var check = _userManager.Users.FirstOrDefault(x => x.UserName == model.UserName );
             if (check != null)
             {
-                throw new Exception("Username is already in use, please choose other!");
+                return "Failed to create user!";
             }
 
             var newUser = new IdentityUser { UserName = model.UserName };

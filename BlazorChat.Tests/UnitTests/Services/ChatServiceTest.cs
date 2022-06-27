@@ -19,7 +19,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task CreatePublicChat_ShouldReturnTrue()
         {
             // arrange 
@@ -38,7 +38,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task CreatePublicChat_IfChatAlreadyExists_ShouldReturnFalse()
         {
             // arrange 
@@ -58,7 +58,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task CreatePrivateChat_ShouldReturnChatId()
         {
             // arrange
@@ -79,7 +79,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task CreatePrivateChat_IfUserDoesNotExist_ShouldReturnTrue()
         {
             // arrange
@@ -96,7 +96,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task GetAllUsersChats_ShouldReturnChats()
         {
             // arrange 
@@ -123,7 +123,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task GetAllUsersChats_IfUserDoesNorExist_ShouldReturnNewList()
         {
             // arrange 
@@ -143,7 +143,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task GetCurrentChat_ShouldReturnChat()
         {
             // arrange
@@ -165,7 +165,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task GetCurrentChat_IfChatDoesNotExist_ShouldReturnNewChat()
         {
             // arrange
@@ -182,7 +182,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public void GetNotJoinedChats_ShouldReturnChats()
         {
             // arrange 
@@ -203,7 +203,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public void GetNotJoinedChats_IfSuchChatsDoNotExist_ShouldReturnNewList()
         {
             // arrange 
@@ -223,7 +223,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "Interaction")]
+        [Trait("Unit", "Chat")]
         public async Task JoinChat_ShouldReturnTrue()
         {
             // arrange 
@@ -242,7 +242,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "Interaction")]
+        [Trait("Unit", "Chat")]
         public async Task JoinChat_IfUserDoesNotExist_ShouldReturnFalse()
         {
             // arrange
@@ -262,7 +262,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "Interaction")]
+        [Trait("Unit", "Chat")]
         public async Task JoinChat_IfUChatDoesNotExist_ShouldReturnFalse()
         {
             // arrange
@@ -282,7 +282,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "CRUD")]
+        [Trait("Unit", "Chat")]
         public async Task GetPrivateChat_ShouldReturnPrivateChat()
         {
             // arrange 
@@ -320,7 +320,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "Interaction")] 
+        [Trait("Unit", "Chat")]
         public async Task FindPrivateChat_ShouldReturnChatId()
         {
             // arrange
@@ -344,7 +344,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Chat ", "Interaction")]
+        [Trait("Unit", "Chat")]
         public async Task FindPrivateChat_IfChatDoesNotExist_ShouldReturnChatId()
         {
             // arrange

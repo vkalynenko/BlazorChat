@@ -2,6 +2,7 @@
 using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;
+using System.Runtime;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
 {
@@ -36,7 +37,11 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
-            catch 
+            catch (UserDoesNotExistException)
+            {
+                return false;
+            }
+            catch
             {
                 return false;
             }

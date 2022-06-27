@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 namespace BlazorChat.Tests.IntegrationTests.Services
 {
     [TestCaseOrderer("BlazorChatApp.BlazorChat.Tests.PriorityOrderer", "BlazorChat.Tests")]
-
     public class IntegrationMessageServiceTest : BaseIntegrationServiceTest
     {
         private readonly Fixture _fixture = new();
@@ -37,11 +36,11 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(1)]
         [Trait("Integration", "Message")]
-        public async Task CreateMessage_ShouldReturnTrue()
+        public void CreateMessage_ShouldReturnTrue()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
-            var messages = await GetTestMessages();
+            CreateTestDataForInMemoryDb();
+            var messages = GetTestMessages().Result;
             var countBefore = messages.ToList().Count;
 
             var chatId = 1;
@@ -51,8 +50,8 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
 
             // act 
-            var actual = await _sut.CreateMessage(chatId, text, userName, userId);
-            messages = await GetTestMessages();
+            var actual = _sut.CreateMessage(chatId, text, userName, userId).Result;
+            messages = GetTestMessages().Result;
             var countAfter = messages.ToList().Count;
 
             // assert
@@ -63,11 +62,11 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(2)]
         [Trait("Integration", "Message")]
-        public async Task CreateMessage_IfChatDoesNotExist_ShouldReturnFalse()
+        public void CreateMessage_IfChatDoesNotExist_ShouldReturnFalse()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
-            var messages = await GetTestMessages();
+            CreateTestDataForInMemoryDbMessage();
+            var messages = GetTestMessages().Result;
             var countBefore = messages.ToList().Count;
 
             var chatId = 0;
@@ -76,8 +75,9 @@ namespace BlazorChat.Tests.IntegrationTests.Services
             var userName = "textUsername";
 
             // act
-            var actual = await _sut.CreateMessage(chatId, text, userName, userId);
-            messages = await GetTestMessages();
+            var actual = _sut.CreateMessage(chatId, text, userName, userId)
+                .Result;
+            messages = GetTestMessages().Result;
             var countAfter = messages.ToList().Count;
 
             // assert
@@ -87,18 +87,18 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(3)]
         [Trait("Integration", "Message")]
-        public async Task DeleteMessage_ShouldReturnTrue()
+        public void DeleteMessage_ShouldReturnTrue()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
-            var messages = await GetTestMessages();
+            CreateTestDataForInMemoryDbMessage();
+            var messages = GetTestMessages().Result;
             var countBefore = messages.ToList().Count;
 
             var messageId = 1;
 
             // act 
-            var actual = await _sut.DeleteMessageFromAll(messageId);
-            messages = await GetTestMessages();
+            var actual = _sut.DeleteMessageFromAll(messageId).Result;
+            messages = GetTestMessages().Result;
             var countAfter = messages.ToList().Count;
 
             // assert
@@ -109,18 +109,18 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(4)]
         [Trait("Integration", "Message")]
-        public async Task DeleteMessage_IfMessageDoesNotExist_ShouldReturnFalse()
+        public void DeleteMessage_IfMessageDoesNotExist_ShouldReturnFalse()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
-            var messages = await GetTestMessages();
+            CreateTestDataForInMemoryDbMessage();
+            var messages = GetTestMessages().Result;
             var countBefore = messages.ToList().Count;
 
             var messageId = 0;
 
             // act 
-            var actual = await _sut.DeleteMessageFromAll(messageId);
-            messages = await GetTestMessages();
+            var actual = _sut.DeleteMessageFromAll(messageId).Result;
+            messages = GetTestMessages().Result;
             var countAfter = messages.ToList().Count;
 
             // assert
@@ -130,19 +130,18 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(5)]
         [Trait("Integration", "Message")]
-        public async Task EditMessage_ShouldReturnUpdatedMessage()
+        public void EditMessage_ShouldReturnUpdatedMessage()
         {
             // arrange 
-            await CreateTestDataForInMemoryDb();
+            CreateTestDataForInMemoryDbMessage();
             var messageId = 1;
             var newText = _fixture.Create<string>();
             var userId = "testUserId";
 
             // act
-            await CreateTestDataForInMemoryDb();
-
-            var actual = await _sut.EditMessage(messageId, newText, userId);
-            var messages = await GetTestMessages();
+            var actual = _sut.EditMessage(messageId, newText, userId)
+                .Result;
+            var messages = GetTestMessages().Result;
 
             // assert
             actual.Should().NotBeNull();
@@ -152,17 +151,18 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(6)]
         [Trait("Integration", "Message")]
-        public async Task EditMessage_IfMessageDoesNotExist_ShouldReturnNewMessage()
+        public void EditMessage_IfMessageDoesNotExist_ShouldReturnNewMessage()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
+            CreateTestDataForInMemoryDbMessage();
             var messageId = 1;
             var newText = _fixture.Create<string>();
             var userId = "testUserId";
 
             // act
-            var actual = await _sut.EditMessage(messageId, newText, userId);
-            var messages = await GetTestMessages();
+            var actual = _sut.EditMessage(messageId, newText, userId)
+                .Result;
+            var messages = GetTestMessages().Result;
 
             // assert
             actual.Should().NotBeNull();
@@ -172,11 +172,11 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(7)]
         [Trait("Integration", "Message")]
-        public async Task ReplyToGroup_ShouldReturnMessage()
+        public void ReplyToGroup_ShouldReturnMessage()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
-            var messages = await GetTestMessages();
+            CreateTestDataForInMemoryDbMessage();
+            var messages = GetTestMessages().Result;
             var countBefore = messages.ToList().Count;
             var replyModel = _fixture.Build<ReplyToGroupModel>()
                 .With(x => x.ChatId, 1)
@@ -184,8 +184,8 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 .Create();
 
             // act
-            var actual = await _sut.ReplyToGroup(replyModel);
-            messages = await GetTestMessages();
+            var actual = _sut.ReplyToGroup(replyModel).Result;
+            messages = GetTestMessages().Result;
             var countAfter = messages.ToList().Count;
             // assert
             actual.Should().BeOfType<Message>();
@@ -195,11 +195,11 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Fact, TestPriority(8)]
         [Trait("Integration", "Message")]
-        public async Task ReplyToUser_ShouldReturnMessage()
+        public void ReplyToUser_ShouldReturnMessage()
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
-            var messages = await GetTestMessages();
+            CreateTestDataForInMemoryDbMessage();
+            var messages = GetTestMessages().Result;
             var countBefore = messages.ToList().Count;
             var replyModel = _fixture.Build<ReplyToUserModel>()
                 .With(x => x.ChatId, 1)
@@ -207,8 +207,8 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 .Create();
 
             // act
-            var actual = await _sut.ReplyToUser(replyModel);
-            messages = await GetTestMessages();
+            var actual = _sut.ReplyToUser(replyModel).Result;
+            messages = GetTestMessages().Result;
             var countAfter = messages.ToList().Count;
 
             // assert
@@ -219,18 +219,18 @@ namespace BlazorChat.Tests.IntegrationTests.Services
 
         [Theory, TestPriority(9)]
         [Trait("Integration", "Message")]
-        [InlineData(0,10)]
-        [InlineData(10,10)]
-        [InlineData(20,40)]
-        public async Task GetMessages_ShouldReturnMessages(int toSkip, int toLoad)
+        [InlineData(0, 10)]
+        [InlineData(10, 10)]
+        [InlineData(20, 40)]
+        public void GetMessages_ShouldReturnMessages(int toSkip, int toLoad)
         {
             // arrange
-            await CreateTestDataForInMemoryDb();
+            CreateTestDataForInMemoryDbMessage();
             var chatId = 1;
 
             // act
-            var actual = await _sut.GetMessages(chatId, toSkip, toLoad);
-            var messages = await GetTestMessages();
+            var actual = _sut.GetMessages(chatId, toSkip, toLoad).Result;
+            var messages = GetTestMessages().Result;
             var enumerable = actual.ToList();
 
             // assert

@@ -3,7 +3,6 @@ using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using Castle.Core.Internal;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.DAL.Data.Repositories
@@ -11,11 +10,9 @@ namespace BlazorChatApp.DAL.Data.Repositories
     public class ChatRepository : IChatRepository
     {
         private readonly BlazorChatAppContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        public ChatRepository(BlazorChatAppContext context, UserManager<IdentityUser> userManager)
+        public ChatRepository(BlazorChatAppContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         public async Task CreateChat(string name, string userId)
@@ -43,10 +40,12 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<int> CreatePrivateChat(string rootId, string targetId)
         {
-            var name1 = _userManager.FindByIdAsync(targetId).Result.UserName;
-            var name2 = _userManager.FindByIdAsync(rootId).Result.UserName;
+            var name1 = _context.Users.FirstOrDefaultAsync(x => x.Id == targetId)
+                .Result?.UserName;
+            var name2 = _context.Users.FirstOrDefaultAsync(x => x.Id == rootId)
+                .Result?.UserName;
 
-            if (name1.IsNullOrEmpty() || name2.IsNullOrEmpty())
+            if (name1 == null || name2 == null)
             {
                 throw new UserDoesNotExistException("User doesn't exist!");
             }
@@ -79,9 +78,10 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<string> CreateNewPrivateChat(string rootId, string targetId)
         {
-            var name1 = _userManager.FindByIdAsync(targetId).Result.UserName;
-            var name2 = _userManager.FindByIdAsync(rootId).Result.UserName;
-
+            var name1 = _context.Users.FirstOrDefaultAsync(x => x.Id == targetId)
+                .Result?.UserName;
+            var name2 = _context.Users.FirstOrDefaultAsync(x => x.Id == rootId)
+                .Result?.UserName;
             var chat = new Chat
             {
                 ChatName = $"{name1} and {name2}",
@@ -122,7 +122,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 .Include(x => x.Users)
                 .Where(x => x.Users.All(y => y.UserId != userId) && x.Type != ChatType.Private).ToList();
 
-            if (chats.IsNullOrEmpty())
+            if (chats == null)
             {
                 throw new ChatsDoNotExistException("There no chats with this parameters");
             }
@@ -132,7 +132,8 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<IEnumerable<Chat>> GetAllUserChats(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
             if (user == null)
             {
                 throw new UserDoesNotExistException("User doesn't exist");
@@ -156,7 +157,8 @@ namespace BlazorChatApp.DAL.Data.Repositories
         public async Task JoinRoom(int chatId, string userId)
         {
             Chat? chat = await _context.Chats.FindAsync(chatId);
-            var user = await _userManager.FindByIdAsync(userId);
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (chat == null)
             {
                 throw new ChatDoesNotExistException("This chat doesn't exist!");

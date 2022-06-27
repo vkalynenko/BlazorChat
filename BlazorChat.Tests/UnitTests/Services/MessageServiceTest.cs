@@ -20,7 +20,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task CreateMessage_ShouldReturnTrue()
         {
             // arrange 
@@ -41,7 +41,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task СreateMessage_IfIncorrectChatId_ShouldReturnFalse()
         {
             // arrange
@@ -62,7 +62,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task DeleteMessage_ShouldReturnTrue()
         {
             // arrange
@@ -80,7 +80,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task DeleteMessage_IfIncorrectMessageId_ShouldReturnFalse()
         {
             //arrange
@@ -97,7 +97,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task EditMessage_ShouldReturnMessage()
         {
             // arrange
@@ -128,7 +128,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task EditMessage_IfIncorrectMessageId_ShouldReturnNewMessage()
         {
             // arrange 
@@ -148,7 +148,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "Reply")]
+        [Trait("Unit", "Message")]
         public async Task ReplyToGroup_ShouldReturnMessage()
         {
             // arrange
@@ -174,7 +174,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         }
 
         [Fact]
-        [Trait("Message", "Reply")]
+        [Trait("Unit", "Message")]
         public async Task ReplyToUser_ShouldReturnMessage()
         {
             // arrange 
@@ -203,7 +203,7 @@ namespace BlazorChat.Tests.UnitTests.Services
         [InlineData(0, 10)]
         [InlineData(10, 10)]
         [InlineData(20, 40)]
-        [Trait("Message", "CRUD")]
+        [Trait("Unit", "Message")]
         public async Task GetMessages_ShouldReturnMessages(int toSkip,int toLoad)
         {
             // arrange
