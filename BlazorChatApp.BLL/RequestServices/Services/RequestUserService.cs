@@ -1,10 +1,14 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using BlazorChatApp.BLL.Helpers;
 using BlazorChatApp.BLL.RequestServices.Interfaces;
 using BlazorChatApp.BLL.Responses;
+using BlazorChatApp.DAL.CustomExtensions;
+using BlazorChatApp.DAL.Models;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace BlazorChatApp.BLL.RequestServices.Services
 {
@@ -31,6 +35,29 @@ namespace BlazorChatApp.BLL.RequestServices.Services
                 Users = httpResponse.Content.ReadFromJsonAsync<List<IdentityUser>>()
             };
         }
+
+        public async Task<SaveProfileResponse> SaveUserProfileInfo(BrowserImageFile profile)
+        {
+            var client = await ClientWithAuthHeader();
+            var path = $"{client.BaseAddress}/user/saveProfile";
+
+            if (client.DefaultRequestHeaders.Authorization == null)
+                return new SaveProfileResponse {StatusCode = HttpStatusCode.Unauthorized,
+                    IsSavingSuccessful = false};
+
+            var httpResponse = await client.PostAsync($"{path}",
+                new StringContent(JsonConvert.SerializeObject(profile),
+                    Encoding.UTF8, "application/json"));
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                return new SaveProfileResponse {IsSavingSuccessful = true, 
+                    StatusCode = httpResponse.StatusCode};
+            }
+
+            return new SaveProfileResponse {IsSavingSuccessful = false};
+        }
+
         public async Task<GetCurrentUserInfo> GetUserInfo()
         {
             var client = await ClientWithAuthHeader();

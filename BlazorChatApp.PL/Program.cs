@@ -19,23 +19,29 @@ using Blazored.LocalStorage;
 using Blazored.Toast;
 using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using BlazorChatApp.DAL.CustomExtensions;
+using BlazorChatApp.PL;
+using BlazorChatApp.PL.Controllers;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration
-    .GetConnectionString("ConnectionString") ??
-                       throw new InvalidOperationException
-                           ("Connection string 'ConnectionString' not found.");
-builder.Services.AddDbContext<BlazorChatAppContext>(options =>
-    options.UseSqlServer(connectionString)); ;
 
+var uri = builder.Configuration["VaultUri"];
+var client = new SecretClient(new Uri(uri), new DefaultAzureCredential());
+var connectionString = await client.GetSecretAsync("ConnectionString");
+                     
+builder.Services.AddDbContext<BlazorChatAppContext>(options =>
+    options.UseSqlServer(connectionString.Value.Value)); 
+builder.Services.AddLogging();
 builder.Services.AddRazorPages();
-builder.Services.AddSignalRCore();
+builder.Services.AddSignalRCore().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]);
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers().AddNewtonsoftJson(
     options => {
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-    }); ;
-
+    });
 
 builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
@@ -46,6 +52,8 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IChatService, ChatService>();
 builder.Services.AddTransient<IMessageService, MessageService>();
+
+builder.Services.AddTransient<UserController>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
@@ -60,6 +68,9 @@ builder.Services.AddTransient<MessageDto>();
 builder.Services.AddTransient<ReplyToGroupModel>();
 builder.Services.AddTransient<ReplyToUserModel>();
 builder.Services.AddTransient<RoomModel>();
+builder.Services.AddTransient<ProfileModel>();
+
+builder.Services.AddTransient<BrowserImageFile>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
@@ -94,7 +105,8 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidAudience = builder.Configuration["JWT:ValidAudience"],
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
     });
 
@@ -103,12 +115,16 @@ builder.Services.AddResponseCompression(opts =>
     opts.MimeTypes = ResponseCompressionDefaults
         .MimeTypes.Concat(new[] {"application/octet-stream"});
 });
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorage:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureBlobStorage:queue"], preferMsi: true);
+});
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
@@ -130,7 +146,11 @@ app.UseEndpoints(endpoints =>
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
     endpoints.MapControllers();
-    endpoints.MapHub<ChatHub>("/chatHub");
-});
 
+    app.UseAzureSignalR(endpoints =>
+    {
+        endpoints.MapHub<ChatHub>("/chatHub");
+    });
+    //endpoints.MapHub<ChatHub>("/chatHub");
+});
 app.Run();

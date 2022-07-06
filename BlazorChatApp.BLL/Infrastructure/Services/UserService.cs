@@ -1,6 +1,11 @@
 ﻿using BlazorChatApp.BLL.Contracts.DTOs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.BLL.Models;
+using BlazorChatApp.DAL.CustomExceptions;
+using BlazorChatApp.DAL.CustomExtensions;
 using BlazorChatApp.DAL.Data.Interfaces;
+using BlazorChatApp.DAL.Models;
+using Castle.Core.Logging;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
@@ -48,6 +53,25 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public IEnumerable<IdentityUser> GetOtherUsers(string id)
         {
             return _unitOfWork.User.GetOtherUsers(id);
+        }
+
+        public async Task<bool> SaveProfile(BrowserImageFile model)
+        {
+            try
+            {
+                await _unitOfWork.User.SaveProfile(model);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+            catch (UserDoesNotExistException)
+            {
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+            
         }
     }
 }

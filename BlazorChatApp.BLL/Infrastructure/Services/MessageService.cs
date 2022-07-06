@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
-using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.Entities;

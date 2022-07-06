@@ -30,10 +30,10 @@ public class AuthService : IAuthService
         var client = _clientFactory.CreateClient("Authorization");
 
         var path = $"{client.BaseAddress}/auth/login";
+
         var httpResponse = await client.PostAsync($"{path}",
             new StringContent(JsonConvert.SerializeObject(model),
                 Encoding.UTF8, "application/json"));
-
 
         if (httpResponse.IsSuccessStatusCode)
         {

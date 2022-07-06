@@ -31,7 +31,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 MessageText = msgText,
                 SenderName = userName,
                 UserId = userId,
-                SentTime = DateTime.Now,
                 IsItReply = false,
             };
 
@@ -50,7 +49,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 MessageText = $"Replied to {model.UserName}:{model.Message} - {model.Reply}",
                 SenderName = model.SenderName,
                 UserId = model.SenderId,
-                SentTime = DateTime.Now,
                 ChatId = model.ChatId,
                 IsItReply = true
             };
@@ -75,7 +73,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
             {
                 MessageText = $"Replied to {model.SenderName}:{model.Message} - {model.Reply}",
                 SenderName = model.UserName,
-                SentTime = DateTime.Now,
                 UserId = model.UserId,
                 ChatId = model.ChatId,
                 IsItReply = true

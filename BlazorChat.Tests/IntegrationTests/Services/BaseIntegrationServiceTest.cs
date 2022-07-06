@@ -40,7 +40,7 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 UserName = "testUserName2",
             };
 
-            context.Users.AddRange(user, user2, user3);
+            context.Users.AddRange(user as User, user2 as User, user3 as User);
             await context.SaveChangesAsync();
 
             // adding public chat
@@ -113,7 +113,6 @@ namespace BlazorChat.Tests.IntegrationTests.Services
             var fixture = new Fixture();
             var context = new BlazorChatAppContext(_contextOptions);
 
-            var messageAppContext = new BlazorChatAppContext(_contextOptions);
             await context.Database.EnsureDeletedAsync();
 
             // adding users 
@@ -123,7 +122,7 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 UserName = "testUserName",
             };
 
-            context.Users.AddRange(user);
+            context.Users.AddRange(user as User);
             await context.SaveChangesAsync();
 
             // adding public chat

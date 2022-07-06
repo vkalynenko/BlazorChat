@@ -1,0 +1,66 @@
+﻿@page "/profile"
+@using BlazorChatApp.DAL.CustomExtensions
+@using BlazorChatApp.BLL.RequestServices.Interfaces
+@inject HttpClient Http
+@inject IToastService ToastService
+<h1>@message</h1>
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+<link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+
+<div class="input-group">
+    <div class="custom-file">
+        <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
+        <label class="custom-file-label" for="inputFile">Choose file</label>
+    </div>
+    <div class="input-group-append">
+        <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+    </div>
+</div>
+
+@foreach (var item in filesBase64)
+{
+    <img src="data:@item.Type;base64,@item.Data" />
+}
+
+@code {
+    private IRequestUserService _userService { get; set; }
+    List<BrowserImageFile> filesBase64 = new();
+    string message = "InputFile";
+    bool isDisabled;
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(); // get the files selected by the users
+        
+            var resizedFile = await files[0].RequestImageFileAsync(files[0].ContentType, 640, 480); // resize the image file
+            var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf); // copy the stream to the buffer
+            }
+            filesBase64.Add(new BrowserImageFile { Data = Convert.ToBase64String(buf), Type = files[0].ContentType, Name = files[0].Name }); // convert to a base64 string!!
+        
+        message = "Click UPLOAD to continue";
+    }
+
+    async Task Upload()
+    {
+        try
+        {
+            isDisabled = true;
+            var response = await _userService.SaveUserProfileInfo(filesBase64[0]);
+
+            if (response.IsSavingSuccessful)
+            {
+                message = $"{filesBase64.Count} files uploaded";
+                ToastService.ShowSuccess("upload success");
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError(e.Message);
+            StateHasChanged();
+        }
+    }
+}

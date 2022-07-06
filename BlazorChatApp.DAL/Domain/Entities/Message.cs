@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BlazorChatApp.DAL.Domain.Entities
 {
@@ -15,7 +14,21 @@ namespace BlazorChatApp.DAL.Domain.Entities
         public bool IsItReply { get; set; }
         public Message()
         {
-            SentTime = DateTime.Now;
+            //DateTime time = DateTime.UtcNow;
+            //TimeZoneInfo localZone = TimeZoneInfo.Local;
+            //TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById(localZone.Id);
+
+            ////SentTime = TimeZoneInfo.ConvertTimeFromUtc(time, cstZone);
+            //SentTime = time.AddHours(localZone.BaseUtcOffset.Hours);
+
+            SentTime=DateTime.SpecifyKind(DateTime.UtcNow.AddHours(3.0), DateTimeKind.Local);
+
+            //TimeZone tzone = TimeZone.CurrentTimeZone;
+
+            //TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById(tzone.DaylightName);
+            //DateTime result = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tzi);
+
+            //SentTime = result;
         }
     }
 }

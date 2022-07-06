@@ -35,6 +35,7 @@
 </div>
 
 @code{
+
     private bool isLoaded = true;
     [Inject] private IAuthService _service { get; set; }
     private async Task RegisterAsync()
@@ -67,7 +68,7 @@
             }
             isLoaded = true;
         }
-        catch
+        catch(Exception exception)
         {
             isLoaded = true;
             ToastService.ShowError("Registration failed!");

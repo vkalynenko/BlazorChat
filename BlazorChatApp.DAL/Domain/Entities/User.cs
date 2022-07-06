@@ -4,6 +4,8 @@ namespace BlazorChatApp.DAL.Domain.Entities
 {
     public class User : IdentityUser
     {
-        private ICollection<Message> Messages { get; set; }
+        public int Age { get; set; }
+        public string ImageUrl { get; set; }
+
     }
 }

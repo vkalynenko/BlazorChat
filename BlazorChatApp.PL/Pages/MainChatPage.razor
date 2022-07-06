@@ -124,38 +124,45 @@ else
     {
         if (firstRender)
         {
-            var getCurrentChatResponse = await RequestChatService.GetCurrentChat(chatId);
-            CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
-            messages = (List<Message>?) await MessageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
-            messages.Reverse();
-            isLoaded = true;
-            hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavManager.ToAbsoluteUri("/chatHub"), options => { options.UseDefaultCredentials = true; })
-                .Build();
-            hubConnection.On<Message>("ReceiveMessage", msg =>
+            try
             {
-                messages.Add(msg);
-                InvokeAsync(StateHasChanged);
-            });
-            hubConnection.On<Message>("ReceiveEditedMessage", msg =>
+                var getCurrentChatResponse = await RequestChatService.GetCurrentChat(chatId);
+                CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
+                messages = (List<Message>?) await MessageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
+                messages.Reverse();
+                isLoaded = true;
+                hubConnection = new HubConnectionBuilder()
+                    .WithUrl(NavManager.ToAbsoluteUri("/chatHub"), options => { options.UseDefaultCredentials = true; })
+                    .Build();
+                hubConnection.On<Message>("ReceiveMessage", msg =>
+                {
+                    messages.Add(msg);
+                    InvokeAsync(StateHasChanged);
+                });
+                hubConnection.On<Message>("ReceiveEditedMessage", msg =>
+                {
+                    messages.Where(x => x.Id == msg.Id).ToList().ForEach(s => s.MessageText = msg.MessageText);
+                    InvokeAsync(StateHasChanged);
+                });
+                hubConnection.On<int>("DeleteMessageFromAll", Id =>
+                {
+                    var message = messages.FirstOrDefault(x => x.Id == Id);
+                    messages.Remove(message);
+                    InvokeAsync(StateHasChanged);
+                });
+                hubConnection.On<List<Message>>("ReceiveLoadedMessages", messageList =>
+                {
+                    foreach (var message in messageList)
+                        messages.Insert(0, message);
+                });
+                await hubConnection.StartAsync();
+                await hubConnection.SendAsync("JoinRoom", chatId);
+                StateHasChanged();
+            }
+            catch (Exception ex)
             {
-                messages.Where(x => x.Id == msg.Id).ToList().ForEach(s => s.MessageText = msg.MessageText);
-                InvokeAsync(StateHasChanged);
-            });
-            hubConnection.On<int>("DeleteMessageFromAll", Id =>
-            {
-                var message = messages.FirstOrDefault(x => x.Id == Id);
-                messages.Remove(message);
-                InvokeAsync(StateHasChanged);
-            });
-            hubConnection.On<List<Message>>("ReceiveLoadedMessages", messageList =>
-            {
-                foreach (var message in messageList)
-                    messages.Insert(0, message);
-            });
-            await hubConnection.StartAsync();
-            await hubConnection.SendAsync("JoinRoom", chatId);
-            StateHasChanged();
+                ToastService.ShowError(ex.Message);
+            }
         }
     }
 

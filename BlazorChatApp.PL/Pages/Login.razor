@@ -23,7 +23,7 @@
     </div> 
 </EditForm>
 <br/><br/>
- <div style="position:center">
+<div style="position:center">
 @if (!isLoaded)
 {
     <div class="loader"></div>
@@ -34,7 +34,6 @@
 {
     private bool isLoaded = true;
     [Inject] private IAuthService _service { get; set; }
-
     private async void LoginAsync()
     {
         isLoaded = false;
@@ -49,14 +48,18 @@
             else
             {
                 ToastService.ShowError("Incorrect login or password!");
+                LoginDto.Password=String.Empty;
             }
             isLoaded = true;
             StateHasChanged();
         }
-        catch 
+        catch(Exception ex)
         {
             isLoaded = true;
+            ToastService.ShowError($"Failed! {ex.Message}");
+            LoginDto.Password=String.Empty;
             NavManager.NavigateTo("/login");
+            StateHasChanged();
         }
     }
 }

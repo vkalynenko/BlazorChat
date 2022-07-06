@@ -35,7 +35,6 @@ namespace BlazorChatApp.PL.Controllers
                     ChatId = chatId,
                     MessageText = message,
                     SenderName = GetUserName(),
-                    SentTime = DateTime.Now,
                 };
                 bool result =
                     await _messageService.CreateMessage(chatId,
