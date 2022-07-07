@@ -2,7 +2,7 @@
 using BlazorChatApp.DAL.CustomExtensions;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
-using BlazorChatApp.DAL.Models;
+using BlazorChatApp.DAL.Domain.Entities;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly BlazorChatAppContext _context;
-
         public UserRepository(BlazorChatAppContext context)
         {
             _context = context;
@@ -26,26 +25,25 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task SaveProfile(BrowserImageFile model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x =>
-                x.Id == model.UserId);
+            var image = await _context.Images.FirstOrDefaultAsync(x => x.UserId == model.UserId);
 
-            if (user == null)
+            if (image != null)
             {
-                throw new UserDoesNotExistException();
-            }
-
-            //if (!model.PhoneNumber.IsNullOrEmpty())
-            //{
-            //    user.PhoneNumber = model.PhoneNumber;
-            //}
-            //user.Age = model.Age;
-
-            if (!model.ImageUrl.IsNullOrEmpty())
-            {
-                user.ImageUrl = model.ImageUrl;
+                _context.Images.Remove(image);
             }
             
-            _context.Users.Update(user);
+            if (!model.ImageUrl.IsNullOrEmpty())
+            {
+                var newImage = new Image
+                {
+                    ImageUrl = model.ImageUrl,
+                    UserId = model.UserId,
+
+                };
+
+               await _context.Images.AddAsync(newImage);
+
+            }
         }
     }
 }

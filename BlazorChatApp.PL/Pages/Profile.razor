@@ -1,20 +1,23 @@
 ﻿@page "/profile"
 @using BlazorChatApp.DAL.CustomExtensions
 @using BlazorChatApp.BLL.RequestServices.Interfaces
-@inject HttpClient Http
+@using BlazorChatApp.BLL.Responses
 @inject IToastService ToastService
-<h1>@message</h1>
+@inherits BaseComponent
 
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
 <link href="https://stackpath.bootstrap.com/font-awasome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 
+<h1>Hello, @userName!</h1>
+<br/>
+
 <div class="input-group">
-    <div class="custom-file">
-        <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
-        <label class="custom-file-label" for="inputFile">Choose file</label>
+    <div class="">
+        <InputFile class="room-button" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
+        <label class="file" for="inputFile">Choose file</label>
     </div>
-    <div class="input-group-append">
-        <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+    <div>
+        <button class="room-button" @onclick="Upload" disabled="@isDisabled">Upload</button>
     </div>
 </div>
 
@@ -22,12 +25,35 @@
 {
     <img src="data:@item.Type;base64,@item.Data" />
 }
+<p>@message</p>
 
+@if (isLoaded==false)
+{
+    <div class="loader" style="position: center">
+    </div> <p>Loading...</p>
+}
 @code {
-    private IRequestUserService _userService { get; set; }
+    [Inject] private IRequestUserService _userService { get; set; }
     List<BrowserImageFile> filesBase64 = new();
     string message = "InputFile";
     bool isDisabled;
+    bool isLoaded =true;
+    string userName = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            var response = await _userService.GetUserInfo();
+            CheckIfUserHasAccess(response, async () =>
+            {
+                userName = response.UserName;
+            });
+            StateHasChanged();
+            ShouldRender();
+        }
+    }
 
     async Task OnChange(InputFileChangeEventArgs e)
     {
@@ -40,27 +66,40 @@
                 await stream.ReadAsync(buf); // copy the stream to the buffer
             }
             filesBase64.Add(new BrowserImageFile { Data = Convert.ToBase64String(buf), Type = files[0].ContentType, Name = files[0].Name }); // convert to a base64 string!!
-        
-        message = "Click UPLOAD to continue";
     }
 
     async Task Upload()
     {
+        isLoaded = false;
         try
         {
             isDisabled = true;
-            var response = await _userService.SaveUserProfileInfo(filesBase64[0]);
-
-            if (response.IsSavingSuccessful)
+            SaveProfileResponse response = await _userService.SaveUserProfileInfo(filesBase64[0]);
+            CheckIfUserHasAccess(response, () =>
             {
-                message = $"{filesBase64.Count} files uploaded";
-                ToastService.ShowSuccess("upload success");
-            }
+                if (response.IsSavingSuccessful)
+                {
+                    message = $"{filesBase64.Count} files uploaded";
+                    ToastService.ShowSuccess("Upload was successful!");
+                    filesBase64.Clear();
+                    StateHasChanged();
+                }
+                else
+                {
+                    ToastService.ShowError("Saving wasn't successful!");
+                    filesBase64.Clear();
+                    StateHasChanged();
+                }
+            });
+           
         }
         catch (Exception e)
         {
-            ToastService.ShowError(e.Message);
+            ToastService.ShowError("Failed to upload an image!");
+            StateHasChanged();
+            filesBase64.Clear();
             StateHasChanged();
         }
+        isLoaded = true;
     }
 }

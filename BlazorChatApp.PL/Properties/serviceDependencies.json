@@ -5,11 +5,6 @@
       "connectionId": "ConnectionStrings:ConnectionString",
       "dynamicId": null
     },
-    "signalr1": {
-      "type": "signalr",
-      "connectionId": "Azure:SignalR:ConnectionString",
-      "dynamicId": null
-    },
     "secrets2": {
       "type": "secrets",
       "connectionId": "VaultUri",

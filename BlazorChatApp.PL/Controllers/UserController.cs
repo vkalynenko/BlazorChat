@@ -2,7 +2,9 @@
 using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
 using BlazorChatApp.BLL.Infrastructure.Interfaces;
+using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.CustomExtensions;
+using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -66,11 +68,18 @@ namespace BlazorChatApp.PL.Controllers
         }
 
         [HttpPost("saveProfile")]
-        public async Task<IActionResult> SaveProfile(BrowserImageFile profile)
+        public async Task<IActionResult> SaveProfile([FromBody]HelpProfileModel profileModel)
         {
             try
             {
-                var userId  = await GetUserId();
+                BrowserImageFile profile = new BrowserImageFile
+                {
+                    Data = profileModel.Data,
+                    Name = profileModel.Name,
+                    Type = profileModel.Type
+                };
+
+                var userId = await GetUserId();
                 profile.UserId = userId;
                 var containerName = "images";
 
@@ -80,18 +89,21 @@ namespace BlazorChatApp.PL.Controllers
                 var secret = secretClient.GetSecretAsync("AzureBlobStorage").Result.Value.Value; // secret for blob from key vault
 
                 BlobContainerClient blobContainerClient = new BlobContainerClient(
-                    secret, containerName); 
+                    secret, containerName);
 
                 BlobClient blobClient = blobContainerClient.GetBlobClient(userId + " " + profile.Name);
 
-                var path = Path.Combine(containerName, userId, profile.Name);
 
                 var fs = Convert.FromBase64String(profile.Data);
+
+                var data = new BinaryData(fs).ToStream();
+
+                await blobClient.DeleteIfExistsAsync();
+                await blobClient.UploadAsync(data);
 
                 var url = blobClient.Uri.AbsoluteUri;
 
                 profile.ImageUrl = url;
-
 
                 var result = await _userService.SaveProfile(profile);
 
@@ -99,7 +111,7 @@ namespace BlazorChatApp.PL.Controllers
                 {
                     return Ok();
                 }
-                    
+
 
                 return BadRequest("Failed to update an info");
             }

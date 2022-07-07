@@ -3,7 +3,6 @@ using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Domain.EF;
 using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.DAL.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorChatApp.DAL.Data.Repositories
@@ -106,9 +105,22 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)
         {
-            return await _context.Messages.OrderByDescending(x=>x.SentTime)
-                .Where(chat => chat.ChatId == chatId).Skip(quantityToSkip).Take(quantityToLoad)
+            //var test = from m in _context.Messages
+            //    join u in _context.Users on m.UserId equals u.Id
+            //    join i in _context.Images on u.Id equals i.UserId
+            //    select new {Message = m, Url = i.ImageUrl};
+
+           return await _context.Messages.OrderByDescending(x => x.SentTime)
+                .Where(chat => chat.ChatId == chatId)
+                .Skip(quantityToSkip)
+                .Take(quantityToLoad) 
                 .ToListAsync();
+
+            //var res = from m in messages
+            //    join i in _context.Images on m.UserId equals i.UserId
+            //    select new {Message = m, Url = i.ImageUrl}.Message;
+            //return res;
+
         }
     }
 }

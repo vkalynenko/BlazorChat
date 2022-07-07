@@ -12,13 +12,10 @@ namespace BlazorChatApp.PL.Controllers;
 public class ChatController : BaseController
 {   
     private readonly IChatService _chatService;
-    private readonly IUserService _userService;
     public ChatController(IChatService chatService, 
-        UserManager<IdentityUser> userManager, 
-        IUserService userService) :base(userManager)
+        UserManager<IdentityUser> userManager) :base(userManager)
     {
         _chatService = chatService;
-        _userService = userService;
     }
 
     [HttpGet("createRoom/{chatName}")]

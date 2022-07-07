@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BlazorChatApp.DAL.CustomExtensions;
+using BlazorChatApp.DAL.Domain.Entities;
 using BlazorChatApp.PL;
 using BlazorChatApp.PL.Controllers;
 using Microsoft.Extensions.Azure;
@@ -31,12 +32,14 @@ var builder = WebApplication.CreateBuilder(args);
 var uri = builder.Configuration["VaultUri"];
 var client = new SecretClient(new Uri(uri), new DefaultAzureCredential());
 var connectionString = await client.GetSecretAsync("ConnectionString");
-                     
+//var signalRConnection = await client.GetSecretAsync("SignalR");       //comment     
+
 builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString.Value.Value)); 
 builder.Services.AddLogging();
 builder.Services.AddRazorPages();
-builder.Services.AddSignalRCore().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]);
+
+builder.Services.AddSignalRCore();//.AddAzureSignalR(signalRConnection.Value.Value); //comment
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers().AddNewtonsoftJson(
     options => {
@@ -115,11 +118,11 @@ builder.Services.AddResponseCompression(opts =>
     opts.MimeTypes = ResponseCompressionDefaults
         .MimeTypes.Concat(new[] {"application/octet-stream"});
 });
-builder.Services.AddAzureClients(clientBuilder =>
-{
-    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorage:blob"], preferMsi: true);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureBlobStorage:queue"], preferMsi: true);
-});
+//builder.Services.AddAzureClients(clientBuilder =>
+//{
+//    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorage:blob"], preferMsi: true);
+//    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureBlobStorage:queue"], preferMsi: true);
+//});
 
 var app = builder.Build();
 
@@ -141,16 +144,18 @@ app.UseAuthorization();
 
 app.UseCookiePolicy();
 
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
     endpoints.MapControllers();
 
-    app.UseAzureSignalR(endpoints =>
-    {
-        endpoints.MapHub<ChatHub>("/chatHub");
-    });
-    //endpoints.MapHub<ChatHub>("/chatHub");
+    //app.UseAzureSignalR(endpoints =>
+    //{
+    //    endpoints.MapHub<ChatHub>("/chatHub");
+    //});
+
+    endpoints.MapHub<ChatHub>("/chatHub");
 });
 app.Run();

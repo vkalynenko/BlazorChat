@@ -40,7 +40,7 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 UserName = "testUserName2",
             };
 
-            context.Users.AddRange(user as User, user2 as User, user3 as User);
+            context.Users.AddRange(user , user2 , user3);
             await context.SaveChangesAsync();
 
             // adding public chat
@@ -122,7 +122,7 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 UserName = "testUserName",
             };
 
-            context.Users.AddRange(user as User);
+            context.Users.AddRange(user);
             await context.SaveChangesAsync();
 
             // adding public chat

@@ -12,8 +12,10 @@ public class BlazorChatAppContext : IdentityDbContext<IdentityUser>
         : base(options)
     {
     }
+   
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Message> Messages { get; set; }   
     public DbSet<ChatUser> ChatUsers { get; set; }
-    public DbSet<User> Users { get; set; }
+    //public DbSet<User> AppUsers { get; set; }
+    public DbSet<Image> Images { get; set; } 
 }

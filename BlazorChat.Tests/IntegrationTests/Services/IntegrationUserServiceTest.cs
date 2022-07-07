@@ -4,6 +4,7 @@ using BlazorChatApp.DAL.Data;
 using BlazorChatApp.DAL.Data.Interfaces;
 using BlazorChatApp.DAL.Data.Repositories;
 using BlazorChatApp.DAL.Domain.EF;
+using BlazorChatApp.DAL.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +24,14 @@ namespace BlazorChat.Tests.IntegrationTests.Services
                 .UseInMemoryDatabase("TestBlazorChatDatabase")
                 .Options;
             var appContext = new BlazorChatAppContext(contextOptions);
+            UserManager<IdentityUser> userManager = new UserManager<IdentityUser>(
+               new UserStore<IdentityUser>(appContext), null,
+               new PasswordHasher<IdentityUser>(null),
+           null, null, null, null, null, null);
             IUserRepository userRepository = new UserRepository(appContext);
             IUnitOfWork unitOfWork = new UnitOfWork(appContext, _chatRepository.Object, 
                 _messageRepository.Object, userRepository);
-            UserManager <IdentityUser> userManager = new UserManager<IdentityUser>(
-                new UserStore<IdentityUser>(appContext), null, 
-                new PasswordHasher<IdentityUser>(null),
-            null, null, null, null, null, null);
+           
             _sut = new UserService(userManager, unitOfWork);
             _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
             _fixture.Behaviors.Add(new OmitOnRecursionBehavior());

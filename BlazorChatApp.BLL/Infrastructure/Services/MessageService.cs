@@ -85,6 +85,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)
         {
             return await _unitOfWork.Message.GetMessages(chatId, quantityToSkip, quantityToLoad);
+           
         }
     }
 }

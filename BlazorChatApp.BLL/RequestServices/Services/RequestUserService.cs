@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using System.Text;
 using BlazorChatApp.BLL.Helpers;
+using BlazorChatApp.BLL.Models;
 using BlazorChatApp.BLL.RequestServices.Interfaces;
 using BlazorChatApp.BLL.Responses;
 using BlazorChatApp.DAL.CustomExtensions;
@@ -45,9 +46,19 @@ namespace BlazorChatApp.BLL.RequestServices.Services
                 return new SaveProfileResponse {StatusCode = HttpStatusCode.Unauthorized,
                     IsSavingSuccessful = false};
 
-            var httpResponse = await client.PostAsync($"{path}",
-                new StringContent(JsonConvert.SerializeObject(profile),
-                    Encoding.UTF8, "application/json"));
+            //var httpResponse = await client.PostAsync($"{path}",
+            //    new StringContent(JsonConvert.SerializeObject(profile),
+            //        Encoding.UTF8, "application/json"));
+            HelpProfileModel model = new HelpProfileModel
+            {
+                Type = profile.Type,
+                Name = profile.Name,
+                Data = profile.Data
+            };
+
+            var httpResponse = await client.PostAsync(path,new StringContent(
+                    JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
+                );
 
             if (httpResponse.IsSuccessStatusCode)
             {

@@ -10,25 +10,38 @@
   "profiles": {
     "BlazorChatApp.PL": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7248;http://localhost:5248",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR",
-        "VaultUri": "https://keyvaultblazorchatapp.vault.azure.net/",
-        "AZURE_USERNAME": "akalynenko@outlook.com"
-      }
+        "AZURE_USERNAME": "akalynenko@outlook.com",
+        "VaultUri": "https://keyvaultblazorchatapp.vault.azure.net/"
+      },
+      "applicationUrl": "https://localhost:7248;http://localhost:5248",
+      "dotnetRunMessages": true
     },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR",
-        "VaultUri": "https://keyvaultblazorchatapp.vault.azure.net/",
-        "AZURE_USERNAME": "akalynenko@outlook.com"
+       // "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR",
+        "AZURE_USERNAME": "akalynenko@outlook.com",
+        "VaultUri": "https://keyvaultblazorchatapp.vault.azure.net/"
       }
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:7248",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        //"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR",
+        "AZURE_USERNAME": "akalynenko@outlook.com",
+        "ASPNETCORE_URLS": "https://localhost:7248;http://localhost:5248",
+        "VaultUri": "https://keyvaultblazorchatapp.vault.azure.net/"
+      },
+      "distributionName": ""
     }
   }
 }
