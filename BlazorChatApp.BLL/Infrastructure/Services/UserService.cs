@@ -4,9 +4,6 @@ using BlazorChatApp.BLL.Models;
 using BlazorChatApp.DAL.CustomExceptions;
 using BlazorChatApp.DAL.CustomExtensions;
 using BlazorChatApp.DAL.Data.Interfaces;
-using BlazorChatApp.DAL.Domain.Entities;
-using BlazorChatApp.DAL.Models;
-using Castle.Core.Logging;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlazorChatApp.BLL.Infrastructure.Services
@@ -31,7 +28,9 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             }
 
             var newUser = new IdentityUser{ UserName = model.UserName};
+
             var result = await _userManager.CreateAsync(newUser, model.Password);
+
 
             if (result.Succeeded)
             {

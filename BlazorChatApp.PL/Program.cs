@@ -22,10 +22,7 @@ using Newtonsoft.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BlazorChatApp.DAL.CustomExtensions;
-using BlazorChatApp.DAL.Domain.Entities;
-using BlazorChatApp.PL;
 using BlazorChatApp.PL.Controllers;
-using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,7 +74,12 @@ builder.Services.AddTransient<BrowserImageFile>();
 
 builder.Services.AddTransient<UserManager<IdentityUser>>();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    {
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+    })
     .AddEntityFrameworkStores<BlazorChatAppContext>()
     .AddDefaultTokenProviders();
 

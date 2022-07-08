@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Components
 @using BlazorChatApp.BLL.Contracts.DTOs
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
+@using Castle.Core.Internal
+@using System.Text.RegularExpressions
 @inject NavigationManager NavManager
 @inject IToastService ToastService
 @inject RegisterDto RegisterDto
@@ -43,28 +45,40 @@
         isLoaded = false;
         try
         {
+            if (RegisterDto.Password.IsNullOrEmpty() || RegisterDto.ConfirmPassword.IsNullOrEmpty() || RegisterDto.UserName.IsNullOrEmpty())
+            {
+                ToastService.ShowWarning("All fields are required!");
+            }
+
             if (RegisterDto.Password != RegisterDto.ConfirmPassword)
             {
-                
                 ToastService.ShowWarning("Passwords aren't match!");
             }
             else
             {
-                var response = await _service.RegisterAsync(RegisterDto.UserName, RegisterDto.Password, RegisterDto.ConfirmPassword);
-                if (response == "Registration was successful!")
+                if (RegisterDto.Password.Length < 8)
                 {
-                    ToastService.ShowSuccess("You are registered successfully!");
-                    ToastService.ShowInfo("Log in to start chatting!");
-                    NavManager.NavigateTo("/login");
+                    ToastService.ShowWarning("Use more complex password! Minimum 8 symbols!");
                 }
                 else
                 {
-                    ToastService.ShowError("User with this name already exists!");
-                    RegisterDto.ConfirmPassword=String.Empty; 
-                    RegisterDto.UserName=String.Empty;
-                    RegisterDto.Password=String.Empty;
-                    StateHasChanged();
+                    var response = await _service.RegisterAsync(RegisterDto.UserName, RegisterDto.Password, RegisterDto.ConfirmPassword);
+                    if (response == "Registration was successful!")
+                    {
+                        ToastService.ShowSuccess("You are registered successfully!");
+                        ToastService.ShowInfo("Log in to start chatting!");
+                        NavManager.NavigateTo("/login");
+                    }
+                    else
+                    {
+                        ToastService.ShowError("User with this name already exists!");
+                        RegisterDto.ConfirmPassword=String.Empty; 
+                        RegisterDto.UserName=String.Empty;
+                        RegisterDto.Password=String.Empty;
+                        StateHasChanged();
+                    }
                 }
+               
             }
             isLoaded = true;
         }

@@ -63,8 +63,13 @@ namespace BlazorChatApp.PL.Controllers
         {
             try
             {
-                await _userService.Register(model);
-                return Ok(model);
+                var isSuccess = await _userService.Register(model);
+                if (isSuccess == "User was created!")
+                {
+                    return Ok(model);
+                }
+
+                return BadRequest("User wasn't created!");
             }
             catch(Exception ex)
             {
