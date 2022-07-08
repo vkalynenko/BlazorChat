@@ -39,6 +39,7 @@ namespace BlazorChatApp.PL.Controllers
                 bool result =
                     await _messageService.CreateMessage(chatId,
                         message, GetUserName(), await GetUserId());
+
                 if (result)
                 {
                     return entity;

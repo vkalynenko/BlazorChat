@@ -42,7 +42,7 @@ namespace BlazorChatApp.BLL.RequestServices.Services
             return new GetAllMessagesFromChat
             {
                 StatusCode = messages.StatusCode,
-                Messages = messages.Content.ReadFromJsonAsync<List<Message>>()
+                Messages = messages.Content.ReadFromJsonAsync<List<dynamic>>()
             };
         }
         private async Task<HttpClient> ClientWithAuthHeader()

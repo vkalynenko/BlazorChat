@@ -10,6 +10,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
     public class MessageRepository : IMessageRepository
     {
         private readonly BlazorChatAppContext _context;
+
         public MessageRepository(BlazorChatAppContext context)
         {
             _context = context;
@@ -20,10 +21,13 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             var chat = await _context.Chats.FindAsync(chatId);
 
+            int imageId = await GetImageId(userId);
+
             if (chat == null)
             {
                 throw new ChatDoesNotExistException("Chat doesn't exist!");
             }
+
             var message = new Message
             {
                 ChatId = chatId,
@@ -31,11 +35,13 @@ namespace BlazorChatApp.DAL.Data.Repositories
                 SenderName = userName,
                 UserId = userId,
                 IsItReply = false,
+                ImageId = imageId
             };
 
             await _context.Messages.AddAsync(message);
             return message;
         }
+
         public async Task<Message?> GetById(int id)
         {
             return await _context.Messages.FindAsync(id);
@@ -43,16 +49,18 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<Message> ReplyToGroup(ReplyToGroupModel model)
         {
+            int imageId = await GetImageId(model.SenderId);
             Message newReply = new()
             {
                 MessageText = $"Replied to {model.UserName}:{model.Message} - {model.Reply}",
                 SenderName = model.SenderName,
                 UserId = model.SenderId,
                 ChatId = model.ChatId,
-                IsItReply = true
+                IsItReply = true,
+                ImageId = imageId
             };
-           await _context.Messages.AddAsync(newReply);
-           return newReply;
+            await _context.Messages.AddAsync(newReply);
+            return newReply;
         }
 
         public async Task DeleteMessageFromAll(int id)
@@ -62,19 +70,22 @@ namespace BlazorChatApp.DAL.Data.Repositories
             if (entity == null)
             {
                 throw new MessageDoesNotExistException("Message doesn't exist");
-            } 
+            }
+
             _context.Messages.Remove(entity);
         }
 
         public async Task<Message> ReplyToUser(ReplyToUserModel model)
         {
+            int imageId = await GetImageId(model.UserId);
             Message newReply = new()
             {
                 MessageText = $"Replied to {model.SenderName}:{model.Message} - {model.Reply}",
                 SenderName = model.UserName,
                 UserId = model.UserId,
                 ChatId = model.ChatId,
-                IsItReply = true
+                IsItReply = true,
+                ImageId = imageId
             };
             await _context.Messages.AddAsync(newReply);
             return newReply;
@@ -84,11 +95,12 @@ namespace BlazorChatApp.DAL.Data.Repositories
         {
             var entity = await FindMessage(id);
             //var userName = _userManager.FindByIdAsync(userId).Result.UserName;
-            var userName =  _context.Users.FirstOrDefaultAsync(x => x.Id == userId).Result?.UserName;
+            var userName = _context.Users.FirstOrDefaultAsync(x => x.Id == userId).Result?.UserName;
             if (entity == null)
             {
                 throw new MessageDoesNotExistException();
             }
+
             if (userId == entity.UserId)
             {
                 entity.SenderName = userName;
@@ -99,7 +111,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<Message> FindMessage(int id)
         {
-            var message = await _context.Messages.FirstOrDefaultAsync(x=>x.Id==id);
+            var message = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
             return message;
         }
 
@@ -110,17 +122,58 @@ namespace BlazorChatApp.DAL.Data.Repositories
             //    join i in _context.Images on u.Id equals i.UserId
             //    select new {Message = m, Url = i.ImageUrl};
 
-           return await _context.Messages.OrderByDescending(x => x.SentTime)
+            var messages = await _context.Messages
+                .Include(x => x.Image)
+                .OrderByDescending(x => x.SentTime)
                 .Where(chat => chat.ChatId == chatId)
                 .Skip(quantityToSkip)
-                .Take(quantityToLoad) 
+                .Take(quantityToLoad)
                 .ToListAsync();
 
             //var res = from m in messages
-            //    join i in _context.Images on m.UserId equals i.UserId
-            //    select new {Message = m, Url = i.ImageUrl}.Message;
-            //return res;
+            //          join i in _context.Images on m.UserId equals i.UserId
+            //          select new { Message = m, Url = i.ImageUrl }.Message;
+            //return res.ToList();
 
+            return messages;
+
+        }
+
+        public async Task<Image> GetImage(string userId)
+        {
+            var image = await _context.Images.FirstOrDefaultAsync(x => x.UserId == userId);
+
+            if (image == null)
+            {
+                var newImage = new Image
+                {
+                    ImageUrl = "https://storageaccountchatapp.blob.core.windows.net/images/avatar.png"
+                };
+                return newImage;
+            }
+            return image;
+        }
+
+        private async Task<int> GetImageId(string userId)
+        {
+            int imageId;
+            var image = await _context.Images.FirstOrDefaultAsync(x => x.UserId == userId);
+            if (image == null)
+            {
+                var newImage = new Image
+                {
+                    UserId = userId,
+                    ImageUrl = "https://storageaccountchatapp.blob.core.windows.net/images/avatar.png"
+                };
+                _context.Images.Add(newImage);
+                imageId = newImage.Id;
+            }
+            else
+            {
+                imageId = image.Id;
+            }
+
+            return imageId;
         }
     }
 }

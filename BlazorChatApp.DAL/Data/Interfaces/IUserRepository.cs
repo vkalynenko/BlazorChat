@@ -7,5 +7,6 @@ namespace BlazorChatApp.DAL.Data.Interfaces
     {
         IEnumerable<IdentityUser> GetOtherUsers(string id);
         Task SaveProfile(BrowserImageFile model);
+        Task<string> GetImageLink(string userId);
     }
 }

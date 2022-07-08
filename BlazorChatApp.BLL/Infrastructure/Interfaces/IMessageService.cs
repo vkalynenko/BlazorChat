@@ -12,5 +12,6 @@ namespace BlazorChatApp.BLL.Infrastructure.Interfaces
         Task<Message> ReplyToGroup(ReplyToGroupModel model);
         Task<Message> ReplyToUser(ReplyToUserModel model);
         Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad);
+        Task<Image> GetImage(string userId);
     }
 }

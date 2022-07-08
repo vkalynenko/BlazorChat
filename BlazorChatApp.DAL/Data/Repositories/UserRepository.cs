@@ -29,21 +29,29 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
             if (image != null)
             {
-                _context.Images.Remove(image);
+                image.ImageUrl = model.ImageUrl;
+                _context.Images.Update(image);
             }
-            
-            if (!model.ImageUrl.IsNullOrEmpty())
+            else
             {
                 var newImage = new Image
                 {
                     ImageUrl = model.ImageUrl,
                     UserId = model.UserId,
-
                 };
 
-               await _context.Images.AddAsync(newImage);
-
+                await _context.Images.AddAsync(newImage);
             }
+        }
+
+        public async Task<string> GetImageLink(string userId)
+        {
+            var image = await _context.Images.FirstOrDefaultAsync(x => x.UserId == userId);
+            if (image == null)
+            {
+                return "https://storageaccountchatapp.blob.core.windows.net/images/avatar.png";
+            }
+            return image.ImageUrl;
         }
     }
 }

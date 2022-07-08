@@ -12,6 +12,8 @@ namespace BlazorChatApp.DAL.Domain.Entities
         public string UserId { get; set; }
         public string SenderName { get; set; }
         public bool IsItReply { get; set; }
+        public int ImageId { get; set; }
+        public Image Image { get; set; }
         public Message()
         {
             //DateTime time = DateTime.UtcNow;

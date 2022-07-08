@@ -3,7 +3,6 @@
 @using BlazorChatApp.DAL.Domain.Entities
 @using BlazorChatApp.BLL.Infrastructure.Interfaces
 @using BlazorChatApp.BLL.Contracts.DTOs
-@using BlazorChatApp.BLL.Models
 @using BlazorChatApp.BLL.RequestServices.Interfaces
 @using BlazorChatApp.DAL.Models
 @using Castle.Core.Internal
@@ -15,6 +14,7 @@
 @inject ReplyToUserModel ReplyToUserModel
 @inject IMessageService MessageService
 @inject IChatService ChatService
+@inject IUserService UserService
 @inject IRequestUserService RequestUserService
 @inject IToastService ToastService
 @inherits BaseComponent
@@ -49,10 +49,11 @@ else
                 <button type="submit" class="btn btn-outline-success" @onclick="() => ChangeSendToEdit(msg.Id, msg.MessageText, msg.UserId)">
                     <i class="fa fa-edit" style="font-size: 12px"></i>
                 </button>
-                
                 @if (msg.IsItReply)
                 {
-                    <header style="background-color: #e6dfe8"><img src="https://storageaccountchatapp.blob.core.windows.net/images/99649dab-aa34-497b-9e43-c10605a34f82%20%D0%B7%D0%B0%D0%B2%D0%B0%D0%BD%D1%82%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F.jfif" width="35" height="35"/>
+                    
+                    <header style="background-color: #e6dfe8"><img style="width:30px;height:30px; object-fit:cover; border-radius:30px" 
+                                                                   src="@msg.Image.ImageUrl" />
                         @msg.SenderName: </header>
                     <p style="background-color: #e6dfe8">
                         @msg.MessageText
@@ -61,7 +62,8 @@ else
                 }
                 else
                 {
-                    <header><img src="https://storageaccountchatapp.blob.core.windows.net/images/99649dab-aa34-497b-9e43-c10605a34f82%20%D0%B7%D0%B0%D0%B2%D0%B0%D0%BD%D1%82%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F.jfif" width="35" height="35"/>
+                    <header><img style="width:30px;height:30px; object-fit:cover; border-radius:30px"
+                                 src="@msg.Image.ImageUrl"/>
                         @msg.SenderName:
                     </header>
                     <p>
@@ -108,10 +110,11 @@ else
 {
     [Parameter]
     public int chatId { get; set; }
-    private bool isLoaded = false;
-    private bool showEditBtn = false;
-    private bool showReplyBtn = false;
-    private bool showReplyToUserBtn = false;
+    public string imageLink { get; set; }
+    private bool isLoaded;
+    private bool showEditBtn;
+    private bool showReplyBtn;
+    private bool showReplyToUserBtn;
 
     private int quantityToSkip = 0;
     private int quantityToLoad = 20;
@@ -120,7 +123,7 @@ else
     public bool IsConnected =>
         hubConnection?.State == HubConnectionState.Connected;
 
-    List<Message>? messages = new List<Message>();
+    List<Message>? messages = new();
     private DAL.Domain.Entities.Chat? chat = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -131,7 +134,7 @@ else
             {
                 var getCurrentChatResponse = await RequestChatService.GetCurrentChat(chatId);
                 CheckIfUserHasAccess(getCurrentChatResponse, async () => chat = getCurrentChatResponse.Chat);
-                messages = (List<Message>?) await MessageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
+                messages = (List<Message>?)await MessageService.GetMessages(chatId, quantityToSkip, quantityToLoad);
                 messages.Reverse();
                 isLoaded = true;
                 hubConnection = new HubConnectionBuilder()
@@ -153,7 +156,7 @@ else
                     messages.Remove(message);
                     InvokeAsync(StateHasChanged);
                 });
-                hubConnection.On<List<Message>>("ReceiveLoadedMessages", messageList =>
+                hubConnection.On<List<dynamic>>("ReceiveLoadedMessages", messageList =>
                 {
                     foreach (var message in messageList)
                         messages.Insert(0, message);

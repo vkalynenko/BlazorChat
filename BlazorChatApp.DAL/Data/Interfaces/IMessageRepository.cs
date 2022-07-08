@@ -10,10 +10,9 @@ namespace BlazorChatApp.DAL.Data.Interfaces
         Task<Message> FindMessage(int id);
         Task<Message> CreateMessage(int chatId, string message, string userName, string userId);
         Task<Message?> GetById(int id);
-        //Task<Message> ReplyToGroup(string newMessage, string oldMessage, string userName,
-        //    string currentName, string currentId, int chatId);
         Task<Message> ReplyToGroup(ReplyToGroupModel model);
         Task<Message> ReplyToUser(ReplyToUserModel model);
         Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad);
+        Task<Image> GetImage(string userId);
     }
 }

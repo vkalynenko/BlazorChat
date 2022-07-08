@@ -30,7 +30,7 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
                 return "Failed to create user!";
             }
 
-            var newUser = new IdentityUser{ UserName = model.UserName };
+            var newUser = new IdentityUser{ UserName = model.UserName};
             var result = await _userManager.CreateAsync(newUser, model.Password);
 
             if (result.Succeeded)
@@ -71,6 +71,19 @@ namespace BlazorChatApp.BLL.Infrastructure.Services
             catch
             {
                 return false;
+            }
+            
+        }
+
+        public async Task<string> GetImageLink(string userId)
+        {
+            try
+            {
+                return await _unitOfWork.User.GetImageLink(userId);
+            }
+            catch
+            {
+                return "https://storageaccountchatapp.blob.core.windows.net/images/avatar.png"; 
             }
             
         }

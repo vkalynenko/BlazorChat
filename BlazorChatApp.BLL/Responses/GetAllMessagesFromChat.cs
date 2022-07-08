@@ -4,6 +4,6 @@ namespace BlazorChatApp.BLL.Responses
 {
     public class GetAllMessagesFromChat :BaseResponse
     {
-        public Task<List<Message>?>? Messages { get; set; }
+        public Task<List<dynamic>?>? Messages { get; set; }
     }
 }
