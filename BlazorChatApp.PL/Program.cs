@@ -86,6 +86,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 
+
 builder.Services.AddHttpClient("Authorization",  client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);

@@ -28,8 +28,6 @@ namespace BlazorChatApp.BLL.Hubs
 
         public async Task SendMessage(int chatId, Message message)
         {
-            var image = await _messageService.GetImage(message.UserId);
-            message.Image = image;
             await Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", message);
         }
 

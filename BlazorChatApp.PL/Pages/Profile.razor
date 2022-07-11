@@ -57,15 +57,18 @@
 
     async Task OnChange(InputFileChangeEventArgs e)
     {
-        var files = e.GetMultipleFiles(); // get the files selected by the users
+        filesBase64.Clear();
+        StateHasChanged();
+        var files = e.GetMultipleFiles(); 
         
-            var resizedFile = await files[0].RequestImageFileAsync(files[0].ContentType, 640, 480); // resize the image file
-            var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
+            var resizedFile = await files[0].RequestImageFileAsync(files[0].ContentType, 512, 512); 
+            var buf = new byte[resizedFile.Size]; 
             using (var stream = resizedFile.OpenReadStream())
             {
-                await stream.ReadAsync(buf); // copy the stream to the buffer
+                await stream.ReadAsync(buf); 
             }
-            filesBase64.Add(new BrowserImageFile { Data = Convert.ToBase64String(buf), Type = files[0].ContentType, Name = files[0].Name }); // convert to a base64 string!!
+            filesBase64.Add(new BrowserImageFile { Data = Convert.ToBase64String(buf), Type = files[0].ContentType, 
+                Name = files[0].Name }); 
     }
 
     async Task Upload()
@@ -79,7 +82,7 @@
             {
                 if (response.IsSavingSuccessful)
                 {
-                    message = $"{filesBase64.Count} files uploaded";
+                    message = $"{filesBase64[0].Name} was uploaded";
                     ToastService.ShowSuccess("Upload was successful!");
                     filesBase64.Clear();
                     StateHasChanged();

@@ -25,20 +25,27 @@ namespace BlazorChatApp.PL.Controllers
         public async Task<Message> SendMessage(int chatId, string message)
         {
             try
+
             {
+                var userId = await GetUserId();
+                var userName = GetUserName();
+
                 if (message.IsNullOrEmpty())
                 {
                     return new Message();
                 }
+                var image = await _messageService.GetImage(userId);
                 var entity = new Message
                 {
                     ChatId = chatId,
                     MessageText = message,
-                    SenderName = GetUserName(),
+                    SenderName = userName,
+                    UserId = userId,
+                    Image = image,
                 };
                 bool result =
                     await _messageService.CreateMessage(chatId,
-                        message, GetUserName(), await GetUserId());
+                        message, userName,  userId);
 
                 if (result)
                 {

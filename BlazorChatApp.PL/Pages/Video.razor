@@ -1,0 +1,45 @@
+﻿@page "/video/{chatId:int}"
+@using BlazorChatApp.PL.Options
+
+<h1>Video conversation</h1>
+
+<div>
+    <canvas id="@options.CanvasID" 
+            style="background-color:lightskyblue;"
+            width="@options.Width"
+            height="360">
+    </canvas>
+</div>
+<div>
+    <button @onclick="Start">Start</button>
+</div>
+<div>
+    <video id="@options.VideoID"
+           style="background-color:lightblue; visibility:hidden;"
+           width="@options.Width">Video stream not available.
+    </video>
+</div>
+
+@code{
+
+    [Parameter]
+    public int chatId { get; set; }
+
+    WebCamOptions options = new() 
+    { 
+        CanvasID = "canvas",
+        VideoID = "video"
+    };
+
+    protected override void OnInitialized()
+    {
+        options.Filter = 
+            "contrast(1.4) sepia(0.2) blur(3px) saturate(200%) hue-rotate(200deg)";
+        options.Width = 480;
+    }
+
+    public async Task Start()
+    {
+        //await JSRuntime.InvokeVoidAsync("WebCamFunctions.start", options);
+    }
+}
