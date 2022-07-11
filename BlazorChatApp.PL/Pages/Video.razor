@@ -1,12 +1,12 @@
-﻿@page "/video/{chatId:int}"
+﻿@page "/video/{ChatId:int}"
 @using BlazorChatApp.PL.Options
-
+@inject IJSRuntime Js
 <h1>Video conversation</h1>
 
 <div>
-    <canvas id="@options.CanvasID" 
-            style="background-color:lightskyblue;"
-            width="@options.Width"
+    <canvas id="canvas" 
+            style="background-color:lightgray;"
+            width="@_options.Width"
             height="360">
     </canvas>
 </div>
@@ -14,32 +14,27 @@
     <button @onclick="Start">Start</button>
 </div>
 <div>
-    <video id="@options.VideoID"
-           style="background-color:lightblue; visibility:hidden;"
-           width="@options.Width">Video stream not available.
+    <video id="video" class="video"
+           style="background-color: lightblue; visibility: hidden;"
+           width="@_options.Width" autoplay="true">Video stream not available.
     </video>
+
 </div>
-
 @code{
-
     [Parameter]
-    public int chatId { get; set; }
+    public int ChatId { get; set; }
 
-    WebCamOptions options = new() 
+    readonly WebCamOptions _options = new() 
     { 
-        CanvasID = "canvas",
+        CanvasId = "canvas",
         VideoID = "video"
     };
-
     protected override void OnInitialized()
     {
-        options.Filter = 
-            "contrast(1.4) sepia(0.2) blur(3px) saturate(200%) hue-rotate(200deg)";
-        options.Width = 480;
+        _options.Width = 480;
     }
-
     public async Task Start()
     {
-        //await JSRuntime.InvokeVoidAsync("WebCamFunctions.start", options);
+        await Js.InvokeVoidAsync("WebCamFunctions.start", _options);
     }
 }

@@ -94,7 +94,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
         public async Task UpdateMessage(int id, string newMessage, string userId)
         {
             var entity = await FindMessage(id);
-            //var userName = _userManager.FindByIdAsync(userId).Result.UserName;
             var userName = _context.Users.FirstOrDefaultAsync(x => x.Id == userId).Result?.UserName;
             if (entity == null)
             {
@@ -117,10 +116,6 @@ namespace BlazorChatApp.DAL.Data.Repositories
 
         public async Task<IEnumerable<Message>> GetMessages(int chatId, int quantityToSkip, int quantityToLoad)
         {
-            //var test = from m in _context.Messages
-            //    join u in _context.Users on m.UserId equals u.Id
-            //    join i in _context.Images on u.Id equals i.UserId
-            //    select new {Message = m, Url = i.ImageUrl};
 
             var messages = await _context.Messages
                 .Include(x => x.Image)

@@ -73,7 +73,7 @@ namespace BlazorChatApp.DAL.Data.Repositories
         public async Task<int> GetChatIdByName(string chatName)
         {
             var entity = await _context.Chats.FirstOrDefaultAsync(x => x.ChatName == chatName);
-            return entity.Id;
+                return entity.Id;
         }
 
         public async Task<string> CreateNewPrivateChat(string rootId, string targetId)

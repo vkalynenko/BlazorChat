@@ -29,14 +29,14 @@ var builder = WebApplication.CreateBuilder(args);
 var uri = builder.Configuration["VaultUri"];
 var client = new SecretClient(new Uri(uri), new DefaultAzureCredential());
 var connectionString = await client.GetSecretAsync("ConnectionString");
-//var signalRConnection = await client.GetSecretAsync("SignalR");       //comment     
+//var signalRConnection = await client.GetSecretAsync("SignalRApp");       //comment     
 
 builder.Services.AddDbContext<BlazorChatAppContext>(options =>
     options.UseSqlServer(connectionString.Value.Value)); 
 builder.Services.AddLogging();
 builder.Services.AddRazorPages();
 
-builder.Services.AddSignalRCore();//.AddAzureSignalR(signalRConnection.Value.Value); //comment
+//builder.Services.AddSignalRCore().AddAzureSignalR(signalRConnection.Value.Value); //comment
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers().AddNewtonsoftJson(
     options => {
@@ -86,7 +86,6 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 
-
 builder.Services.AddHttpClient("Authorization",  client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Url:Route"]);
@@ -121,11 +120,6 @@ builder.Services.AddResponseCompression(opts =>
     opts.MimeTypes = ResponseCompressionDefaults
         .MimeTypes.Concat(new[] {"application/octet-stream"});
 });
-//builder.Services.AddAzureClients(clientBuilder =>
-//{
-//    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureBlobStorage:blob"], preferMsi: true);
-//    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureBlobStorage:queue"], preferMsi: true);
-//});
 
 var app = builder.Build();
 

@@ -9,7 +9,7 @@ namespace BlazorChatApp.DAL.Models
         public string? ImageUrl{ get; set; }
         public byte[]? Photo { get; set; }
         public string? UserId { get; set; }
-        public BrowserImageFile File { get; set; }
+        public BrowserImageFile? File { get; set; }
 
 
     }
